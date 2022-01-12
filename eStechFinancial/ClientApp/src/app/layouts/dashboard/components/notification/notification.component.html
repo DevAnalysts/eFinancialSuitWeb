@@ -1,0 +1,34 @@
+<!--<div class="card-body">
+    <div class="list-group">
+        <a *ngFor="let f of favourites" href="#" class="list-group-item clearfix d-block">
+            <i class="{{f.icon}}"></i> {{f.page_Name}}
+            <span class="float-right text-muted small"><em>estech</em></span>
+        </a>
+    </div>
+</div>-->
+<!--<div class="card-body">
+    <div class="list-group">
+        <a *ngFor="let f of favourites" href="#" class="list-group-item clearfix d-block">
+            <i class="{{f.icon}}"></i> {{f.page_Name}}
+            <span class="float-right text-muted small"><em>estech</em></span>
+        </a>
+
+    </div>
+</div>(close)="closeMenus(f)"-->
+
+<div class="row" style="padding-left:0px;">
+  <div *ngFor="let f of favourites;" href="#" class="list-group-item clearfix d-block" style="height: 50px;border:0px">
+    <p style="width:200px;background-color:#f1f1f1;padding-right:3px;border-radius:4px;">
+
+      <ngb-alert type="custom2" (close)="setFavourites(f.pageID)">
+        <div class="position" style="cursor:pointer;height:40px;width:180px;" (click)="changePages(f)">
+          
+            <img style="height:30px;width:30px" src="{{f.pageImg}}">
+            <b style="font-weight: 600;font-size:small;">{{f.pageName}}</b>          
+        </div>
+      </ngb-alert>
+    </p>
+  </div>
+
+ 
+</div>

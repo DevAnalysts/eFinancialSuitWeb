@@ -1,0 +1,236 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12" [style.display]="ShowGrid">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;">
+            {{permissionUtility.FUNCTIONALITYNAME}}
+          </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" placeholder="search..." [(ngModel)]="filter" id="filter"  class="form-control" />
+            <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open()">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+
+            <tr class="thclr">
+              <th style="width: 15%">ID</th>
+              <th style="width: 15%">Date</th>
+              <th style="width: 15%">Sub Category</th>
+              <th style="width: 15%">No of Items Adjusted</th>
+              <th style="width: 20%">Remarks</th>
+              <th style="width: 10%">Status</th>
+              <th style="width: 10%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let e of gridlist | filter:filter | paginate: { itemsPerPage: 14, currentPage: p, id:'1st'};">
+              <td>{{e.adjustmentcode}}</td>
+              <td>{{e.adjustmentdate}}</td>
+              <td>{{e.subcategoryname}}</td>
+              <td>{{e.noofitem}}</td>
+              <td>{{e.remarks}}</td>
+              <td>
+                <div *ngIf="e.status==0; then draft else saved"> </div>
+                <ng-template #draft>DRAFT</ng-template>
+                <ng-template #saved>
+                  <div *ngIf="e.status==1; then saved else cancel"> </div>
+                  <ng-template #saved>ADJUSTED</ng-template>
+                  <ng-template #cancel>CANCELLED</ng-template>
+                </ng-template>
+              </td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissionUtility.PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.adjustmentcode,content)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+        <pagination-controls id="1st" (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+
+    <div class="col-md-12" [style.display]="ShowModal">
+      <div class="modal-header">
+        <h5 class="modal-title" style="font-weight: bold;">
+          <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small  tip" id="myInput" (click)="show(1);">
+            <i class="fa fa-list"></i>
+          </button>
+          {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+        </h5>
+
+        <button type="button" class="close" aria-label="Close" (click)="routeInvoice();">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div id="alertWarning" style="display:none">
+        <p *ngFor="let alert of alerts">
+          <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+        </p>
+      </div>
+      <div class="modal-body">
+
+
+        <div class="row">
+          
+          <div class="col-sm-3" style="padding-left: 30px;">
+            <div class="form-group" style="width: 300px;">
+              <span>Adjustment Date:</span>
+              <div *ngIf="btnmode; then DateToOn else DateTooff"> </div>
+              <ng-template #DateToOn>
+                <div class="input-group" style="margin-top: 5px;">
+                  <input class="form-control" name="a" [(ngModel)]="adjustmentdate.model"
+                         displayMonths="1" navigation="none" ngbDatepicker #a="ngbDatepicker">
+                  <div class="input-group-append">
+                    <button class="btn btn-small" (click)="a.toggle()">
+                      <i class="fa fa-calendar" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+
+
+              </ng-template>
+              <ng-template #DateTooff>
+                <div class="input-group" style="margin-top: 5px;">
+                  <input class="form-control" name="a" [(ngModel)]="adjustmentdate.model"
+                         displayMonths="1" navigation="none" ngbDatepicker #a="ngbDatepicker" disabled="disabled">
+                  <div class="input-group-append">
+                    <button class="btn btn-small" (click)="a.toggle()">
+                      <i class="fa fa-calendar" aria-hidden="true"></i>
+                    </button>
+                  </div>
+                </div>
+              </ng-template>
+
+            </div>
+          </div>
+          
+          <div class="col-sm-3" style="padding-left: 30px;">
+            <div class="form-group" style="width: 300px;">
+              <span>Sub Category:</span>
+              <div *ngIf="btnmode; then CategoryOn else CategoryOff"> </div>
+              <ng-template #CategoryOn>
+                <select class="form-control"  style="margin-top: 5px;" [(ngModel)]="subcategorycode" id="subcategorycode" (change)="getItem(subcategorycode)">
+                  <option *ngFor="let o of subcategory" [value]="o.subcategorycode">{{o.subcategoryname}}</option>
+                </select>
+              </ng-template>
+              <ng-template #CategoryOff>
+                <select class="form-control" [(ngModel)]="subcategorycode" id="subcategorycode" (change)="getItem(subcategorycode)" disabled>
+                  <option *ngFor="let o of subcategory" [value]="o.subcategorycode">{{o.subcategoryname}}</option>
+                </select>
+              </ng-template>
+
+            </div>
+          </div>
+          <div class="col-md-4"></div>
+          
+          <div class="col-sm-2">
+            <input class="form-control" type="text" name="search" placeholder="search..." [(ngModel)]="filter2" style="float:right; width:200px;margin-top: 15px;">
+          </div>
+
+        </div>
+
+        <div class="row table-shadow-padding" style="height:450px;overflow-y:auto">
+          <table class="table table-hover table-striped table-shadow-padding" style="border-bottom:1px solid lightgray">
+            <thead>
+              <tr class="thclr">
+                <!--<th style="width: 5%">SR #</th>-->
+                <th style="width: 55%">Item Name</th>
+                <th style="width: 10%">System Qty</th>
+                <th style="width: 10%">Pending Qty</th>
+                <th style="width: 10%">Physical Qty</th>
+                <th style="width: 10%">Difference Qty</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>
+              <tr *ngFor="let e of items | filter:filter2 | paginate: { itemsPerPage: 50, currentPage: a , id:'2nd'};">
+                <!--| paginate: { itemsPerPage: 10, currentPage: a};let i = index-->
+                <!--<td>{{i + 1}}</td>-->
+                <td>{{e.item_Name}}</td>
+                <td>{{e.systemQty  | number: '1.2-5'}}</td>
+                <td>{{e.pendingQty  | number: '1.2-5'}}</td>
+                <td>
+                  <div *ngIf="btnmode; then AdjustAdd else AdjustUpdate"> </div>
+                  <ng-template #AdjustAdd>
+                    <input type="number" min="0" class="form-control" [(ngModel)]="e.physicalQty" id="physicalQty" (ngModelChange)="e.differenceQty = e.physicalQty - e.systemQty;checkStock(e.item_AdjustmentDetail_ID,e.physicalQty)">
+                  </ng-template>
+                  <ng-template #AdjustUpdate>
+                    <div *ngIf="itemadjuststatus==0; then UpdateDraft else UpdateAdjusted"> </div>
+                    <ng-template #UpdateDraft>
+                      <input type="number" min="0" class="form-control" [(ngModel)]="e.physicalQty" id="physicalQty" (ngModelChange)="e.differenceQty = e.physicalQty - e.systemQty;checkStock(e.item_AdjustmentDetail_ID,e.physicalQty)">
+                    </ng-template>
+                    <ng-template #UpdateAdjusted>
+                      <input type="number" min="0" class="form-control" [(ngModel)]="e.physicalQty" id="physicalQty" readonly>
+                    </ng-template>
+
+                  </ng-template>
+
+
+                </td>
+                <td>{{e.differenceQty  | number: '1.2-5'}}</td>
+                <td>
+                  <button class="btn btn-small btn-danger tip" type="button" id="remove" (click)="deleteRow(e.item_Code)">
+                    <span class="fa fa-remove text-white"></span>
+                  </button>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+
+
+        </div>
+        <div>
+          <pagination-controls id="2nd" (pageChange)="a = $event" style="float:right;"></pagination-controls>
+        </div>
+        <div class="row">
+          <div class="col-md-2">
+            <span>Remarks:</span>
+          </div>
+          <div class="col-md-8">
+            <fieldset class="form-group">
+              <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please type here..." class="form-control" style="height:auto;"
+                        rows="4"></textarea>
+            </fieldset>
+          </div>
+        </div>
+
+
+
+      </div>
+      <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+      <div class="modal-footer">
+        <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+        <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+        <ng-template #submitAdd>
+          <button id="submitAddAdjust" type="button" class="btn btn-small btn-warning tip" (click)="saveData(1);"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+          <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveData(0);"><i class="fa fa-file-text-o" aria-hidden="true"></i>Draft</button>
+        </ng-template>
+        <ng-template #submitUpdate>
+          <button id="cancel" type="button" class="btn btn-small btn-warning tip" style="left:10px;position:absolute;" (click)="cancelDraft();"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+          <button [style.display]="permissionUtility.PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateData();"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save</button>
+        </ng-template>
+        <button type="button" class="btn btn-small" (click)="routeInvoice();"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+      </div>
+    </div>
+
+
+</div>
+<!-- End Row -->

@@ -1,0 +1,369 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header" style="height: auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> {{permissomUtility.FUNCTIONALITYNAME}}
+          </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group">
+            <input type="text" style="margin:1px;" #input (keydown.enter)="$event.target.blur()" (blur)="orderDetails(input.value)" [(ngModel)]="id" id="id"
+              placeholder="search..." class="form-control" />
+            <div class="input-group-append order-last">
+              <button [style.display]="permissomUtility.PermissionAdd" style="margin: 2px;"
+                class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Supply #</th>
+              <th>Order #</th>
+              <th>Supply Date</th>
+              <th>Customer Name</th>
+              <!--<th>Order #</th>-->
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner> -->
+            <tr *ngFor="let dt of order  | paginate: { itemsPerPage: 14, currentPage: p, id:'1st'};">
+              <td>{{dt.goods_Supply_ID}}</td>
+              <td>{{dt.supply_NO}}</td>
+              <td>{{dt.sO_NO}}</td>
+              <td>{{dt.supply_Date | date:"dd/MM/yy"}} </td>
+              <td>{{dt.customer_Name}}</td>
+              <!--<td>{{dt.saleorder}}</td>-->
+              <td>{{dt.cancel}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissomUtility.PermissionEdit" class="btn btn-small btn-warning tip"
+                    (click)="getDetailsByID(dt.goods_Supply_ID,content)" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                  <!--<button class="btn btn-small btn-danger tip" data-original-title="Remove" type="button" value="Delete" (click)="getDetailsByID(dt.purchase_Order_ID)"
+                          id="remove">
+                    <span class="fa fa-trash"></span>
+                  </button>-->
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls id="1st" (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissomUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-1">
+
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Date:</span>
+            <div class="input-group" style="width: 330px;">
+              <input class="form-control" name="dp" [(ngModel)]="supply_Date.model" ngbDatepicker #dd="ngbDatepicker"
+                (ngModelChange)="changeGDDate($event)">
+              <div class="input-group-append" style="margin-top: 5px;">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div> 
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Sale Officer:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-male" style="margin-top: 5px;" aria-hidden="true"></i>
+              <select id="order_Envoy" class="form-control" [(ngModel)]="order_Envoy">
+                <option *ngFor="let u of users" [value]="u.order_Envoy">{{u.emp_Name}}</option>
+              </select>
+            </div>
+          </div>
+        </div> 
+        
+      </div>
+      <div class="row">
+        <div class="col-md-1" id="lblOrder">
+
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Customer:</span>
+            <div class="inner-addon left-addon" style="margin-left:30px;margin-top: 5px;">
+              <i class="fa fa-group" aria-hidden="true"></i>
+              <ng-select2 [data]="customers" id="customer_ID" [value]="customer_ID" (valueChanged)="changeCustomer($event)"
+                [width]="300">
+              </ng-select2>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3" id="Order">
+          <div class="form-group">
+            <span>Order:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-list-alt" style="margin-top: 5px;" aria-hidden="true"></i>
+              <select id="sale_Order_ID" [(ngModel)]="sale_Order_ID" (change)="changeOrder(customer_ID,sale_Order_ID)"
+                class="form-control">
+                <option *ngFor="let o of orders" [value]="o.sale_Order_ID">{{o.sO_NO}}</option>
+              </select>
+            </div>
+          </div>
+        </div> 
+        
+        <div class="col-md-1">
+          <div *ngIf="allowOW; then lblO "> </div>
+          <ng-template #lblO>
+
+          </ng-template>
+        </div>
+        <div class="col-md-2">
+          <div *ngIf="allowOW; then selO "> </div>
+          <ng-template #selO>
+            <div class="form-group">
+              <span>Office:</span>
+              <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+                <i class="fa fa-building" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                <input type="text" class="form-control" [(ngModel)]="officE_NAME" id="officE_NAME" readonly="readonly">
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-1" id="lblOrder">
+
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Driver:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-male" style="margin-top:5px ;" aria-hidden="true"></i>
+              <input type="text" maxlength="100" (keypress)="valid.onlyAlphabet($event)" class="form-control" [(ngModel)]="driver" id="driver" tabindex="2">
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3" id="Order">
+          <div class="form-group">
+            <span>Vehicle/Bilty #:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-truck" style="margin-top: 5px;" aria-hidden="true"></i>
+              <input type="text" maxlength="100" onkeypress="return event.charCode>=48 && event.charCode<=57 || event.charCode>=65 && event.charCode<=90 || event.charCode>=97 && event.charCode<=122" class="form-control" [(ngModel)]="vehicle" id="vehicle" tabindex="2">
+            </div>
+          </div>
+        </div> 
+        <div class="col-md-3" id="Order">
+          <div class="form-group">
+            <span>Dispatch From:</span>
+            <div class="inner-addon left-addon" style="width: 300px; margin-left: 30px;">
+              <i class="fa fa-barcode" style="margin-top: 5px;" aria-hidden="true"></i>
+              <input type="text" maxlength="100" onkeypress="return event.charCode>=48 && event.charCode<=57 || event.charCode>=65 && event.charCode<=90 || event.charCode>=97 && event.charCode<=122" class="form-control" [(ngModel)]="dispatchFrom" id="dispatchFrom" tabindex="2">
+            </div>
+          </div>
+        </div>
+        <div class="col-md-1">
+          <div *ngIf="allowOW; then lblW "> </div>
+          <ng-template #lblW>
+
+          </ng-template>
+        </div>
+        <div class="col-md-2">
+          <div *ngIf="allowOW; then selW "> </div>
+          <ng-template #selW>
+            <div class="form-group">
+              <span>Warehouse:</span>
+              <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+                <i class="fa fa-building" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                <input type="text" class="form-control" [(ngModel)]="warehouse" id="warehouse" readonly="readonly">
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+
+
+      <div class="row table-shadow-padding">
+
+
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:98%;">
+
+            <tr class="thclr row">
+
+              <th style="width:2%;margin-left:15px">Sr#.</th>
+              <th style="width:32%">Item</th>
+              <th style="width:8%">
+                <div *ngIf="hideStock; then lblstock "> </div>
+                <ng-template #lblstock>
+                  <span ng-show="hideStock">Stock</span>
+                </ng-template>
+              </th>
+              <th style="width:9%">
+                <div *ngIf="hidePending; then lblPending "> </div>
+                <ng-template #lblPending>
+                  <span ng-show="hidePending">Pending</span>
+                </ng-template>
+              </th>
+              <th style="width:10%">Order Quantity</th>
+              <th style="width:13%">Delievered Quantity</th>
+              <th style="width:14%">Supply Quantity</th>
+              <th style="width:10%">Action</th>
+            </tr>
+          </thead>
+          <tbody style="height: 200px;overflow: hidden scroll;display: block;width:100%;">
+            <tr
+              *ngFor="let i of GoodsSupplyDetails | paginate: { itemsPerPage: 50, currentPage: g, id:'2nd'} ; let idx = index"
+              class="row">
+              <td style="width:2%;margin-left:15px">{{(idx+1)+(g-1)*50}}</td>
+              <td style="width:32%">
+                <span>{{i.item_Name}}</span>
+                <span>{{i.item_Code}}</span>
+                <div *ngIf="i.scheme=='1'; then packet"> </div>
+                <ng-template #packet>
+                  - PACKET
+                </ng-template>
+              </td>
+              <td style="width:8%">
+                <div *ngIf="hideStock; then stock "> </div>
+                <ng-template #stock>
+                  <span ng-show="hideStock"> {{i.stock_Qty}}</span>
+                </ng-template>
+              </td>
+              <td style="width:9%">
+                <div *ngIf="hidePending; then pen "> </div>
+                <ng-template #pen>
+                  <span ng-show="hidePending"> {{i.pending}}  {{unitList[i.uoM].unit}}</span>
+                </ng-template>
+              </td>
+              <td style="width:10%">
+                <span> {{i.order_Qty}} {{unitList[i.uoM].unit}}</span>
+              </td>
+              <td style="width:13%">
+                {{i.accepted_Qty}} {{unitList[i.uoM].unit}}
+              </td>
+              <td style="width:14%">
+                <input type="number" onClick="this.select();" [(ngModel)]="i.quantity" style="width: 60%;" class="form-control" min="1"
+                  (change)="changeQuantity(i,i.item_Code,i.order_Qty,i.quantity,i.stock_Qty)" />{{unitList[i.uoM].unit}}
+              </td>
+              <td style="width:10%">
+                <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button"
+                  value="Delete" id="remove" (click)="changeMode(idx,i,2)">
+                  <span class="fa fa-remove text-white"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+
+      </div>
+      <pagination-controls id="2nd" (pageChange)="g = $event" style="float:right;"></pagination-controls>
+
+      <div class="row">
+        <div class="col-md-3">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-5">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-align-justify" aria-hidden="true"></i>
+            <fieldset class="form-group">
+              <textarea [(ngModel)]="remarks" id="de" name="textarea" placeholder="Please text here..."
+                class="form-control" style="height:auto;" rows="4"></textarea>
+            </fieldset>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+    <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner> -->
+    <div class="modal-footer">
+      <div class="row" style="position: absolute;left: 30px;">
+        <div *ngIf="mode; then submitcancel "> </div>
+        <ng-template #submitcancel>
+          <!--Cancel Invoice-->
+          <button [style.display]="permissomUtility.PermissionDelete" type="button" id="cancelBtn"
+            style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="cancelGDN();"><i
+              class="fa fa-minus-square-o" aria-hidden="true"></i>Cancel</button>
+        </ng-template>
+        <!--RDLC Show-->
+        <button type="button" id="viewRDLC" style="cursor:pointer; margin-left:5px; padding: 6px 7px;"
+          class="btn btn-small btn-warning tip" (click)="onNavigate('/gdn-rpt-rdlc')">
+          <img src="../../../../../../assets/images/icon/report.png" >
+        </button>
+        <!--Excel Show-->
+        <button type="button" id="viewExcel" style="cursor:pointer; margin-left:5px;"
+          class="btn btn-small btn-warning tip" (click)="onNavigate('/gdn-rpt-excel')"><i
+            class="fa fa-file-excel-o"></i></button>
+            <div class="col-md-2" style="margin-top: 5px;" [style.display]="templateshow">
+
+              <select [(ngModel)]="templatecode" id="templatecode">
+                <option *ngFor="let u of companytemplate " [value]="u.templatecode">{{u.templatename}}</option>
+              </select>
+    
+            </div>
+      </div>
+
+
+      <!--Show Order View-->
+      <div id="viewBtn">
+        <span>Show</span>
+        <input type="checkbox" id="isView" name="isView" [(ngModel)]="isView" />
+      </div>
+      <div *ngIf="mode; then submitUpdate else  submitAdd "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip"
+          (click)="saveOrder( goods_Supply_ID, '', supply_Date, customer_ID, sale_Order_ID, '', 1,order_Envoy, remarks, guid, 0)">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button [style.display]="permissomUtility.PermissionEdit" id="submitUpdate" type="button"
+          class="btn btn-small btn-warning tip"
+          (click)="updateOrder( goods_Supply_ID, '', supply_Date, customer_ID, sale_Order_ID, '', 1,order_Envoy, remarks, guid, 0)">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+
+      <!--Cancel-->
+      <button type="button" class="btn btn-small" id="x" (click)="c('Close click')"><i class="fa fa-window-close-o"
+          aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>

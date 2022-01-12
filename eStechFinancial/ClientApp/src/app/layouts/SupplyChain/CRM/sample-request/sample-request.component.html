@@ -1,0 +1,1046 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text"  #input (keydown.enter)="$event.target.blur()" (blur)="getCustomers(input.value)" [(ngModel)]="ID"
+              id="ID" placeholder="search..." class="form-control" />
+             
+            <div class="btn-group">
+ 
+              <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button> 
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="isLoading"
+        style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Customer #</th>
+              <th>Customer Name</th>
+              <th>Refrence No</th>
+              <th>Heel Type</th>
+              <th>Fabric Type</th>
+              <th>Customer Registration</th>
+              <th>Required Quantity</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of customers  | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.customer_ID}}</td>
+              <td>{{dt.customerNo}}</td>
+              <td>{{dt.customer_Name}}</td>
+              <td>{{dt.phone}}</td>
+              <td>{{dt.cell}}</td>
+              <td>{{dt.contact_Name}}</td>
+              <td>{{dt.netPayable}}</td>
+              <td>{{dt.status}}</td>
+              <!-- <td *ngIf="dt.status==true">Active</td>
+              <td *ngIf="dt.status==false">Disabled</td> -->
+              <td>
+                <div class="btn-group" style="float:right; "> 
+                  <button [style.display]="permissionUtility.PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.customer_ID,content)" id="view">
+                    <span class="fa fa-eye"></span>
+                  </button>
+                </div>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.customer_ID,content)" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header"> 
+      <span style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYDETAILNAME}} </span>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>   
+      <div class="modal-body" style="overflow-y: scroll; height: 75vh;">
+          <div class="row">
+            <div class="col-md-12">
+
+              <h4>Product Information</h4>
+            </div> 
+          </div> 
+          <div class="row">
+          <div class="col-md-6" >
+            <div class="row"> 
+              <div class="col-md-5">
+                <div class="form-group">
+                  <span>Customer:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-user" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+ 
+                    <input type="text" tabindex="1" (keypress)="valid.onlyAlphabet($event)" class="form-control" maxlength="40" [pattern]="'^[A-Za-z0-9.() ]+$'" [(ngModel)]="customer_Name" id="customer_Name" (change)="changeCustomerName(customer_Name);" placeholder="Customer"  />
+ 
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-1">
+                
+              </div>
+              <div class="col-md-5">
+                <div class="form-group">
+                  <span>Ref No:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-address-book-o" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                    <input type="number" tabindex="2" maxlength="100" class="form-control" [(ngModel)]="refNo" id="refNo"  >
+                  </div>
+
+                </div>
+              </div> 
+            </div>
+            <div class="row"> 
+              <div class="col-md-5">
+                <div class="form-group">
+                  <span>Style:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-paint-brush" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                    <input type="text" tabindex="3" class="form-control" maxlength="100" [(ngModel)]="style" id="style" >
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-1">
+                
+              </div>
+              <div class="col-md-5">
+                <div class="form-group"> 
+                  <span>Fabric Type:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-at" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i> 
+                    <select class="form-control" [(ngModel)]="fabric_type" id="fabric_type">
+                        <option *ngFor="let d of departments " [value]="d.dept_Id">{{d.dept_Name}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div> 
+              
+            </div> 
+            <div class="row"> 
+              <div class="col-md-5">
+                <div class="form-group">
+                  <span>Heel Type:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-thumb-tack" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                    <input type="text" tabindex="3" class="form-control" maxlength="100" [(ngModel)]="heel_type" id="heel_type" >
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-1">
+                
+              </div>
+              <div class="col-md-5">
+                <div class="form-group">
+                  <span>Needle:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-thumb-tack" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                    <input type="text" tabindex="3" class="form-control" maxlength="100" [(ngModel)]="needle" id="needle" >
+                  </div>
+                </div>
+              </div> 
+            </div> 
+            <div class="row">
+               
+              <div class="col-md-5">
+                <div class="form-group">
+                  <span>Customer Reg:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-user" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                    <input type="text" tabindex="7" class="form-control" [(ngModel)]="customer_reg" id="customer_reg" maxlength="12" 
+                         >
+                  </div> 
+                </div>
+              </div> 
+            </div>
+            <div class="row"> 
+              <div class="col-md-8">
+                <div class="form-group">
+                  <span>Remarks:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+                    <i class="fa fa-align-justify" aria-hidden="true"></i>
+                    <fieldset class="form-group" >
+                      <textarea [(ngModel)]="remarks" tabindex="28" id="remarks" name="textarea" placeholder="Please text here..."
+                        class="form-control" style="height:auto;" rows="4"></textarea>
+                    </fieldset>
+                  </div>
+                </div> 
+              </div>
+              </div>
+          </div> 
+          <div class="col-md-6" >
+            <div class="row"> 
+              <div class="col-md-5">
+                <div class="form-group">
+                  <span>Base Color:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-paint-brush" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                    <input type="number" class="form-control" [(ngModel)]="color" id="color" tabindex="15">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-1">
+                
+              </div>
+              <div class="col-md-5">
+                <div class="form-group">
+                  <span>Yarn Availability:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-credit-card" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                    <input type="number" class="form-control" [(ngModel)]="availiability" id="availiability" tabindex="15">
+                  </div>
+                </div>
+              </div> 
+            </div>
+            <div class="row"> 
+              <div class="col-md-5">
+                <div class="form-group" >
+                  <span>Cust. Size:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-balance-scale" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                    <input type="text" class="form-control" maxlength="40" [(ngModel)]="size" id="size" tabindex="17">
+                  </div>
+
+                </div>
+              </div>
+              <div class="col-md-1">
+                
+              </div>
+              <div class="col-md-5">
+                <div class="form-group">
+                  <span>Required Qty:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-linode" style="margin-top: 5px;" aria-hidden="true"></i>
+                    <input type="text" class="form-control" maxlength="40" [(ngModel)]="reqQty" id="reqQty" tabindex="17">
+                  </div>
+                </div>
+              </div> 
+            </div>
+            <div class="row"> 
+              <div class="col-md-5"> 
+                  <div class="form-group">
+                    <span>Request Date</span>
+                    <div class="input-group" style="width: 255px;">
+                      <input class="form-control" name="a" id="frmdt" maxlength="10"  [(ngModel)]="date.model" ngbDatepicker #a="ngbDatepicker">
+                      <div class="input-group-append" style="margin-top: 5px;">
+                        <button class="btn btn-small " (click)="a.toggle()">
+                          <i class="fa fa-calendar" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div> 
+              </div> 
+              <div class="col-md-1">
+                
+              </div>
+              <div class="col-md-5">
+                <div class="form-group">
+                  <span>Cycle Time:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;">
+                    <i class="fa fa-clock-o" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                    <input type="text" class="form-control" maxlength="40" [(ngModel)]="cycle_time" id="cycle_time" tabindex="20">
+                  </div>
+
+                </div>
+              </div> 
+            </div>
+            <div class="row"> 
+              <div class="col-md-5"> 
+                <div class="form-group">
+                  <span>Required Date</span>
+                  <div class="input-group" style="width: 255px;">
+                    <input class="form-control" name="a" id="frmdt" maxlength="10"  [(ngModel)]="date.model" ngbDatepicker #a="ngbDatepicker">
+                    <div class="input-group-append" style="margin-top: 5px;">
+                      <button class="btn btn-small " (click)="a.toggle()">
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                  </div>
+                </div> 
+            </div> 
+
+              <div class="col-md-1">
+                
+              </div>
+              <div class="col-md-5"> 
+                  <div class="form-group">
+                    <span>Rev. Req. Date</span>
+                    <div class="input-group" style="width: 255px;">
+                      <input class="form-control" name="a" id="frmdt" maxlength="10"  [(ngModel)]="date.model" ngbDatepicker #a="ngbDatepicker">
+                      <div class="input-group-append" style="margin-top: 5px;">
+                        <button class="btn btn-small " (click)="a.toggle()">
+                          <i class="fa fa-calendar" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </div>
+                  </div> 
+              </div> 
+            </div>
+            <div class="row" style="margin-top: 10px;"> 
+              <div class="col-md-8">
+                <div class="form-group">
+                  <span>Remarks:</span>
+                  <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+                    <i class="fa fa-align-justify" aria-hidden="true"></i>
+                    <fieldset class="form-group" >
+                      <textarea [(ngModel)]="remarks" tabindex="28" id="remarks" name="textarea" placeholder="Please text here..."
+                        class="form-control" style="height:auto;" rows="4"></textarea>
+                    </fieldset>
+                  </div>
+                </div> 
+              </div>
+              </div>
+          </div>
+          </div> 
+          <div class="row">
+            <div class="col-md-6">
+
+              <h4>Greige Specs</h4>
+            </div> 
+            <div class="col-md-6">
+
+              <h4>Other Information</h4>
+            </div> 
+          </div>
+        <div class="row">
+           <!--Table Grid-->
+          <div class="col-md-6" >
+            
+              <table class="table table-bordered">
+                <thead >
+                  <tr > 
+                    <th style="width:20%">Description</th>
+                    <th style="width:20%">Length</th>
+                    <th style="width:20%">Width</th>
+                    <th style="width:20%">Strech</th>
+                  </tr>
+                </thead>
+                <tbody>
+      
+                        <tr  >
+                           <td style="width:20%">
+                            <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                          </td>
+                          <td style="width:20%">
+                            <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                          </td>
+                          <td style="width:20%;"> 
+                            <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                          </td>
+                          <td style="width:20%;"> 
+                            <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                          </td>
+                        
+                        </tr> 
+                        <tr  >
+                          <td style="width:20%">
+                           <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                         </td>
+                         <td style="width:20%">
+                           <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                         </td>
+                         <td style="width:20%;"> 
+                           <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                         </td>
+                         <td style="width:20%;"> 
+                           <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                         </td>
+                       
+                       </tr> 
+                       <tr  >
+                        <td style="width:20%">
+                         <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </td>
+                       <td style="width:20%">
+                         <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </td>
+                       <td style="width:20%;"> 
+                         <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                       </td>
+                       <td style="width:20%;"> 
+                         <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                       </td>
+                     
+                     </tr> 
+                     <tr  >
+                      <td style="width:20%">
+                       <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                     </td>
+                     <td style="width:20%">
+                       <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                     </td>
+                     <td style="width:20%;"> 
+                       <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                     </td>
+                     <td style="width:20%;"> 
+                       <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                     </td>
+                   
+                   </tr> 
+                   <tr  >
+                    <td style="width:20%">
+                     <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                   </td>
+                   <td style="width:20%">
+                     <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                   </td>
+                   <td style="width:20%;"> 
+                     <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                   </td>
+                   <td style="width:20%;"> 
+                     <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                   </td>
+                 
+                 </tr> 
+                </tbody>
+              </table> 
+            
+          </div>
+          <!--Table Grid-->
+          <div class="col-md-6">
+            <table class="table table-border">
+              <tbody> 
+                  <tr class="row">
+                    <td class="col-md-3">
+                      <span>Welt Construction:</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="form-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-paint-brush" style="font-size:medium" aria-hidden="true"></i> -->
+                          <input type="number" class="form-control" [(ngModel)]="color" id="color" tabindex="15">
+                        </div>
+                      </div>
+                    </td>
+                    <td class="col-md-3">
+                      <span>Processing Type:</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="form-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-credit-card" style="font-size:medium" aria-hidden="true"></i> -->
+                          <input type="number" class="form-control" [(ngModel)]="availiability" id="availiability" tabindex="15">
+                        </div>
+                      </div>
+                    </td> 
+                  </tr>
+                  <tr class="row">
+                    <td class="col-md-3">
+                      <span>Rib Construction:</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="form-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-balance-scale" style="font-size:medium" aria-hidden="true"></i> -->
+                          <input type="text" class="form-control" maxlength="40" [(ngModel)]="size" id="size" tabindex="17">
+                        </div>
+      
+                      </div>
+                    </td>
+                    <td class="col-md-3">
+                      <span>Recipe Code:</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="form-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-linode" aria-hidden="true"></i> -->
+                          <input type="text" class="form-control" maxlength="40" [(ngModel)]="reqQty" id="reqQty" tabindex="17">
+                        </div>
+                      </div>
+                    </td> 
+                  </tr>
+                  <tr class="row">
+                    <td class="col-md-3">
+                      <span>Arch Construction:</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="input-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-linode" aria-hidden="true"></i> -->
+                          <input type="text" class="form-control" maxlength="40" [(ngModel)]="reqQty" id="reqQty" tabindex="17">
+                        </div>
+                      </div>
+                    </td> 
+                    <td class="col-md-3">
+                      <span>Pre Boarding:</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="form-group">
+                        <div class="inner-addon left-addon">
+                         <!--  <i class="fa fa-clock-o" style="font-size:medium" aria-hidden="true"></i> -->
+                          <input type="text" class="form-control" maxlength="40" [(ngModel)]="cycle_time" id="cycle_time" tabindex="20">
+                        </div>
+      
+                      </div>
+                    </td> 
+                  </tr>
+                  <tr class="row">
+                    <td class="col-md-3">
+                      <span>Linking Type:</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="input-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-linode" aria-hidden="true"></i> -->
+                          <input type="text" class="form-control" maxlength="40" [(ngModel)]="reqQty" id="reqQty" tabindex="17">
+                        </div>
+                      </div>
+                    </td>
+      
+                    <td class="col-md-3">
+                      <span>Pre Boarding Form</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="input-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-linode" aria-hidden="true"></i> -->
+                          <input type="text" class="form-control" maxlength="40" [(ngModel)]="reqQty" id="reqQty" tabindex="17">
+                        </div>
+                      </div>
+                    </td> 
+                  </tr>
+                  <tr class="row">
+                    <td class="col-md-3">
+                      <span>Boarding Type:</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="input-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-linode" aria-hidden="true"></i> -->
+                          <input type="text" class="form-control" maxlength="40" [(ngModel)]="reqQty" id="reqQty" tabindex="17">
+                        </div>
+                      </div>
+                    </td>
+      
+                    <td class="col-md-3">
+                      <span>Press Temperature</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="input-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-linode" aria-hidden="true"></i> -->
+                          <input type="text" class="form-control" maxlength="40" [(ngModel)]="reqQty" id="reqQty" tabindex="17">
+                        </div>
+                      </div>
+                    </td> 
+                  </tr>
+                  <tr class="row">
+                    <td class="col-md-3">
+                      <span>Boarding Form:</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="input-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-linode" aria-hidden="true"></i> -->
+                          <input type="text" class="form-control" maxlength="40" [(ngModel)]="reqQty" id="reqQty" tabindex="17">
+                        </div>
+                      </div>
+                    </td>
+      
+                    <td class="col-md-3">
+                      <span>Press Time</span>
+                    </td>
+                    <td class="col-md-3">
+                      <div class="input-group">
+                        <div class="inner-addon left-addon">
+                          <!-- <i class="fa fa-linode" aria-hidden="true"></i> -->
+                          <input type="text" class="form-control" maxlength="40" [(ngModel)]="reqQty" id="reqQty" tabindex="17">
+                        </div>
+                      </div>
+                    </td> 
+                  </tr> 
+              </tbody>             
+            </table>
+          </div>
+          
+          
+        </div>
+        <div class="row">
+          <div class="col-md-9"> 
+            <h4>Finished Specs</h4>
+          </div> 
+          <div class="col-md-3">
+
+            <h4>Picture</h4>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-9">
+            <table class="table table-bordered">
+              <thead >
+                <tr > 
+                  <th style="width:20%">Analysis Description</th>
+                  <th style="width:20%">
+                    <div class="row">
+                      <div class="col" style="text-align:center">Length</div>
+                    </div>
+                    <div class="row" >
+                      <div class="col-6" style="text-align:center;">Required </div>
+                      <div class="col-6" style="text-align:center">Acheived</div>
+                    </div>
+                  </th>
+                  <th style="width:20%">
+                    <div class="row">
+                      <div class="col" style="text-align:center">Width</div>
+                    </div>
+                    <div class="row" >
+                      <div class="col-6" style="text-align:center;">Required </div>
+                      <div class="col-6" style="text-align:center">Acheived</div>
+                    </div>
+                  </th>
+                  <th style="width:20%">
+                    <div class="row">
+                      <div class="col" style="text-align:center">Stretch</div>
+                    </div>
+                    <div class="row" >
+                      <div class="col-6" style="text-align:center;">Required </div>
+                      <div class="col-6" style="text-align:center">Acheived</div>
+                    </div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody> 
+                    <tr  >
+                        <td style="width:20%">
+                        <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      </td>
+                      <td style="width:20%">
+                        <div class="row" style="margin: 0 auto;">
+                          <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                          <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                        </div> 
+                      </td>
+                      <td style="width:20%;"> 
+                        <div class="row" style="margin: 0 auto;">
+                          <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                          <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                        </div> 
+                      </td>
+                      <td style="width:20%;"> 
+                        <div class="row" style="margin: 0 auto;">
+                          <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                          <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                        </div> 
+                      </td>
+                    
+                    </tr> 
+                     <tr  >
+                        <td style="width:20%">
+                         <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </td>
+                       <td style="width:20%">
+                         <div class="row" style="margin: 0 auto;">
+                           <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                           <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                         </div> 
+                       </td>
+                       <td style="width:20%;"> 
+                         <div class="row" style="margin: 0 auto;">
+                           <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                           <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                         </div> 
+                       </td>
+                       <td style="width:20%;"> 
+                         <div class="row" style="margin: 0 auto;">
+                           <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                           <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                         </div> 
+                       </td>
+                     
+                     </tr> 
+                     <tr  >
+                      <td style="width:20%">
+                       <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                     </td>
+                     <td style="width:20%">
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                     <td style="width:20%;"> 
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                     <td style="width:20%;"> 
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                   
+                     </tr> 
+                     <tr  >
+                      <td style="width:20%">
+                       <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                     </td>
+                     <td style="width:20%">
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                     <td style="width:20%;"> 
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                     <td style="width:20%;"> 
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                   
+                     </tr> 
+                     <tr  >
+                      <td style="width:20%">
+                       <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                     </td>
+                     <td style="width:20%">
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                     <td style="width:20%;"> 
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                     <td style="width:20%;"> 
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                   
+                     </tr> 
+                     <tr  >
+                      <td style="width:20%">
+                       <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                     </td>
+                     <td style="width:20%">
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                     <td style="width:20%;"> 
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                     <td style="width:20%;"> 
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                   
+                     </tr>
+                     <tr  >
+                      <td style="width:20%">
+                       <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                     </td>
+                     <td style="width:20%">
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                     <td style="width:20%;"> 
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                     <td style="width:20%;"> 
+                       <div class="row" style="margin: 0 auto;">
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />&nbsp;
+                         <input type="number" style="width:47%"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                       </div> 
+                     </td>
+                   
+                     </tr> 
+              </tbody>
+            </table> 
+          </div>
+          <div class="col-sm-3">
+            <div class="form-group"> 
+              <div class="image-upload">
+                <label for="file">
+                  <img [src]="imageUrl" style="width:20vw;height:20vw;position: absolute;cursor:pointer">
+                </label> 
+                <input id="file" type="file" accept="image/*" (change)="handleFileInput($event.target.files)" style="display:none" />
+              </div>
+            </div>
+          </div> 
+        </div>
+
+
+
+
+        <div class="row">
+          <div class="col-md-12"> 
+            <h4>Yarn Detail</h4>
+          </div> 
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <table class="table table-bordered">
+              <thead >
+                <tr > 
+                  <th style="width:16.5%">Yarn Description</th>
+                  <th style="width:16.5%">Greige Quantity</th>
+                  <th style="width:16.5%">%</th>
+                  <th style="width:16.5%">Weight</th>
+                  <th style="width:16.5%">Yarn Specification</th>
+                  <th style="width:16.5%">Play</th>
+                </tr>
+              </thead>
+              <tbody> 
+                    <tr  >
+                        <td style="width:16.5%">
+                        <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      </td>
+                      <td style="width:16.5%">
+                        <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      </td>
+                      <td style="width:16.5%"> 
+                        <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                      </td>
+                      <td style="width:16.5%"> 
+                        <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                      </td>
+                      <td style="width:16.5%">
+                        <div class="form-group">
+                          <input type="text" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                          <input type="text" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                        </div> 
+                      </td>
+                      <td style="width:16.5%">
+                        <div class="form-group">
+                          <input type="number" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                          <input type="number" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                        </div>
+                      </td>
+                    
+                    </tr> 
+                    <tr  >
+                      <td style="width:16.5%">
+                        <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      </td>
+                      <td style="width:16.5%">
+                        <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      </td>
+                      <td style="width:16.5%"> 
+                        <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                      </td>
+                      <td style="width:16.5%"> 
+                        <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                      </td>
+                      <td style="width:16.5%">
+                      <div class="form-group">
+                        <input type="text" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                        <input type="text" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      </div>
+                      </td>
+                      <td style="width:16.5%">
+                      <div class="form-group">
+                        <input type="number" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                        <input type="number" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      </div>
+                      </td>
+                    
+                    </tr>  
+                    <tr  >
+                    <td style="width:16.5%">
+                      <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:16.5%"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:16.5%">
+                    <div class="form-group">
+                      <input type="text" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      <input type="text" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </div>
+                    <div class="form-group">
+                      <input type="number" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </div>
+                    </td>
+                    <td style="width:16.5%">
+                    <div class="form-group">
+                      <input type="number" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      <input type="number" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </div>
+                    <div class="form-group">
+                      <input type="number" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </div>
+                    </td>
+                  
+                    </tr>  
+                    <tr  >
+                    <td style="width:16.5%">
+                      <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:16.5%"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="text"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                  
+                    </tr> 
+                    <tr  >
+                    <td style="width:16.5%">
+                      <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:16.5%"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="text"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                  
+                    </tr> 
+                    <tr  >
+                    <td style="width:16.5%">
+                      <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:16.5%"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:16.5%">
+                    <div class="form-group">
+                      <input type="text" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      <input type="text" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </div>
+                    </td>
+                    <td style="width:16.5%">
+                    <div class="form-group">
+                      <input type="number" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                      <input type="number" style="width: 98%;"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </div>
+                    </td>
+                  
+                    </tr> 
+                    <tr  >
+                    <td style="width:16.5%">
+                      <input type="text" readonly id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:16.5%"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="text"  id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:16.5%">
+                      <input type="number" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                  
+                    </tr>
+              </tbody>
+            </table> 
+          </div>
+        </div>
+        
+      </div>
+          <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+         
+    <div class="modal-footer" >
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnMode; then submitAdd else  submitUpdate "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" tabindex="31" class="btn btn-small btn-warning tip"
+          (click)="saveCustomer(customer_ID, customer_Name, nTN, contact_Name, phone, fax, email, website, contact_Phone, contact_Cell, balance, remarks, credit_Limit, balance_Type_ID, credit_Hold_ID, payment_Term_ID, freight_Term_ID, industary_ID, ownership_ID,line1, line2, line3,status, customerCode)">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+ 
+        <button [style.display]="permissionUtility.PermissionEdit"  id="submitUpdate" type="button" tabindex="32" class="btn btn-small btn-warning tip" (click)="updateCustomer( customer_ID, customer_Name, nTN, contact_Name, phone, fax, email, website, contact_Phone, contact_Cell, balance, remarks, credit_Limit, balance_Type_ID, credit_Hold_ID, payment_Term_ID, freight_Term_ID, industary_ID, ownership_ID,line1, line2, line3,status, customerCode)">
+ 
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+      <button id="x" type="button" class="btn btn-small" (click)="c('Close click')" tabindex="33"><i
+          class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div> 
+    
+
+  </ng-template>
+</div>
+
+

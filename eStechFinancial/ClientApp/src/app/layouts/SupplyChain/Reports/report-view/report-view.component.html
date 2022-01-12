@@ -1,0 +1,54 @@
+<div>
+
+  <table id="datatable" class="table">
+    <thead>
+      <tr style="background:#fafafa;">
+        <th *ngFor="let c of columns" [hidden]="c.column_IsVisible==false" [style.minwidth]="c.column_Width" style="border:1px solid #525252;font-size-adjust:0.58; font-weight:bold; font-size-adjust:.4;">  {{c.title}}</th>
+
+      </tr>
+    </thead>
+    <tbody [hidden]="reportType==1">
+      <tr style="font-weight:bold;" scope="row" [hidden]="rows!=null">
+        <td style="text-align:center; font-weight:bold; font-size:24pt;" [attr.ColSpan]="columns.length">
+          {{message}}
+        </td>
+      </tr>
+      <tr *ngFor="let row of rows" scope="row" [hidden]="rows==null">
+
+
+
+        <td *ngFor="let c of columns" style="border:1px solid #525252;" [attr.RowSpan]="( c.column_IsGroup==true  && row['GRowNumber']==1 ?row['GNoOfRows']:1) " [hidden]="( ((c.column_IsGroup==true  && row['GRowNumber']>1) || c.column_IsVisible==false)? true:false)  " [style.minwidth]="c.column_Width">
+          <span>{{ row[c.dataKey] }}</span>
+
+        </td>
+
+      </tr>
+      <tr>
+
+        <td *ngFor="let  c of columns ; let i = index" style="font-weight:bold;" [hidden]=" c.column_IsVisible==false"><span [hidden]="(0==i)==false" style="text-align:right;">Total:</span><span [hidden]="( c.column_IsTotal==false)"> {{getSum(rows,c.dataKey)}}</span></td>
+      </tr>
+    </tbody>
+    <tbody [hidden]="reportType==2">
+      <tr style="font-weight:bold;" scope="row" [hidden]="rows!=null">
+        <td style="text-align:center; font-weight:bold; font-size:24pt;" [attr.ColSpan]="columns.length">
+          {{message}}
+        </td>
+      </tr>
+      <tr *ngFor="let row of rows" scope="row" [hidden]="rows==null">
+
+
+
+        <td *ngFor="let c of columns" style="border:1px solid #525252;" [hidden]="(c.column_IsVisible==false? true:false)  " [style.minwidth]="c.column_Width">
+          <span>{{ row[c.dataKey] }}</span>
+
+        </td>
+
+      </tr>
+      <tr>
+
+        <td *ngFor="let  c of columns ; let i = index" style="font-weight:bold;" [hidden]=" c.column_IsVisible==false"><span [hidden]="(0==i)==false" style="text-align:right;">Total:</span><span [hidden]="( c.column_IsTotal==false)"> {{getSum(rows,c.dataKey)}}</span></td>
+      </tr>
+    </tbody>
+  </table>
+  
+</div>

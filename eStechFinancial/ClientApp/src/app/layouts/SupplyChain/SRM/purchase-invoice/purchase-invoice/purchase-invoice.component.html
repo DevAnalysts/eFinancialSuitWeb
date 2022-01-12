@@ -1,0 +1,482 @@
+<!-- Row -->
+<div class="row">
+
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissomUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" #input (keydown.enter)="$event.target.blur()" (blur)="getInvoices(input.value)" [(ngModel)]="id" id="id" placeholder="search..." class="form-control" />
+
+            <button [style.display]="permissomUtility.PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+
+            <tr class="thclr">
+              <th>ID </th>
+              <th>Invoice No</th>
+              <th>Order No</th>
+              <th>Supplier Name</th>
+              <th>Invoice Date</th>
+              <th>Total Cost</th>
+              <th>Total Discount</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+              <th> </th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of invoices  | paginate: { itemsPerPage: 14, currentPage: p ,id:'1st'};">
+              <td>{{dt.purchase_Invoice_ID}}</td>
+              <td>{{dt.invoice_NO}}</td>
+              <td>{{dt.pO_NO}}</td>
+              <td>{{dt.supplier_Name}}</td>
+              <td>{{dt.invoice_Date | date:"dd/MM/yyyy"}} </td>
+              <td>{{dt.total_Cost  | number: '1.2-5'}}</td>
+              <td>{{dt.total_Discount  | number: '1.2-5'}}</td>
+              <td>{{dt.total_Amount  | number: '1.2-5'}}</td>
+              <td>{{dt.cancel}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissomUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="getInvoiceDetailsByID(dt.purchase_Invoice_ID,content)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                  <!--<button class="btn btn-small btn-danger tip" data-original-title="Remove" type="button" value="Delete" (click)="getDetailsByID(dt.purchase_Order_ID)"
+                          id="remove">
+                    <span class="fa fa-trash"></span>
+                  </button>-->
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls id="1st" (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissomUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+      <div class="row" style="padding-bottom:5px;">
+        <div class="col-md-2">
+          <span>Date:</span>
+        </div>
+        <div class="col-md-2">
+          <span>Due Date:</span>
+        </div>
+        <div class="col-md-6" style="text-align:right">
+          <span>Balance:</span>
+        </div>
+        <div class="col-md-2">
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="invoice_Date.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="changeInvoiceDate($event)">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group" >
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="delivery_Date.model" ngbDatepicker #ddd="ngbDatepicker"
+                (ngModelChange)="changeDeliveryDate($event)">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="ddd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6" style="text-align:right">
+          <span style="font-size:30px;font-weight:600">PKR {{TotalAmount() | number: '1.2-5'}}</span>
+        </div>
+        <div class="col-md-2"></div>
+      </div>
+      <div class="row" style="padding-bottom:5px;">
+        <div class="col-md-4">
+          <span>Supplier:</span>
+        </div>
+        <div class="col-md-2">
+          <span>Order:</span>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-md-4" style="padding-left:40px">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-group" style="font-size:medium" aria-hidden="true"></i>
+              <ng-select2 [data]="suppliers" [value]="supplier_ID" (valueChanged)="changeSupplier($event)" [width]="400">
+              </ng-select2>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2" style="padding-left: 40px;">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-list-alt  " style="font-size:medium" aria-hidden="true"></i>
+              <select id="purchase_Order_ID" [(ngModel)]="PendingOrderListID" (change)="changeOrder(PendingOrderListID)" class="form-control">
+                <option *ngFor="let o of orders" [value]="o.id">{{o.pO_NO}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row table-shadow-padding">
+
+        <table class="table table-hover table-striped table-shadow" style="width:100%">
+          <thead style="display: block;width:98%;">
+
+            <tr class="thclr row">
+              <th style="width:4%;margin-left:15px">Sr#.</th>
+              <th style="width:25%">Item</th>
+              <th style="width:5%">
+                <div *ngIf="hideStock; then lblstock else lblstock1"> </div>
+                <ng-template #lblstock>
+                  <span ng-show="hideStock">Stock</span>
+                </ng-template>
+              </th>
+              <th style="width:10%">Unit Cost</th>
+              <th style="width:7%">Quantity</th>
+              <th style="width:10%">Cost</th>
+              <th style="width:7%">Disc. Rate</th>
+              <th style="width:7%">Discount </th>
+              <th style="width:7%">
+                <div *ngIf="hide; then lbltaxrate else lbltaxrate1"> </div>
+                <ng-template #lbltaxrate>
+                  <span ng-show="hide">Tax Rate</span>
+                </ng-template>
+              </th>
+              <th style="width:5%">
+                <div *ngIf="hide; then lbltax else lbltax1"> </div>
+                <ng-template #lbltax>
+                  <span ng-show="hide">Tax</span>
+                </ng-template>
+              </th>
+              <th style="width:11%">Net Amount</th>
+            </tr>
+          </thead>
+          <tbody style="min-height: 300px;max-height: 500px;overflow: hidden scroll;display: block;width:100%;">
+            <tr *ngFor="let i of PurchaseInvoiceDetail  | paginate: { itemsPerPage: 50, currentPage: g, id:'2nd'} ; let idx = index" class="row">
+              <td style="width:4%;margin-left:15px">{{(idx+1)+(g-1)*50}}</td>
+              <td style="width:25%">
+                <span>{{i.item_Name}}</span>
+                <span>{{i.item_Code}}</span>
+              </td>
+              <td style="width:5%">
+                <div *ngIf="hideStock; then stock else stock1"> </div>
+                <ng-template #stock>
+                  <span ng-show="hideStock"> {{i.stock_Qty}}</span>
+                </ng-template>
+              </td>
+              <td style="width:10%">
+                <span>{{i.unit_Price}}</span>
+              </td>
+              <td style="width:7%">
+                {{(i.quantity)}} {{getUnitName(i.unit_ID)}}
+              </td>
+              <td style="width:10%">
+                {{(i.unit_Price * i.quantity) | number:'1.2-5'}}
+                <!--{{(i.purchase_Cost) | number:'1.2-5'}}-->
+              </td>
+              <td style="width:7%">
+                <input type="number" onClick="this.select();" [(ngModel)]="i.discount_Rate" class="form-control" (change)="changeDiscountRate(i,i.discount_Rate)" style="width:70%" />
+              </td>
+              <td style="width:7%">
+                {{i.discount_Amount|  number:'1.2-5'}}
+              </td>
+              <td style="width:7%">
+                <div *ngIf="hide; then tax22 else tax33"> </div>
+                <ng-template #tax22>
+
+
+                  <select class="form-control" [(ngModel)]="i.taxrateid" disabled="disabled">
+                    <option *ngFor="let i of taxrateList " [value]="i.taxrateid">{{i.taxratename}}</option>
+                  </select>
+
+                </ng-template>
+              </td>
+              <td style="width:5%">
+                <div *ngIf="hide; then taxa else taxa1"> </div>
+                <ng-template #taxa>
+                  <span ng-show="hide"> {{i.tax_Amount | number:'1.2-5'}}</span>
+                </ng-template>
+              </td>
+              <td style="width:11%">
+                <div *ngIf="hide; then lblNet else lblNet1"> </div>
+                <ng-template #lblNet>
+                  {{i.net_Amount | number:'1.2-5'}}
+                </ng-template>
+                <ng-template #lblNet1>
+                  {{i.net_Amount | number:'1.2-5'}}
+                </ng-template>
+                <!--<ng-template #lblNet>
+                  {{(((i.quantity * i.unit_Price) - ((i.quantity) * (i.unit_Price) * (i.discount_Rate)/100)) + ((i.quantity * i.unit_Price) -  ((i.quantity * i.unit_Price) * i.discount_Rate/100))/100 * i.tax_Rate) | number:'1.2-5'}}
+                </ng-template>
+                <ng-template #lblNet1>
+                  {{(i.quantity) * (i.unit_Price) - ((i.quantity) * (i.unit_Price) * (i.discount_Rate)/100) | number:'1.2-5'}}
+                </ng-template>-->
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+      <pagination-controls id="2nd" (pageChange)="g = $event" style="float:right;"></pagination-controls>
+      <div class="modal-footer"></div>
+      <div class="row">
+        <div class="col-md-1">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-5" style="padding-left:20px">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-align-justify  " style="font-size:medium" aria-hidden="true"></i>
+            <fieldset class="form-group">
+              <textarea [(ngModel)]="remarks" id="de" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                        rows="4"></textarea>
+            </fieldset>
+          </div>
+        </div>
+        <div class="col-md-3">
+
+        </div>
+        <div class="col-md-3">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <span>Total Amount:</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-money  " style="font-size:medium" aria-hidden="true"></i>
+                  <input class="form-control" [ngModel]="TotalCost()   | number : '1.2-5'" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <span>Total Discount:</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-money  " style="font-size:medium" aria-hidden="true"></i>
+
+                  <input class="form-control" [ngModel]="TotalDiscount()   | number : '1.2-5'" readonly />
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row" id="lblTotalTax">
+            <div class="col-md-6">
+              <div class="form-group">
+                <span>Total Tax:</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-money  " style="font-size:medium" aria-hidden="true"></i>
+                  <input class="form-control" [ngModel]="TotalTax()   | number : '1.2-5'" readonly />
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <span>(+)Freight:</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-money  " style="font-size:medium" aria-hidden="true"></i>
+                  <input type='number' onClick="this.select();" class="form-control" [(ngModel)]="freight_Chrgs" min="0" (change)="changeFreight(freight_Chrgs)" />
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <span>Net Amount:</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-money  " style="font-size:medium" aria-hidden="true"></i>
+                  <input class="form-control" [ngModel]="TotalAmount()   | number : '1.2-5'" readonly />
+                </div>
+
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="row" [style.display]="ShowAttachment">
+        <div class="col-sm-2">
+          <div class="form-group">
+            <span>Attachment:</span>
+          </div>
+        </div>
+      </div>
+      <div class="row" [style.display]="ShowAttachment">
+
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="image-upload">
+              <!--<input type="button" class="btn" id="uploadFile" value="Upload" onclick="document.getElementById('file-input').click();" />-->
+              <label for="file-input">
+                <img [src]="imageUrl" style="width:100px;height:100px;position: absolute;cursor:pointer">
+              </label>
+              <input id="file-input" type="file" (change)="handleFileInput($event.target.files)" style="display:none;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-10">
+
+          <table class="table table-hover table-striped table-shadow">
+            <thead style="display: block;width:98%;">
+              <!--<tr class="thclr row">
+                <th style="width:4%;margin-left:15px">Sr#.</th>
+                <th style="width:83%">Attachments</th>
+                <th style="width:10%"></th>
+              </tr>-->
+            </thead>
+            <tbody style="height: 100px;overflow: hidden scroll;display: block;width:100%;">
+              <tr *ngFor="let i of attachments let idx = index" class="row">
+                <td style="width:4%;margin-left:15px">{{idx+1}}</td>
+                <td style="width:83%;cursor:pointer;" (click)="getAttachmentByID(i.fileId)">
+                  {{i.fileName}}
+                </td>
+                <td style="width:10%">
+                  <div class="btn-group" style="float:right; ">
+                    <button class="btn btn-small btn-warning tip" (click)="getAttachmentByID(i.fileId)">
+                      <span class="fa fa-eye"></span>
+                    </button>
+                    <button class="btn btn-small btn-danger tip" data-original-title="Remove" type="button" value="Delete" [style.display]="permissomUtility.PermissionEdit" (click)="cancelFile(i.fileId)"
+                            id="remove">
+                      <span class="fa fa-trash"></span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div style="position: absolute; left: 30px">
+        <!--Cancel Invoice-->
+        <div *ngIf="mode; then submitcancel "> </div>
+        <ng-template #submitcancel>
+          <button [style.display]="permissomUtility.PermissionDelete" type="button" id="cancelBtn" class="btn btn-small btn-warning tip" (click)="cancelInvoice()"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Cancel</button>
+        </ng-template>
+        <button type="button" id="viewVoucherRDLC" title="View Voucher" class="btn btn-small btn-warning tip"
+        style="cursor:pointer; margin-left:5px;padding: 6px 7px;" (click)="onVoucherNavigate('/gv-rpt-rdlc')"> <i
+          class="fa fa-file"></i></button> 
+            
+      </div>
+      <!--Exchange Check-->
+      <div id="ex">
+        <span>Exchange</span>
+        <input type="checkbox" id="exchange" name="exchange" [(ngModel)]="exchange" />
+      </div>
+      <!--Show Invoice View-->
+      <div id="viewBtn" style="display:none">
+        <span>Show</span>
+        <input type="checkbox" id="isView" name="isView" [(ngModel)]="isView" />
+        <button type="button" id="viewIcon" class="fa fa-eye" style="cursor:pointer" routerLink="/supply-chain-reports" newtab></button>
+      </div> 
+       <!--show voucher-->
+       <div *ngIf="showVoucher; then showv"> </div>
+       <ng-template #showv>
+         <div id="showVoucher">
+           <span>Show Voucher </span>
+           <input type="checkbox" id="showVoucher" [disabled]="DisablevoucherCheckBox" name="showVoucher" [(ngModel)]="showVoucher" />
+         </div>
+       </ng-template>
+      <!--GRN Show-->
+      <div id="showGRN">
+        <span> GRN</span>
+        <input type="checkbox" name="allowInvoice" [(ngModel)]="allowInvoice" (change)="changeGRN(allowInvoice)" id="checkboxGRN" />
+      </div>
+      <div *ngIf="mode; then submitUpdate else  submitAdd "> </div>
+      <ng-template #submitAdd>
+        <!--Save-->
+        <button id="submitAddMore" type="button" class="btn btn-small btn-warning tip" (click)="saveMoreInvoice(purchase_Invoice_ID, invoice_Date, 1,1,supplier_ID, purchase_Order_ID, TotalCost(), TotalDiscount(), TotalTax(),freight_Chrgs, TotalAmount(), 0, 0, remarks)"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & New</button>
+        <!--Save-->
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveInvoice(purchase_Invoice_ID, invoice_Date, 1,1,supplier_ID, purchase_Order_ID, TotalCost(), TotalDiscount(), TotalTax(),freight_Chrgs, TotalAmount(), 0, 0, remarks)"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <!--Update-->
+        <button [style.display]="permissomUtility.PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateInvoice(purchase_Invoice_ID, invoice_Date, 1,1,supplier_ID, purchase_Order_ID, TotalCost(), TotalDiscount(), TotalTax(),freight_Chrgs, TotalAmount(), 0, 0, remarks)"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close.</button>
+      </ng-template>
+
+
+      <!--Cancel-->
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click')"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>

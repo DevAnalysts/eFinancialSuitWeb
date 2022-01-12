@@ -1,0 +1,247 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input (keyup)="getBranches(input.value)" [(ngModel)]="ID" id="ID" placeholder="search..." class="form-control" />
+            <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>Branch ID</th>
+              <th>Bank</th>
+              <th>Branch</th>
+              <th>Branch Code</th>
+              <th>Phone</th>
+              <th>Email</th>
+              <th>Contact Person</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>
+            <tr *ngFor="let dt of bankBranches| paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.brancH_CODE}}</td>
+              <td>{{dt.banK_NAME }}</td>
+              <td>{{dt.brancH_NAME }}</td>
+              <td>{{dt.brancH_CODE_NAME }}</td>
+              <td>{{dt.phone}}</td>
+              <td>{{dt.email}}</td>
+              <td>{{dt.contactPerson}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" id="edit" (click)="getDetailsByID(dt.brancH_CODE,content)">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                  <button [style.display]="permissionUtility.PermissionView" class="btn btn-small btn-warning tip" id="view" (click)="getDetailsByID(dt.brancH_CODE,content)">
+                    <span class="fa fa-eye"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-8">
+          <h6>Branch Information:</h6>
+        </div>
+        <div class="col-md-4">
+          <h6>Address Information:</h6>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Bank Name:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="banK_CODE" id="banK_CODE" tabindex="1">
+              <option *ngFor="let b of banks " [value]="b.banK_CODE">{{b.banK_NAME}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-4"></div>
+        <div class="col-sm-2">
+          <span>Line 1:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" required minlength="5" maxlength="40" [(ngModel)]="line1" id="line1" tabindex="9">
+          </div>
+        </div>
+
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Branch Name:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" minlength="3" maxlength="30" required maxlength="100" (keypress)="valid.onlyAlphabet($event)" [(ngModel)]="brancH_NAME" id="brancH_NAME" tabindex="2">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Branch Code:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="brancH_CODE_NAME" id="brancH_CODE_NAME" tabindex="3">
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span>Line 2:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" maxlength="50" [(ngModel)]="line2" id="line2" tabindex="10">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Phone #:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" minlength="11" maxlength="12" placeholder="xxxx-xxxxxxx" mask="0000-0000000" [(ngModel)]="phone" id="phone" tabindex="4" required>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Mobile #:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" minlength="11" maxlength="12" placeholder="xxxx-xxxxxxx" mask="0000-0000000" [(ngModel)]="mobile" id="mobile" tabindex="5" required>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span>Line 3:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" maxlength="50" [(ngModel)]="line3" id="line3" tabindex="11">
+          </div>
+        </div>
+
+
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Email:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="email" class="form-control" maxlength="30" placeholder="text@text.com" email [(ngModel)]="email" id="email" tabindex="6">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Contact Person:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" maxlength="50" [(ngModel)]="contactPerson" id="contactPerson" tabindex="7">
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span>City:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <ng-select2 [data]="city" id="citycode" [value]="citymodel" (valueChanged)="getCityChange($event)" [width]="195" tabindex="12">
+            </ng-select2>
+          </div>
+        </div>
+      </div>
+      <!--<div class="row">
+        <div class="col-md-2">
+          <span>Address:</span>
+        </div>
+        <div class="col-md-6">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="address" id="remarks" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+      </div>-->
+      <div class="row">
+        <div class="col-md-2">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-6">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto; "
+                      rows="4" tabindex="8"></textarea>
+          </fieldset>
+        </div>
+        <div class="col-sm-2">
+          <span>Province:</span>
+          <br />
+          <br />
+          <br />
+          <div style="margin-top:-10px">Country:</div>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="provincename" id="provincename" readonly="readonly" tabindex="13">
+            <br />
+            <input type="text" class="form-control" [(ngModel)]="countryname" id="countryname" readonly="readonly" tabindex="14">
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+    <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+    <div class="modal-footer">
+      <div *ngIf="mode; then submitUpdate else submitAdd "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveBranches()" tabindex="14">
+          Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button [style.display]="permissionUtilityPermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateBranches()" tabindex="14">
+          Save & Close
+        </button>
+      </ng-template>
+      <button type="button" class="btn btn-small" (click)="c('Close click')" tabindex="15">Close</button>
+    </div>
+  </ng-template>
+</div>

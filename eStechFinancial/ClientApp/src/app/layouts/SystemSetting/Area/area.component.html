@@ -1,0 +1,126 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div [class]="card1style">
+      <div class="row  card-header" style="height:40px;">
+        <div class="col-md-10" style="padding-top:5px;">
+          <div class="page-title-list">
+
+
+            <span style="font-size:large;font-weight:bold;">       {{PermissionUtility.FUNCTIONALITYNAME}} </span>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" name="search" placeholder="search..." [(ngModel)]="ID" style="float:left; width:100px;margin:3px;">
+            <button class=" btn btn-small btn-warning tip" style="margin:3px;" (click)="Add()"  [style.display]="PermissionUtility.PermissionAdd">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div></div>
+        </div>
+        <div class="card-body table-responsive" style="padding:5px;">
+          <table class="table table-hover table-striped" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176)">
+            <thead>
+              <tr class="thclr">
+                <th>ID</th>
+                <th>Name</th>
+                <th>Details</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of subject  | paginate: { itemsPerPage: 20, currentPage: p};">
+                <td>{{u.areA_CODE}}</td>
+                <td>{{u.name}}</td>
+                <td>{{u.details}}</td>
+                <td>
+                  <div *ngIf="true == u.status; then on else off"></div>
+
+                  <ng-template #on>
+                    <input type="checkbox" [checked]="checked" pointer-events="none" disabled="disabled" style="margin-top: 8px;">
+                  </ng-template>
+                  <ng-template #off>
+                    <input type="checkbox" [checked]="unchecked" pointer-events="none" disabled="disabled" style="margin-top: 8px;">
+                  </ng-template>
+                  <div class="btn-group" style="float:right; " [style.display]="PermissionUtility.PermissionEdit"  >
+                    <button class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.areA_CODE);Edit();" id="edit">
+                      <span class="fa fa-pencil"></span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+        </div>
+      </div>
+      <div [class]="card2style" style="padding:0px;margin:0px;border:0px;" [style.display]="card2display">
+        <div class="card-header" style="height:40px;">
+          <div class="page-title-list"> 
+            <span style="font-size:large;font-weight:bold;">{{PermissionUtility.FUNCTIONALITYDETAILNAME}}</span>
+          </div>
+        </div>
+        <div class="card-body" style="margin-top:20px;">
+          <div class='container-fluid'>
+            <div class='row'> 
+              <div class="col-md-8">
+                <div class="form-group">
+                  <span>Area Name</span>
+                  <input type="text" class="form-control" [(ngModel)]="name" id="name">
+                </div>
+              </div>
+            </div>
+            <div class='row'> 
+              <div class="col-sm-8">
+                <div class="form-group">
+                  <span>City</span>
+                  <ng-select2 [data]="city" id="citymodel" [value]="citymodel" (valueChanged)="getCityChange($event)" [width]="360">
+                  </ng-select2>
+                </div>
+              </div>
+            </div>
+            <div class='row'>
+              <div class="col-sm-8">
+                <div class="form-group">
+                  <span>Office</span>
+                  <ng-select2  [data]="office" id="officemodel" [value]="officemodel" [width]="360">
+                  </ng-select2>
+                </div>
+                </div> 
+              </div>
+              <div class='row'>
+                <div class="col-sm-8">
+                  <div class="form-group">
+                    <span>Detail</span>
+                    <input type="text" class="form-control" [(ngModel)]="details" id="details">
+                  </div>
+                </div>
+              </div>
+              <div class='row'>
+
+                <div class="col-md-8">
+                  <div class="form-group">
+                    <span>Status</span>
+                    <input type="checkbox" [(ngModel)]="statuS" id="statuS" />
+                  </div>
+                </div>
+              </div>
+              <div class='row'>
+                <div class="col-md-4"></div>
+                <div class="col-md-6">
+                  <button type="button" class=" btn" style="float:right;margin:3px;" (click)="Cancel()"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+                  <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp1"
+                          (click)="saveArea(name,  details,statuS,officeId)">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>  Save
+                  </button>
+                  <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp2"
+                          (click)="UpdateArea(name, citymodel, details, statuS,officemodel)">
+                    <i class="fa fa-floppy-o" aria-hidden="true"></i>   Save
+                  </button>
+                </div>
+              </div>
+
+            </div>
+          </div>
+  </div></div></div>
+

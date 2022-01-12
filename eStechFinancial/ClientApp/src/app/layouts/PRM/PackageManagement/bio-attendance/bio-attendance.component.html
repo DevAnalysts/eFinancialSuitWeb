@@ -1,0 +1,153 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" name="search" placeholder="search..." #input (keydown.enter)='$event.target.blur()' (blur)="getGrid(input.value)" [(ngModel)]="id"
+              style="float:left; width:100px;margin:3px 0px 3px 3px;">
+            <button [style.display]="PermissionAdd" class=" btn btn-small btn-warning tip" style="margin:3px 3px 3px 0px;"
+              id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th style="width: 5%">ID</th>
+              <th style="width: 28%">Name</th>
+              <th style="width: 15%">Office</th>
+              <th style="width: 15%">Date</th>
+              <th style="width: 15%">Hours</th>
+              <th style="width: 15%">Minutes</th>
+              <th style="width: 5%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>
+            <tr *ngFor="let e of gridlist    | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{e.attendanceId}}</td>
+              <td>{{e.employee}}</td>
+              <td>{{e.office}}</td>
+              <td>{{e.attendanceDate  | date:"dd/MM/yyyy" }}</td>
+              <td>{{e.totalHours  }}</td>
+              <td>{{e.totalMinutes  }}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView" class="btn btn-small btn-warning tip"
+                    (click)="getDetailsByID(e.attendanceDate,e.attendanceId,content)" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Attendance Date:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="attendanceDate.model" ngbDatepicker #dd="ngbDatepicker"
+                (ngModelChange)="changeDate()">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12" style="border:ridge;padding-right:0px;padding-left:0px">
+        <div #dvScroll style="min-height: 500px; overflow-y: auto;-ms-overflow-style: -ms-autohiding-scrollbar;">
+          <table class="table table-hover table-striped" style="width:100%">
+            <thead>
+              <tr class="thclr">
+                <th style="width:2%">Sr.#</th>
+                <th style="width:15%">Date</th>
+                <th style="width:20%">Employee</th>
+                <th style="width:15%">Check In</th>
+                <th style="width:15%">Check Out</th>
+                <th style="width:10%">Hours </th>
+                <th style="width:10%">Minutes</th>
+                <th style="width:10%">Total Minutes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let i of attendanceDetail let idx = index">
+                <td>{{idx+1}}</td>
+                <td>
+                  <input type="text" class="form-control" [(ngModel)]="i.attendanceDate" name="attendanceDate"
+                    readonly />
+                </td>
+                <td>
+                  <input type="text" class="form-control" [(ngModel)]="i.employee" name="employee" readonly />
+                </td>
+                <td>
+                  <span class="form-control">{{i.checkInTime |  date:'dd/MM/yyyy @ h:mma'}} </span>
+                </td>
+                <td> <span class="form-control">{{i.checkOutTime |  date:'dd/MM/yyyy @ h:mma'}} </span>
+                </td>
+                <td>
+                  <input type="number" class="form-control" [(ngModel)]="i.hours" name="hours" readonly />
+                </td>
+                <td>
+                  <input type="number" class="form-control" [(ngModel)]="i.minutes" name="minutes" readonly />
+                </td>
+                <td>
+                  <input type="number" class="form-control" [(ngModel)]="i.totalMinutes" name="totalMinutes" readonly />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+
+      <button id="submitAdd" type="button" tabindex="45" class="btn btn-small btn-warning tip" (click)="saveData()">
+        Save & Close
+      </button>
+
+
+      <button type="button" id="x" class="btn btn-small" tabindex="46" (click)="c('Close click')">Close</button>
+    </div>
+  </ng-template>
+
+</div>

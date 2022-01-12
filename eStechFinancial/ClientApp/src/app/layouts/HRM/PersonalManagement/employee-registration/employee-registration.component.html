@@ -1,0 +1,716 @@
+
+<div class="card mb-3">
+
+  <div class="row card-header">
+    <div class="col-md-10" style="height: auto;">
+      <span class="input-group" style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+    </div>
+    <div class="col-md-2">
+      <div class="input-group">
+        <input class="form-control" type="text" name="search" placeholder="search..." #input (keydown.enter)='$event.target.blur()' (blur)="getEmployees(input.value)" [(ngModel)]="id" style="margin:1px;">
+       <div class="input-group-append order-last">
+        <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip" style="margin: 1px 0px 1px 0px" id="myInput" (click)="open(content)">
+          <i class="fa fa-plus"></i>
+        </button>
+       </div>        
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+    <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+  </div>
+  <div class="card-body table-responsive table-shadow-padding">
+    <table class="table table-hover table-striped table-shadow">
+      <thead>
+        <tr class="thclr">
+          <th>ID</th>
+          <th>Name</th>
+          <th>Father Name</th>
+          <th>CNIC</th>
+          <th>Designation</th>
+          <th>Department</th>
+          <th>Office</th>
+          <th>Joining Date</th>
+          <th>Status</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr *ngFor="let e of emplist   | paginate: { itemsPerPage: 14, currentPage: p};">
+          <td>{{e.empcode}}</td>
+          <td>{{e.empname}}</td>
+          <td>{{e.fathername}}</td>
+          <td>{{e.cnic}}</td>
+          <td>{{e.designation}}</td>
+          <td>{{e.department}}</td>
+          <td>{{e.office}}</td>
+          <td>{{e.joiningdate}}</td>
+          <td>{{getEmpStatus(e.empstatus)}}</td>
+          <td>
+            <div class="btn-group" style="float:right; ">
+              <button [style.display]="permissionUtility.PermissionView" style="padding:  6px 7px;" class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.empcode,content)"
+                      id="view">
+                <span><img src="../../../../../../assets/images/icon/report.png" ></span>
+              </button>
+            </div>
+            <div class="btn-group" style="float:right; ">
+              <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.empcode,content)"
+                      id="edit">
+                <span class="fa fa-pencil"></span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+<pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h5 class="modal-title" style="font-weight: bold;">
+      <span style="font-size:large;font-weight:bold;">   {{permissionUtility.FUNCTIONALITYDETAILNAME}}</span>
+    </h5>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div id="alertWarning" style="display:none">
+    <p *ngFor="let alert of alerts">
+      <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+    </p>
+  </div>
+
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-sm-2">
+        <h6><b>Basic Information</b></h6>
+        <span>Employee ID:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group" style="margin-bottom:25px;">
+        </div>
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-user" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="empcode" id="empcode" tabindex="1" readonly="readonly">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <!--<h6 style="color:white">.</h6>
+        <span>Image:</span>-->
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+        
+
+          <div class="image-upload">
+            <label for="file">
+              <img [src]="imageUrl" style="width:100px;height:100px;position: absolute;cursor:pointer">
+            </label>
+
+            <input id="file" type="file" accept="image/*" (change)="handleFileInput($event.target.files)" style="display:none" />
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <h6><b>Contact Information</b></h6>
+        <span>Phone #:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group" style="margin-bottom:25px;">
+
+        </div>
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-phone" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" maxlength="12" placeholder="xxxx-xxxxxxx" mask="0000-0000000" (keypress)="valid.onlyNumber($event)" [(ngModel)]="phoneno" id="phoneno" tabindex="32">
+          </div>
+        </div>
+        </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>First Name:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-user-o" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" required (keypress)="valid.onlyAlphabet($event)" [(ngModel)]="firstname" id="firstname" tabindex="2">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <!--<span>Middle Name:</span>-->
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <!--<input type="text" class="form-control" [(ngModel)]="middlename" id="middlename" tabindex="3">-->
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <span>Cell #:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-mobile" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" required maxlength="12" placeholder="xxxx-xxxxxxx" mask="0000-0000000" (keypress)="valid.onlyNumber($event)" [(ngModel)]="cellno" id="cellno" tabindex="33">
+          </div>
+        </div>
+        </div>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>Last Name:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-user-o" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" (keypress)="valid.onlyAlphabet($event)" [(ngModel)]="lastname" id="lastname" tabindex="4">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>Father Name:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-user-circle" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" required (keypress)="valid.onlyAlphabet($event)" [(ngModel)]="fathername" id="fathername " tabindex="5">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>Email:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-envelope" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" maxlength="30" placeholder="text@text.com" email [(ngModel)]="email" id="email" tabindex="34">
+          </div>
+        </div>
+        </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>Date of Birth:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="input-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-calendar" style="font-size:medium" aria-hidden="true"></i>
+            <input class="form-control" name="a" maxlength="10" id="dob" (keyup)="valid.MaskedDate($event)" (keypress)="valid.MaskedDate($event);valid.onlyNumber($event)" [(ngModel)]="dob.model" ngbDatepicker #a="ngbDatepicker" tabindex="6">
+          </div>
+            <div class="input-group-append">
+              <button class="btn btn-small " (click)="a.toggle()">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <span>CNIC:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-id-card" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" required maxlength="15" mask="00000-0000000-0" placeholder="xxxxx-xxxxxxx-x" (keypress)="valid.onlyNumber($event)" [(ngModel)]="cnic" id="cnic" tabindex="7">
+          </div>
+        </div>
+        </div>
+      <div class="col-md-4">
+        <h6><b>Employment Information</b></h6>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>Gender:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-genderless" style="font-size:medium" aria-hidden="true"></i>
+            <select class="form-control" [(ngModel)]="gender" id="gender" tabindex="8">
+              <option value="1">Male</option>
+              <option value="2">Female</option>
+            </select>
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>Martal Status:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-link" style="font-size:medium" aria-hidden="true"></i>
+            <select class="form-control" [(ngModel)]="maritalstatus" id="maritalstatus" tabindex="9">
+              <option value="1">Single</option>
+              <option value="2">Married</option>
+            </select>
+          </div>
+        </div>
+        </div>
+
+      <div class="col-sm-2">
+        <span>Office:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-building" style="font-size:medium" aria-hidden="true"></i>
+            <select class="form-control" [(ngModel)]="officecode" id="officecode" tabindex="35">
+              <option *ngFor="let o of office" [value]="o.officecode">{{o.officename}}</option>
+            </select>
+          </div>
+        </div>
+        </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>EOBI #:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-barcode" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="eobi" id="eobi" tabindex="10">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>GLI #:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-barcode" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="gli" id="gli" tabindex="11">
+          </div>
+        </div>
+        </div>
+
+      <div class="col-sm-2">
+        <span>Department:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-building-o" style="font-size:medium" aria-hidden="true"></i>
+            <select class="form-control" [(ngModel)]="departmentcode" id="departmentcode" tabindex="36" (change)="getDesignation(departmentcode)">
+              <option *ngFor="let o of department" [value]="o.departmentcode">{{o.departmentname}}</option>
+            </select>
+          </div>
+        </div>
+        </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>Social Security:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-lock" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="socialsecurity" id="socialsecurity" tabindex="12">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>Birth Place:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-bed" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="birthplace" id="birthplace" tabindex="13">
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-2">
+        <span>Designation:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-user-md" style="font-size:medium" aria-hidden="true"></i>
+            <select class="form-control" [(ngModel)]="designationcode" id="designationcode" tabindex="37">
+              <option *ngFor="let o of designation" [value]="o.designationcode">{{o.designationname}}</option>
+            </select>
+          </div>
+        </div>
+        </div>
+    </div>
+    <div class="row">
+
+      <div class="col-sm-2">
+        <span>Religion:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-moon-o " style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="religion" id="religion" tabindex="14">
+          </div>
+        </div>
+        </div>
+
+      <div class="col-sm-2">
+        <span>Nationality:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-flag" style="font-size:medium" aria-hidden="true"></i>
+            <select class="form-control" [(ngModel)]="nationalcode" id="nationalcode" tabindex="15">
+              <option *ngFor="let o of nationality" [value]="o.nationalcode">{{o.nationalname}}</option>
+            </select>
+          </div>
+        </div>
+        </div>
+
+      <div class="col-sm-2">
+        <span>Employment Type:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="inner-addon left-addon">
+          <i class="fa fa-legal " style="font-size:medium" aria-hidden="true"></i>
+          <select class="form-control" [(ngModel)]="emptypecode" id="emptypecode" tabindex="38" (ngModelChange)="ShowDates()">
+            <option *ngFor="let o of emptype" [value]="o.emptypecode">{{o.emptypename}}</option>
+          </select>
+        </div>
+      </div>
+      </div>
+    <div class="row">
+      <div class="col-md-4">
+        <h6><b>Address Information</b></h6>
+      </div>
+      <div class="col-sm-4">
+
+      </div>
+
+      <div class="col-sm-2">
+        <span>Category:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="inner-addon left-addon">
+          <i class="fa fa-trello" style="font-size:medium" aria-hidden="true"></i>
+          <select class="form-control" [(ngModel)]="categorycode" id="categorycode" tabindex="39">
+            <option *ngFor="let o of category" [value]="o.categorycode">{{o.categoryname}}</option>
+          </select>
+        </div>
+      </div>
+      </div>
+    <div class="row">
+      <div class="col-sm-4">
+        <h6><b><i>Present Address</i></b></h6>
+      </div>
+      <div class="col-sm-4">
+        <h6><b><i>Permanent Address</i></b></h6>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>Line 1:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-address-book" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" required maxlength="80" [(ngModel)]="psline1" id="psline1" tabindex="16">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>Line 1:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-address-book" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" required maxlength="80" [(ngModel)]="pmline1" id="pmline1" tabindex="19">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>Joining Date:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="input-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-calendar" style="font-size:medium" aria-hidden="true"></i>
+          <input class="form-control" name="b" maxlength="10" id="joindt" (keypress)="valid.MaskedDate($event);valid.onlyNumber($event)" [(ngModel)]="joiningdate.model" ngbDatepicker #b="ngbDatepicker" placement="top" tabindex="41">
+          </div>
+          <div class="input-group-append">
+            <button class="btn btn-small " (click)="b.toggle()">
+              <i class="fa fa-calendar" aria-hidden="true"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>Line 2:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-address-book-o" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" maxlength="60" [(ngModel)]="psline2" id="psline2" tabindex="17">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>Line 2:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-address-book-o" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" maxlength="60" [(ngModel)]="pmline2" id="pmline2" tabindex="20">
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="col-sm-2" [style.display]="showconfirmdate">
+        <span>Confirmation Date:</span>
+      </div>
+      <div class="col-sm-2" [style.display]="showconfirmdate">
+        <div class="form-group">
+          <div class="input-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-calendar" style="font-size:medium" aria-hidden="true"></i>
+            <input class="form-control" name="g" maxlength="10" id="confdt" (keypress)="valid.MaskedDate($event);valid.onlyNumber($event)" [(ngModel)]="confirmdate.model" ngbDatepicker #g="ngbDatepicker" placement="top" tabindex="43">
+            </div>
+            <div class="input-group-append">
+              <button class="btn btn-small " (click)="g.toggle()">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2" [style.display]="showcontractdate">
+        <span>Contract End Date:</span>
+      </div>
+      <div class="col-sm-2" [style.display]="showcontractdate">
+        <div class="form-group">
+          <div class="input-group">
+            <input class="form-control" name="f" maxlength="10" (keypress)="valid.MaskedDate($event);valid.onlyNumber($event)" [(ngModel)]="conenddate.model" ngbDatepicker #f="ngbDatepicker" placement="top" tabindex="42">
+            <div class="input-group-append">
+              <button class="btn btn-small " (click)="f.toggle()">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-sm-2">
+        <span>Line 3:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-address-book-o" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" maxlength="60" [(ngModel)]="psline3" id="psline3" tabindex="18">
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <span>Line 3:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-address-book-o" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" maxlength="60" [(ngModel)]="pmline3" id="pmline3" tabindex="21">
+          </div>
+        </div>
+      </div>
+
+
+      <div *ngIf="btnmode; then statusAdd else statusUpdate"> </div>
+      <ng-template #statusAdd>
+        <div class="col-sm-2">
+          <span>Status:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-eye" style="font-size:medium" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="empstatuscode" id="empstatuscode" tabindex="44" disabled="disabled">
+                <option value="1">Active</option>
+                <option value="2">InActive</option>
+              </select>
+            </div>
+          </div>
+          </div>
+      </ng-template>
+      <ng-template #statusUpdate>
+        <div class="col-sm-2">
+          <span>Status:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-eye" style="font-size:medium" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="empstatuscode" id="empstatuscode" tabindex="44">
+                <option value="1">Active</option>
+                <option value="2">InActive</option>
+              </select>
+            </div>
+          </div>
+          </div>
+      </ng-template>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>City:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-location-arrow " style="font-size:medium" aria-hidden="true"></i>
+            <ng-select2 [data]="pscity" id="pscitycode" [value]="pscitymodel" (valueChanged)="getPresentCityChange($event)" [width]="178.83">
+            </ng-select2>
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>City:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-location-arrow " style="font-size:medium" aria-hidden="true"></i>
+            <ng-select2 [data]="pmcity" id="pmcitycode" [value]="pmcitymodel" (valueChanged)="getPermanentCityChange($event)" [width]="178.83">
+            </ng-select2>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>Province:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-tag" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="psprovincename" id="psprovincename" readonly="readonly">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>Province:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-tag" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="pmprovincename" id="pmprovincename" readonly="readonly">
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>Country:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-globe" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="pscountryname" id="pscountryname" readonly="readonly">
+          </div>
+        </div>
+        </div>
+      <div class="col-sm-2">
+        <span>Country:</span>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-globe" style="font-size:medium" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="pmcountryname" id="pmcountryname" readonly="readonly">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-2">
+        <span>Correspond At:</span>
+      </div>
+
+      <div class="col-sm-1">
+        <div class="form-group">
+          <input type="radio" [checked]="present" (click)="changePS()" tabindex="29">Present
+        </div>
+      </div>
+      <div class="col-sm-1">
+        <div class="form-group">
+          <input type="radio" [checked]="permanent" (click)="changePM()" tabindex="30">Permanent
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-md-2">
+        <span>Remarks:</span>
+      </div>
+      <div class="col-md-6">
+        <div class="inner-addon left-addon">
+          <i class="fa fa-align-justify" style="font-size:medium" aria-hidden="true"></i>
+          <fieldset class="form-group" tabindex="31">
+            <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please type here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+      </div>
+      </div>
+
+
+  </div>
+
+  <div class="modal-footer">
+    <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+    <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+    <ng-template #submitAdd>
+      <button id="submitAdd" type="button" tabindex="45" class="btn btn-small btn-warning tip"
+              (click)="saveEmployee(firstname, middlename, lastname, fathername, cnic, gender, maritalstatus, eobi, gli, socialsecurity, birthplace, nationalcode, religion, remarks, correspond,psline1, psline2, psline3, pscitycode, psprovincecode, pscountrycode, pmline1, pmline2, pmline3, pmcitycode, pmprovincecode, pmcountrycode,phoneno, cellno, email, officecode, departmentcode, designationcode, emptypecode, categorycode, gradecode, empstatuscode);">
+        <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+      </button>
+    </ng-template>
+    <ng-template #submitUpdate>
+      <button [style.display]="permissionUtility.PermissionEdit" id="submitUpdate" type="button" tabindex="45" class="btn btn-small btn-warning tip"
+              (click)="updateEmployee(firstname, middlename, lastname, fathername, cnic, gender, maritalstatus, eobi, gli, socialsecurity, birthplace, nationalcode, religion, remarks, correspond,psline1, psline2, psline3, pscitycode, psprovincecode, pscountrycode, pmline1, pmline2, pmline3, pmcitycode, pmprovincecode, pmcountrycode,phoneno, cellno, email, officecode, departmentcode, designationcode, emptypecode, categorycode, gradecode, empstatuscode);">
+        <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+      </button>
+    </ng-template>
+    <button type="button" class="btn btn-small" tabindex="46" id="x" (click)="c('Close click')"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Close</button>
+  </div>
+</ng-template>
+
+

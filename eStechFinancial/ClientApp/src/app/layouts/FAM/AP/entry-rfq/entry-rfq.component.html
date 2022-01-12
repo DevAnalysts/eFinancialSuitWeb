@@ -1,0 +1,213 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;">
+            {{FUNCTIONALITYNAME}}
+          </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" #input (keyup)="searchGrid(input.value)" [(ngModel)]="order_ID" id="order_ID" placeholder="search..." class="form-control" style="margin-right:5px;">
+            <button [style.display]="PermissionAdd" class="btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Quotation #</th>
+              <th>Quotaion Date</th>
+              <th>RFQ #</th>
+              <th>Supplier</th>
+              <th>Specification</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of grid | paginate: { itemsPerPage: 14, currentPage: p };">
+              <td>{{dt.quotation_ID}}</td>
+              <td>{{dt.quoteno}} </td>
+              <td>{{dt.quotendate}}</td>
+              <td>{{dt.rfqno}}</td>
+              <td>{{dt.supplier}}</td>
+              <td>{{dt.specification}}</td>
+              <td>{{dt.cancel}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.quotation_ID,content)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+
+    <div class="modal-header">
+      <h4 class="modal-title">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Quotation:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select [(ngModel)]="rfqcode" class="form-control" (change)="changeQuotation()">
+              <option *ngFor="let c of rfq" [value]="c.rfqcode" [selected]="c.rfqcode">{{c.rfqname}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Date:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="pO_Date.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="changePODate($event)">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Supplier:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <ng-select2 [data]="suppliers" id="supplier_ID" [value]="supplier_IDM" (valueChanged)="changeSupplier($event)" [width]="190">
+            </ng-select2>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <span>Specification:</span>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="specification" id="specification" tabindex="1" >
+          </div>
+        </div>
+
+      </div>
+      <div class="row table-shadow-padding">
+
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th style="width:2%;margin-left:15px">Sr#.</th>
+              <th style="width:40%">Item</th>
+              <th style="width:10%">Qty.</th>
+              <th style="width:10%">Unit Price.</th>
+              <th style="width:35%">Specification</th>
+
+            </tr>
+          </thead>
+          <tbody style="height: 200px;overflow: hidden scroll;display: block;width:100%;">
+            <tr *ngFor="let i of purchaseOrderDetails let idx = index " class="row">
+              <td style="width:2%;margin-left:15px">{{idx+1}}</td>
+              <td style="width:40%">
+                {{i.item_Name}}
+              </td>
+              <td style="width:10%;">
+                {{i.quantity}}
+              </td>
+              <td style="width:8%;">
+                <input type="number" min="0" class="form-control" [(ngModel)]="i.unit_Price" id="unitprice" tabindex="1">
+              </td>
+              <td style="width:20%;padding-left: 20px;">
+                <label class="switch">
+                  <input type="checkbox" [(ngModel)]="i.specification" (change)="callcon(i.specification)">
+                  <span class="slider round"></span>
+                </label>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="modal-footer"></div>
+      <div class="row">
+        <div class="col-md-1">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-11">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" id="de" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+
+      </div>
+    </div>
+
+
+
+    <div class="modal-footer">
+      <!--<div *ngIf="mode; then submitUpdateC else submitAddC"> </div>
+      <ng-template #submitUpdateC>
+        <div class="row" style="position: absolute;left: 30px;">
+          <button [style.display]="PermissionDelete" type="button" id="cancelBtn" class="btn btn-small btn-warning tip" (click)="cancelOrder()"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Cancel</button>
+        </div>
+      </ng-template>-->
+
+      <div *ngIf="mode; then submitUpdate else submitAdd"> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveOrder()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button [style.display]="PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateOrder()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+      </ng-template>
+
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o" aria-hidden="true"></i> Close</button>
+    </div>
+  </ng-template>
+
+
+</div>

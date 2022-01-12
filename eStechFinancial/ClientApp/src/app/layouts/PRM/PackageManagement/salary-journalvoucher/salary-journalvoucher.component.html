@@ -1,0 +1,351 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" name="search" placeholder="search..." [(ngModel)]="id" style="float:left; width:100px;margin:3px;">
+            <button [style.display]="PermissionAdd" class=" btn btn-small btn-warning tip" style="margin:3px;" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+
+            <tr class="thclr">
+              <th style="width: 25%">Office</th>
+              <th style="width: 25%">Voucher No</th>
+              <th style="width: 20%">Voucher Date</th>
+              <th style="width: 20%">Net Amount</th>
+              <th style="width: 10%"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let e of gridlist   | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{e.office}}</td>
+              <td>{{e.voucherno}}</td>
+              <td>{{e.voucherdate}}</td>
+              <td>{{e.amount  | number: '1.2-5'}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.vouchercode,contentdetail)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click');">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Current Month:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="monthname" id="monthname" readonly="readonly">
+          </div>
+        </div>
+
+
+      </div>
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Office:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div *ngIf="btnmode; then OfficeOn else OfficeOff"> </div>
+            <ng-template #OfficeOn>
+              <select class="form-control" [(ngModel)]="officecode" id="officecode" tabindex="35" (change)="getMonth(officecode,0)">
+                <!-- <option value="0">Select...</option>-->
+                <option *ngFor="let o of office" [value]="o.officecode">{{o.officename}}</option>
+              </select>
+            </ng-template>
+            <ng-template #OfficeOff>
+              <select class="form-control" [(ngModel)]="officecode" id="officecode" tabindex="35" disabled>
+                <!-- <option value="0">Select...</option>-->
+                <option *ngFor="let o of office" [value]="o.officecode">{{o.officename}}</option>
+              </select>
+            </ng-template>
+
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span>Voucher Date:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div *ngIf="btnmode; then DateToOn else DateTooff"> </div>
+            <ng-template #DateToOn>
+              <div class="input-group">
+                <input class="form-control" name="a" [(ngModel)]="salarydate.model"
+                       displayMonths="1" navigation="none" ngbDatepicker #a="ngbDatepicker">
+                <div class="input-group-append">
+                  <button class="btn btn-small" (click)="a.toggle()">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+
+
+            </ng-template>
+            <ng-template #DateTooff>
+              <div class="input-group">
+                <input class="form-control" name="a" [(ngModel)]="salarydate.model"
+                       displayMonths="1" navigation="none" ngbDatepicker #a="ngbDatepicker" disabled="disabled">
+                <div class="input-group-append">
+                  <button class="btn btn-small" (click)="a.toggle()">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Remarks:</span>
+        </div>
+        <div class="col-md-6">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please type here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+      </div>
+
+      <div class="row">
+
+        <div class="col-sm-7">
+
+        </div>
+        <div class="col-sm-1">
+          <div *ngIf="btnmode; then checkOn else checkoff"> </div>
+          <ng-template #checkOn>
+
+            <button type="button" class="btn btn-small btn-warning tip" id="review" (click)="viewJV()">Load</button>
+
+          </ng-template>
+          <ng-template #checkoff>
+
+
+          </ng-template>
+        </div>
+      </div>
+      <!--<div class="row" style="margin-left:5px;margin-right:5px;">-->
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th style="width: 5%">SR #</th>
+              <th style="width: 30%">Account Name</th>
+              <th style="width: 30%">Debit</th>
+              <th style="width: 30%">Credit</th>
+              <th style="width: 5%"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let e of salary;let i = index">
+              <td>{{i + 1}}</td>
+              <td>{{e.accounT_TITLE}}</td>
+              <td>{{e.debit  | number: '1.2-5'}}</td>
+              <td>{{e.credit  | number: '1.2-5'}}</td>
+              <td></td>
+
+            </tr>
+
+          </tbody>
+        </table>
+
+      </div>
+      <!--</div>-->
+
+    </div>
+
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <!--<button type="button" class="btn btn-small btn-warning tip" style="left:5px;position:absolute;" (click)="updateData();">Cancel</button>-->
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip"
+                (click)="saveData();">
+          Save
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <!--<button type="button" class="btn btn-small btn-warning tip" style="left:5px;position:absolute;" (click)="cancelData();">Cancel</button>
+        <button id="submitUpdate" type="button"  class="btn btn-small btn-warning tip"
+                (click)="updateData();">
+          Save..
+        </button>-->
+      </ng-template>
+      <button type="button" class="btn btn-small" (click)="c('Close click');">Close</button>
+    </div>
+  </ng-template>
+
+  <!----Salary Package---->
+  <ng-template #contentdetail let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Office:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="uofficename" id="uoffice" readonly="readonly">
+
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Voucher No:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="uvoucherno" id="uvoucherno" readonly="readonly">
+
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span>Voucher Date:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="uvoucherdate" id="uvoucherdate" readonly="readonly">
+
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="row" style="margin-left:5px;margin-right:5px;">
+        <div class="card-body table-responsive">
+          <table class="table table-hover table-striped" style="border-bottom:1px solid lightgray">
+            <thead>
+              <tr class="thclr">
+                <th style="width: 5%">SR #</th>
+                <th style="width: 30%">Account Name</th>
+                <th style="width: 30%">Debit</th>
+                <th style="width: 30%">Credit</th>
+                <th style="width: 5%"></th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr *ngFor="let e of uvoucherlist;let i = index">
+                <td>{{i + 1}}</td>
+                <td>{{e.accountname}}</td>
+                <td>{{e.debit  | number: '1.2-5'}}</td>
+                <td>{{e.credit  | number: '1.2-5'}}</td>
+                <td></td>
+
+              </tr>
+
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Remarks:</span>
+        </div>
+        <div class="col-md-6">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="uremarks" id="remarks" name="textarea" placeholder="Please type here..." class="form-control" style="height:auto;"
+                      rows="4" readonly="readonly"></textarea>
+          </fieldset>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <!-- <button type="button" class="btn btn-small btn-warning tip" style="left:5px;position:absolute;" (click)="cancelSalary();" [style.display]="ucancelbtn">Cancel</button>-->
+        <!--<button id="submitUpdate" type="button" tabindex="45" class="btn btn-small btn-warning tip"
+                (click)="updateData();">
+          Save..
+        </button>-->
+      </ng-template>
+      <ng-template #submitUpdate>
+
+      </ng-template>
+      <button type="button" id="x" class="btn btn-small" tabindex="46" (click)="c('Close click')">Close</button>
+    </div>
+  </ng-template>
+</div>
+
+
+

@@ -1,0 +1,781 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text"  #input (keydown.enter)="$event.target.blur()" (blur)="getCustomers(input.value)" [(ngModel)]="ID"
+              id="ID" placeholder="search..." class="form-control" />
+            <!--<button [style.display]="PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>-->
+            <div class="btn-group">
+ 
+              <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button>
+              <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown" placement="bottom-right" [style.display]="permissionUtility.PermissionDropdown">
+                <button class="btn btn-primary dropdown-toggle-split" style="margin-left: 5px;" ngbDropdownToggle></button>
+
+                <div class="dropdown-menu" ngbDropdownMenu>
+                  <button [style.display]="permissionUtility.PermissionItem1" style="text-align:left" class="col-sm-12 btn btn-small btn-warning tip" id="myInput" (click)="routePage(1)">
+                    <i class="fa fa-plus"></i> Customer Log Book
+                  </button>
+                  <button [style.display]="permissionUtility.PermissionItem2" style="text-align:left" class="col-sm-12 btn btn-small btn-warning tip" id="myInput" (click)="routePage(2)">
+ 
+                    <i class="fa fa-plus"></i> Customer Area/Route
+                  </button>
+
+                </div>
+
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+       <div class="row" *ngIf="isLoading"
+        style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div> 
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Customer #</th>
+              <th>Customer Name</th>
+              <th>Phone</th>
+              <th>Cell</th>
+              <th>Contact Person</th>
+              <th>Net Payable</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of customers  | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.customer_ID}}</td>
+              <td>{{dt.customerNo}}</td>
+              <td>{{dt.customer_Name}}</td>
+              <td>{{dt.phone}}</td>
+              <td>{{dt.cell}}</td>
+              <td>{{dt.contact_Name}}</td>
+              <td>{{dt.netPayable}}</td>
+              <td>{{dt.status}}</td>
+              <!-- <td *ngIf="dt.status==true">Active</td>
+              <td *ngIf="dt.status==false">Disabled</td> -->
+              <td>
+                <div class="btn-group" style="float:right; ">
+ 
+                  <button [style.display]="permissionUtility.PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.customer_ID,content)"
+                          id="view">
+                    <span class="fa fa-eye"></span>
+                  </button>
+                </div>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.customer_ID,content)"
+                          id="edit">
+ 
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;" >
+        Customer
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+
+    <nav ngbNav #nav="ngbNav" [(activeId)]="tactive" class="nav-tabs">
+      <ng-container [ngbNavItem]="1">
+        <ng-template ngbNavTitle>
+          <a ngbNavLink>Details</a>   
+        </ng-template>
+        <ng-template ngbNavContent>
+          <div id="alertWarning" style="display:none">
+            <!-- <p *ngFor="let alert of alerts">
+              <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+            </p> -->
+          </div>
+          <div class="modal-body" >
+            <div class="row">
+              <div class="col-md-8">
+
+                <h4>Account Information</h4>
+              </div>
+              <div class="col-md-4">
+
+                <h4>Contact Information</h4>
+              </div>
+            </div>
+
+
+
+            <div class="row">
+              <div class="col-md-2">
+                <span>Name:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-user" style="font-size:medium" aria-hidden="true"></i>
+ 
+                    <input type="text" tabindex="1" (keypress)="valid.onlyAlphabet($event)" required class="form-control" maxlength="40" [pattern]="'^[A-Za-z0-9.() ]+$'" [(ngModel)]="customer_Name" id="customer_Name" (change)="changeCustomerName(customer_Name);" placeholder="Name"  />
+ 
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span>NTN:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-address-book-o" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="number" tabindex="2" maxlength="100" class="form-control" [(ngModel)]="nTN" id="nTN"  >
+                  </div>
+
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span>Contact Name:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-user" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="text" tabindex="3" class="form-control" maxlength="100" [(ngModel)]="contact_Name" id="contact_Name" >
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <span>Email:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-at" style="font-size:medium" aria-hidden="true"></i>
+ 
+                    <input type="email" email tabindex="4" class="form-control" maxlength="30" placeholder="text@text.com"  [(ngModel)]="email" id="email"  (change)="checkCustomerEmail(email)">
+ 
+                  </div>
+                </div>
+              </div> <div class="col-md-2">
+                <span>GST:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-address-book-o" style="font-size:medium" aria-hidden="true"></i>
+ 
+                    <input type="number" tabindex="5" class="form-control" maxlength="100"  [(ngModel)]="gst" id="gst">
+ 
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span>Cell #:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-mobile" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="text" tabindex="6" class="form-control" [(ngModel)]="contact_Cell" id="contact_Cell"
+                    mask="0000-0000000" maxlength="12" placeholder="xxxx-xxxxxxx" (keypress)="valid.onlyNumber($event)"   (change)="checkCContactCell(contact_Cell)">
+                  </div>
+
+                </div>
+              </div> 
+              
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <span>Phone:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-phone" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="text" tabindex="7" class="form-control" [(ngModel)]="phone" id="phone" mask="0000-0000000" maxlength="12" placeholder="xxxx-xxxxxxx" (keypress)="valid.onlyNumber($event)"
+                        (change)="checkCustomerPhone(phone)">
+                  </div>
+
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span>Cell:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-mobile-phone" style="font-size:medium" aria-hidden="true"></i>
+
+                    <input type="text" tabindex="8" class="form-control" maxlength="12" placeholder="xxxx-xxxxxxx" mask="0000-0000000" (keypress)="valid.onlyNumber($event)" [(ngModel)]="cell" id="cell"  (change)="checkCustomerCell(cell);">
+
+                  </div>
+
+                </div>
+              </div> 
+              <div class="col-md-2">
+                <span>Phone #:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-phone" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="text" tabindex="9" class="form-control" [(ngModel)]="contact_Phone" id="contact_Phone"
+                    mask="0000-0000000" maxlength="12" placeholder="xxxx-xxxxxxx" (keypress)="valid.onlyNumber($event)"   (change)="checkCContactPhone(contact_Phone)">
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <span>Fax:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-fax" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="text" tabindex="10" class="form-control" [(ngModel)]="fax" id="fax" mask="0000-0000000" maxlength="12" placeholder="xxxx-xxxxxxx" (keypress)="valid.onlyNumber($event)"
+                       >
+                  </div>
+
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span>Customer Code:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-mobile-phone" style="font-size:medium" aria-hidden="true"></i>
+
+                    <input type="text" tabindex="11" class="form-control" maxlength="12" [(ngModel)]="customerCode" id="customerCode"  (change)="checkCustomerCode(customerCode);">
+
+                  </div>
+
+                </div>
+              </div> 
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <span>Website:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-internet-explorer" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="text" class="form-control" tabindex="12" [(ngModel)]="website" id="website" >
+                  </div>
+
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span>Tax Code:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+                    <select class="form-control" [(ngModel)]="taxcode" id="taxcode" tabindex="13" (change)="changeTaxCode()">
+                      <option value="1">Tax Exempted</option>
+                      <option value="2">Tax</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <span>Balance:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="form-group">
+                    <div class="inner-addon left-addon">
+                      <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+                      <input type="number" [disabled]="balanceDisable" class="form-control" [(ngModel)]="balance" id="balance" tabindex="14">
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span>Balance Type:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-trello" style="font-size:medium" aria-hidden="true"></i>
+                    <div *ngIf="btnMode; then submitABT else  submitUBT "> </div>
+                    <ng-template #submitABT>
+                      <select class="form-control" [(ngModel)]="balance_Type_ID" id="balance_Type_ID" tabindex="15" (change)="changeBalanceType()">
+                        <option *ngFor="let b of balanceTypeList " [value]="b.balance_Type_ID">{{b.balance_Type}}
+                        </option>
+                      </select>
+                    </ng-template>
+                    <ng-template #submitUBT>
+                      <select class="form-control" [(ngModel)]="balance_Type_ID" id="balance_Type_ID" tabindex="15"
+                        disabled>
+                        <option *ngFor="let b of balanceTypeList " [value]="b.balance_Type_ID">{{b.balance_Type}}
+                        </option>
+                      </select>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <span [style.display]="discountShow">Discount Rate:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="form-group">
+                    <div class="inner-addon left-addon">
+                      <i class="fa fa-money" style="font-size:medium" aria-hidden="true"
+                        [style.display]="discountShow"></i>
+                      <select class="form-control" [(ngModel)]="discountRateID" id="discountRateID" tabindex="8"
+                        [style.display]="discountShow">
+                        <option *ngFor="let d of discountRates " [value]="d.discountRateID">{{d.discountTitle}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-8">
+                <h4>Account Detail</h4>
+              </div>
+              <div class="col-md-4">
+
+                <h4>Address Information</h4>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <span>Credit Limit:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="number" class="form-control" [(ngModel)]="credit_Limit" id="credit_Limit" tabindex="15">
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span>Credit Hold:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-credit-card" style="font-size:medium" aria-hidden="true"></i>
+                    <select class="form-control" [(ngModel)]="credit_Hold_ID" id="credit_Hold_ID" tabindex="16">
+                      <option *ngFor="let c of creditHoldList " [value]="c.credit_Hold_ID">{{c.credit_Hold}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <span>Line 1:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-drivers-license" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="text" class="form-control" required maxlength="40" [(ngModel)]="line1" id="line1" tabindex="17">
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <span>Payment Term:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-linode" aria-hidden="true"></i>
+                    <select class="form-control" [(ngModel)]="payment_Term_ID" id="payment_Term_ID" tabindex="18">
+                      <option *ngFor="let p of paymentTermList " [value]="p.payment_Term_ID">{{p.payment_Term}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span>Freight Term:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-truck" aria-hidden="true"></i>
+                    <select class="form-control" [(ngModel)]="freight_Term_ID" id="freight_Term_ID" tabindex="19">
+                      <option *ngFor="let f of freightTermList " [value]="f.freight_Term_ID">{{f.freight_Term}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <span>Line 2:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-drivers-license-o" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="text" class="form-control" maxlength="40" [(ngModel)]="line2" id="line2" tabindex="20">
+                  </div>
+
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <span>Customer Category:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-server" aria-hidden="true"></i>
+                    <select class="form-control" [disabled]="DisabledCustomerCategories" [(ngModel)]="customerCategoryId" id="customerCategoryId" tabindex="21">
+                      <option *ngFor="let i of customerCategories " [value]="i.customerCategoryId">{{i.customerCategoryName}}
+                      </option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <span>Industary:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-industry" aria-hidden="true"></i>
+                    <select class="form-control" [(ngModel)]="industary_ID" id="industary_ID" tabindex="22">
+                      <option *ngFor="let i of industaryList " [value]="i.industary_ID">{{i.industary}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <span>Line 3:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-drivers-license-o" aria-hidden="true"></i>
+                    <input type="text" class="form-control"  maxlength="40" [(ngModel)]="line3" id="line3" tabindex="23">
+                  </div>
+
+                </div>
+              </div>
+
+            </div>
+            <div class="row">
+              <div class="col-md-2">
+                <span>Ownership:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-black-tie" aria-hidden="true"></i>
+                    <select class="form-control" [(ngModel)]="ownership_ID" id="ownership_ID" tabindex="24">
+                      <option *ngFor="let o of ownershipList " [value]="o.ownership_ID">{{o.ownership}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span [style.display]="AreaShow">Area:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-map-o" aria-hidden="true" [style.display]="AreaShow"></i>
+                    <select class="form-control" [(ngModel)]="areacode" id="areacode" [style.display]="AreaShow" tabindex="25">
+                      <option *ngFor="let i of area " [value]="i.areacode">{{i.areaname}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2">
+                <span>City:</span>
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-map-pin" style="font-size:medium" aria-hidden="true"></i>
+                    <ng-select2 [data]="city" id="citycode" [value]="citycode" (valueChanged)="getCityChange($event)"
+                      [width]="189.16" tabindex="26">
+                    </ng-select2>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row" [style.display]="parentShow">
+              <div class="col-md-2">
+                <span>Is Ref. Customer?:</span>
+              </div>
+              <div class="row" [style.display]="parentShow" style="margin: 5px 0 10px 0 ;"> 
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <div class="inner-addon left-addon">  
+                     <input type="checkbox" tabindex="31" [(ngModel)]="refStatus" (change)="getParentCustomer(refStatus?true:false)" id="refStatus" pointer-events="none">  
+                    </div>
+                  </div>
+                </div> 
+              </div>
+              <div class="col-md-2" style="margin-left: 13vw;">
+                <span>Ref Customer:</span>
+              </div> 
+              <div class="row"  [style.display]="parentShow"> 
+                  <div class="col-md-4"  >
+                    <div class="form_Group"  >
+                      <div class="inner-addon left-addon">
+                        <i class="fa fa-group" style="font-size:medium" aria-hidden="true"></i>
+                        <ng-select2 [data]="refCustomers" id="refCustomerID" [value]="refCustomerID" [disabled]="disabledRefrenceCustomer" [width]="250">
+                        </ng-select2>
+                      </div>  
+                    </div> 
+                  </div> 
+              </div> 
+            </div>
+
+            <div class="row">
+              <div class="col-md-2">
+                <span>Description:</span>
+              </div>
+              <div class="col-md-6">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-align-justify" aria-hidden="true"></i>
+                  <fieldset class="form-group" >
+                    <textarea [(ngModel)]="remarks" tabindex="28" id="remarks" name="textarea" placeholder="Please text here..."
+                      class="form-control" style="height:auto;" rows="4"></textarea>
+                  </fieldset>
+                </div>
+              </div>
+              <div class="col-md-2">
+                <span>Province:</span>
+                <br />
+                <br />
+                <br />
+                <div style="margin-top:-10px">Country:</div>
+
+              </div>
+              <div class="col-md-2">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-thumb-tack" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="text" class="form-control" tabindex="29" [(ngModel)]="provincename" id="provincename"
+                      readonly="readonly">
+                  </div>
+                  <br />
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-thumb-tack" style="font-size:medium" aria-hidden="true"></i>
+                    <input type="text" class="form-control" tabindex="30" [(ngModel)]="countryname" id="countryname"
+                      readonly="readonly">
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-2" style="margin-top: -10px;">
+                <span>Status:</span>
+              </div>
+              <div class="col-md-2" style="margin-top: -10px;">
+                <div class="form-group">
+                  <input type="checkbox" tabindex="31" [(ngModel)]="status" id="status" pointer-events="none"
+                    style="margin-top: 8px;">
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+        </ng-template>
+      </ng-container>
+      <div *ngIf="PermissionCustomerDiscount">
+        <ng-container [ngbNavItem]="2" [disabled]="!PermissionCustomerDiscount">
+          <ng-template ngbNavTitle>
+            <a ngbNavLink>Discounts</a>  
+          </ng-template>
+          <ng-template ngbNavContent>
+            <customer-discount [customerid]="customer_ID" [customername]="customer_Name"
+              (newItemEvent)="setCustomerDiscounts($event)"></customer-discount>
+          </ng-template>
+        </ng-container>
+      </div>
+    </nav>
+
+    <div [ngbNavOutlet]="nav" class="mt-2"></div>
+
+    <div class="modal-footer" style="background-color: rgb(255, 255, 255);">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnMode; then submitAdd else  submitUpdate "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" tabindex="31" class="btn btn-small btn-warning tip"
+          (click)="saveCustomer(customer_ID, customer_Name, nTN, contact_Name, phone, fax, email, website, contact_Phone, contact_Cell, balance, remarks, credit_Limit, balance_Type_ID, credit_Hold_ID, payment_Term_ID, freight_Term_ID, industary_ID, ownership_ID,line1, line2, line3,status, customerCode)">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+ 
+        <button [style.display]="permissionUtility.PermissionEdit"  id="submitUpdate" type="button" tabindex="32" class="btn btn-small btn-warning tip" (click)="updateCustomer( customer_ID, customer_Name, nTN, contact_Name, phone, fax, email, website, contact_Phone, contact_Cell, balance, remarks, credit_Limit, balance_Type_ID, credit_Hold_ID, payment_Term_ID, freight_Term_ID, industary_ID, ownership_ID,line1, line2, line3,status, customerCode)">
+ 
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+      <button id="x" type="button" class="btn btn-small" (click)="c('Close click')" tabindex="33"><i
+          class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+
+  </ng-template>
+  <ng-template #customercontent let-h="close" let-f="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        NEW CUSTOMER
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="f('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-sm-12">
+          <span>Name</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" id="addCustomerName" [(ngModel)]="addCustomerName" class="form-control"
+              (change)="checkDisableStatus()" required />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Cell</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addCustomerCell" [textMask]="{mask: mask1}" class="form-control"
+              (change)="checkCustomerCell(addCustomerCell)" required />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Phone</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addCustomerPhone" [textMask]="{mask: mask1}" class="form-control"
+              (change)="checkCustomerPhone(addCustomerPhone)" required/>
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Email</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addCustomerEmail" class="form-control"
+              (change)="checkCustomerEmail(addCustomerEmail)" required />
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <span>Category</span>
+        </div>
+        <div class="col-md-12">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="categorycode">
+              <option *ngFor="let i of category " [value]="i.customerCategoryId">{{i.customerCategoryName}}</option>
+            </select>
+
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Address</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addCustomerAddress" class="form-control"  required
+            (change)="checkCustomerAddress(addCustomerAddress)"/>
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>City</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <ng-select2 [data]="city" id="citycode" [value]="citycode" (valueChanged)="getCityChange($event)"
+              [width]="265">
+            </ng-select2>
+          </div>
+        </div>
+
+        <div class="col-md-12" style="display:inline-flex">
+          <span>Status</span>
+
+          <div class="col-md-2">
+            <input type="checkbox" [(ngModel)]="addCustomerStatus" pointer-events="none" style="margin-top: 4px;">
+          </div>
+        </div>
+
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" id="SaveNewCustomer" class="btn btn-small btn-warning tip" (click)="saveCustomer()"><i
+          class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+      <button type="button" class="btn btn-small" id="x" (click)="h('Close click')"><i class="fa fa-window-close-o"
+          aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>

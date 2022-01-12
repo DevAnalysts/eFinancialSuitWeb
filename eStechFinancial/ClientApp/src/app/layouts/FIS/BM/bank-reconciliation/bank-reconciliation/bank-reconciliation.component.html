@@ -1,0 +1,360 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input (keydown.enter)='$event.target.blur()' (blur)="getReconciliations(input.value)" [(ngModel)]="ID" id="ID" placeholder="search..." class="form-control" />
+            <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Office</th>
+              <th>Account Title</th>
+              <th>Ledger Balance</th>
+              <th>Bank Balance</th>
+              <th>Net</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>
+            <tr *ngFor="let dt of bankReconciliations  | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.reconciliationID}}</td>
+              <td>{{dt.officE_NAME }}</td>
+              <td>{{dt.accounT_TITLE }}</td>
+              <td>{{dt.ledgerBalance }}</td>
+              <td>{{dt.bankBalance}}</td>
+              <td>{{dt.net}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" id="edit" (click)="getDetailsByID(dt.reconciliationID,content)">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-2">
+          <span>Date:</span>
+        </div>
+        <div class="col-md-2" style="margin-left: -1.8vw;">
+          <div class="form-group">
+            <div class="input-group" style="width:220px;">
+              <input class="form-control" name="dp" [(ngModel)]="reconciliationDate.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="setReconciliationDate($event)">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Office:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-building-o" style="font-size:medium" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="officE_CODE" id="officE_CODE">
+                <option *ngFor="let b of offices " [value]="b.officE_CODE">{{b.officE_NAME}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Bank Accounts:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-folder" style="font-size:medium" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="accounT_CODE" id="accounT_CODE" (change)="getVoucherDetails(accounT_CODE)">
+                <option *ngFor="let b of accounts " [value]="b.accounT_CODE">{{b.accounTTITLE}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Book Balance:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="number"  class="form-control" [(ngModel)]="ledgerBalance" id="ledgerBalance" disabled>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Bank Balance:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="bankBalance" id="bankBalance" (change)="CalculateNet()">
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Difference:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="number" class="form-control" [(ngModel)]="DifferenceBalance" id="DifferenceBalance" disabled>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Deposit In Transit:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="number" class="form-control" [(ngModel)]="deposit" disabled>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Outstanding Cheque:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="number" class="form-control" [(ngModel)]="outstanding" disabled>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Adjusted Bank Balance:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="number" class="form-control" [(ngModel)]="NetBalance" id="NetBalance" disabled>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <h4>Deposit In Transit</h4>
+        </div>
+      </div>
+      <!--Debit-->
+      <div class="row table-shadow-padding ">
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;">ID</th>
+              <th style="width:8%">Voucher No</th>
+              <th style="width:10%">Voucher Date</th>
+              <th style="width:10%">Cheque No</th>
+              <th style="width:10%">Cheque Date</th>
+              <th style="width:10%">Amount</th>
+              <th style="width:15%">In Transit</th>
+              <th style="width:15%"><input type="checkbox" [(ngModel)]="receivedAll" (change)="receiveAll();" />Receive</th>
+              <th style="width:15%">Received Date</th>
+            </tr>
+          </thead>
+          <tbody style="display: block;width:100%;">
+            <tr class="row" *ngFor="let dt of bankReconciliationDetail" style="height: 40px;">
+              <td style="width:5%;margin-left:25px;">{{dt.tranS_ID}}</td>
+              <td style="width:8%">{{dt.voucherID }}</td>
+              <td style="width:10%">{{dt.voucherDate| date:"dd/MM/yyyy" }}</td>
+              <td style="width:10%">{{dt.chequeNo }}</td>
+              <td style="width:10%">{{dt.chequeDate| date:"dd/MM/yyyy" }}</td>
+              <td style="width:10%">{{dt.debit  | number: '1.2-5' }}</td>
+              <td style="width:15%"><input type="checkbox" id="selectedDebit" [(ngModel)]="dt.selected" (change)="CalculateNet();" disabled /></td>
+              <td style="width:15%"><input type="checkbox" id="receivedCredit" [(ngModel)]="dt.received" (change)="CalculateNet();" /></td>
+              <td style="width:15%">
+                <div *ngIf="mode; then dateUpdate else dateAdd"> </div>
+                <ng-template #dateAdd>
+                  <div *ngIf="dt.received; then payDate else payDate1"> </div>
+                  <ng-template #payDate>
+                        <span ng-show="dt.received"> 
+                      
+                      <div class="input-group ">
+                        <input class="form-control" name="dp" [(ngModel)]="paymentDate.model" ngbDatepicker #ddd="ngbDatepicker" (ngModelChange)="changeVDate($event)">
+                        <div class="input-group-append">
+                          <button class="btn btn-small " (click)="ddd.toggle()">
+                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                      </div>
+                    
+                     </span> 
+                  </ng-template>
+                </ng-template>
+                <ng-template #dateUpdate>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;"></th>
+              <th style="width:8%"></th>
+              <th style="width:10%"></th>
+              <th style="width:10%"></th>
+              <th style="width:10%">Total In Transit :</th>
+              <th style="width:10%">{{TotalCredit()  | number: '1.2-5'}}</th>
+              <th style="width:15%"></th>
+              <th style="width:15%"></th>
+              <th style="width:15%"></th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <!--End Debit-->
+
+      <div class="row">
+        <div class="col-md-12">
+          <h4>Outstanding Cheques</h4>
+        </div>
+      </div>
+      <!--Credit-->
+      <div class="row table-shadow-padding ">
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;">ID</th>
+              <th style="width:8%">Voucher No</th>
+              <th style="width:10%">Voucher Date</th>
+              <th style="width:10%">Cheque No</th>
+              <th style="width:10%">Cheque Date</th>
+              <th style="width:10%">Amount</th>
+              <th style="width:15%">Outstanding</th>
+              <th style="width:15%"><input type="checkbox" [(ngModel)]="receivedAllB" (change)="receiveAllOut();" />Paid</th>
+              <th style="width:15%">Payment Date</th>
+            </tr>
+          </thead>
+          <tbody style="display: block;width:100%;">
+            <tr class="row" *ngFor="let dt of bankReconciliationOutstanding" style="height: 40px;">
+              <td style="width:5%;margin-left:25px;">{{dt.tranS_ID}}</td>
+              <td style="width:8%">{{dt.voucherID }}</td>
+              <td style="width:10%">{{dt.voucherDate| date:"dd/MM/yyyy" }}</td>
+              <td style="width:10%">{{dt.chequeNo }}</td>
+              <td style="width:10%">{{dt.chequeDate| date:"dd/MM/yyyy" }}</td>
+              <td style="width:10%">{{dt.debit  | number: '1.2-5' }}</td>
+              <td style="width:15%"><input type="checkbox" id="selectedDebit" [(ngModel)]="dt.selected" (change)="CalculateNetOut();" disabled /></td>
+              <td style="width:15%"><input type="checkbox" id="receivedCredit" [(ngModel)]="dt.received" (change)="CalculateNetOut();" /></td>
+              <td style="width:15%">
+                <div *ngIf="mode; then dateUpdate else dateAdd"> </div>
+                <ng-template #dateAdd>
+                  <div *ngIf="dt.received; then payDate else payDate1"> </div>
+                  <ng-template #payDate>
+                    <span ng-show="dt.received">
+                      <div class="input-group">
+                        <input class="form-control" name="dp" [(ngModel)]="paymentDate.model" ngbDatepicker #ddd="ngbDatepicker" (ngModelChange)="changeVDate($event)">
+                        <div class="input-group-append">
+                          <button class="btn btn-small " (click)="ddd.toggle()">
+                            <i class="fa fa-calendar" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </span>
+                  </ng-template>
+                </ng-template>
+                <ng-template #dateUpdate>
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;"></th>
+              <th style="width:8%"></th>
+              <th style="width:5%"></th>
+              <th style="width:5%"></th>
+              <th style="width:20%">Total Outstanding Cheques:</th>
+              <th style="width:10%">{{TotalCreditOut()  | number: '1.2-5'}}</th>
+              <th style="width:15%"></th>
+              <th style="width:15%"></th>
+              <th style="width:15%"></th>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <!--End Credit-->
+    </div>
+    <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+    <div class="modal-footer">
+
+      <div class="row" style="position: absolute;left: 30px;">
+        <!--<div *ngIf="mode; then VoucherUpdate"> </div>
+        <ng-template #VoucherUpdate>-->
+        <!--Approve Voucher-->
+        <button type="button" id="approveBtn" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="changeApproveStatus();"><i class="fa fa-floppy-o" aria-hidden="true"></i> Approve</button>
+        <!--</ng-template>-->
+
+      </div>
+
+      <div *ngIf="mode; then submitUpdate else submitAdd "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveBankReconciliation()">
+          Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <!--<button id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="c('Close click')" (click)="updateBankReconciliation()">
+          Save
+        </button>-->
+      </ng-template>
+      <button type="button" class="btn btn-small" (click)="c('Close click')">Close</button>
+    </div>
+  </ng-template>
+</div>

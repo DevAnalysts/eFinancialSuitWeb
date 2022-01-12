@@ -1,0 +1,67 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;">  {{permissomUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text"  #input (keyup)="searchOrderDetails(input.value)" [(ngModel)]="searchInput" id="searchInput" placeholder="search..." class="form-control" />
+
+            <button [style.display]="permissomUtility.PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" routerLink="/purchase-retail-invoice">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Order No</th>
+              <th>Supplier Name</th>
+              <th>Order Date</th>
+              <th>Total Cost</th>
+              <th>Total Discount</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of order | paginate: { itemsPerPage: 14, currentPage: p , id:'1st'};">
+              <td>{{dt.purchase_Order_ID}}</td>
+              <td>{{dt.pO_NO}}</td>
+              <td>{{dt.supplier_Name}}</td>
+              <td>{{dt.pO_Date | date:"dd/MM/yy"}} </td>
+              <td>{{dt.total_Cost  | number: '1.2-5'}}</td>
+              <td>{{dt.total_Discount  | number: '1.2-5'}}</td>
+              <td>{{dt.total_Amount  | number: '1.2-5'}}</td>
+              <td>{{dt.cancel}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissomUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="routeInvoice(dt.purchase_Order_ID)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls id="1st" (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+

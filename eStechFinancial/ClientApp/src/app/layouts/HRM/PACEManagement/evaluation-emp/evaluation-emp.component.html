@@ -1,0 +1,243 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input (keyup)="getGridSearch(input.value)" [(ngModel)]="id" id="id" placeholder="search..." class="form-control" />
+            <button class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+
+    <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+
+  </div>
+      <!--[style.display]="PermissionAdd"-->
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Employee Name</th>
+              <th>Designation</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let dt of order  | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.evaluation_Group_Emp_ID}}</td>
+              <td>{{dt.employee}}</td>
+              <td>{{dt.designation}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.evaluation_Group_Emp_ID,content)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                  <!--[style.display]="PermissionView"-->
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>Employee Name:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div *ngIf="!mode; then EmpAdd else EmpUpdate"> </div>
+            <ng-template #EmpAdd>
+              <ng-select2 [data]="emplist" id="empcode" [value]="empmodel" (valueChanged)="getEmployeesChange($event)" [width]="190">
+              </ng-select2>
+            </ng-template>
+            <ng-template #EmpUpdate>
+              <ng-select2 [data]="emplist" id="empcode" [value]="empmodel" (valueChanged)="getEmployeesChange($event)" [width]="190" [disabled]="disabled">
+              </ng-select2>
+            </ng-template>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Designation:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select id="designationcode" [(ngModel)]="designationcode" class="form-control" disabled="disabled">
+              <option *ngFor="let c of designation" [value]="c.designationcode">{{c.designationname}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Department:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select id="department" [(ngModel)]="departmentcode" class="form-control" disabled="disabled">
+              <option *ngFor="let c of department" [value]="c.departmentcode">{{c.departmentname}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Quaterly/Period:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="period" id="period" (change)=getDates(period)>
+              <option value="1">Quaterly</option>
+              <option value="2">Monthly</option>
+              <option value="3">Weekly</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <span>Start Date:</span>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div class="input-group">
+            <input class="form-control" name="a" id="strtdt" maxlength="10" (keypress)="valid.onlyNumber($event);valid.MaskedDate($event)" [(ngModel)]="startdate.model" ngbDatepicker #a="ngbDatepicker">
+            <div class="input-group-append">
+              <button class="btn btn-small " (click)="a.toggle()">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <span>End Date:</span>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <div class="input-group">
+            <input class="form-control" name="b" id="enddt" maxlength="10" (keypress)="valid.onlyNumber($event);valid.MaskedDate($event)" [(ngModel)]="enddate.model" ngbDatepicker #b="ngbDatepicker">
+            <div class="input-group-append">
+              <button class="btn btn-small " (click)="b.toggle()">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row table-shadow-padding">
+
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:100%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px">Sr#.</th>
+              <th style="width:20%">KPI</th>
+              <th style="width:20%">GOAL</th>
+              <th style="width:10%">Weight</th>
+              <th style="width:10%">Supervisor A</th>
+              <th style="width:10%">Supervisor B</th>
+              <th style="width:10%">Head</th>
+              <th style="width:10%">Total</th>
+
+            </tr>
+          </thead>
+          <tbody style="height: 200px;overflow: hidden scroll;display: block;width:100%;">
+            <tr *ngFor="let i of evaluationempdetails let idx = index" class="row">
+              <td style="width:5%;margin-left:25px">{{idx+1}}</td>
+              <td style="width:20%">{{i.kpI_ID}} : {{i.kpi}}</td>
+              <td style="width:20%">{{i.goaL_TARGET}}</td>
+              <td style="width:10%">{{i.weightage}}</td>
+              <td style="width:10%"><input type="number" min="0" class="form-control" [(ngModel)]="i.supervisoR_SCORE_A" (change)="sumScore(idx,i.supervisoR_SCORE_A,i.supervisoR_SCORE_B,i.grouP_HEAD_SCORE)" /></td>
+              <td style="width:10%"><input type="number" min="0" class="form-control" [(ngModel)]="i.supervisoR_SCORE_B" (change)="sumScore(idx,i.supervisoR_SCORE_A,i.supervisoR_SCORE_B,i.grouP_HEAD_SCORE)" /></td>
+              <td style="width:10%"><input type="number" min="0" class="form-control" [(ngModel)]="i.grouP_HEAD_SCORE" (change)="sumScore(idx,i.supervisoR_SCORE_A,i.supervisoR_SCORE_B,i.grouP_HEAD_SCORE)" /></td>
+              <td style="width:10%"><input type="number" min="0" class="form-control" [(ngModel)]="i.totaL_SCORE" readonly="readonly" /></td>
+              
+            </tr>
+            
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="row">
+        <div class="col-md-8">
+        </div>
+        <div class="col-md-2">
+          <span>Total Score:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="totalscore" id="totalscore" readonly="readonly">
+
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer"></div>
+
+      <!--<div class="row">
+        <div class="col-md-1">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-5">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" id="de" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+
+      </div>-->
+    </div>
+
+    <div class="modal-footer">
+      <div *ngIf="mode; then submitUpdate else  submitAdd "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveData()"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save</button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateData()"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save</button>
+      </ng-template>
+      <!--Save  [style.display]="PermissionEdit"-->
+      <!--Update-->
+      <!--Cancel-->
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click')"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>

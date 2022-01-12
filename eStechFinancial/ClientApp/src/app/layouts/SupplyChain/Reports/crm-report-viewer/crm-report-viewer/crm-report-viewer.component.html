@@ -1,0 +1,625 @@
+<div class="card mb-3">
+
+  <div class="card-header doNotPrint" style="vertical-align:middle;">
+    <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:100000 "></spinner>-->
+    <div class="btn-group" ngbDropdown #myDrop="ngbDropdown" style="margin-bottom: 3px;margin-right: 8px;">
+      <button type="button" class="btn btn-outline-secondary" (click)="$event.stopPropagation(); myDrop.open();" style="border: 1px solid grey;">
+        <i class="fa fa-list"></i>  <span style="font-size:14px;font-weight:bold; margin:3px 1px; min-width:200px;">{{reportName}}</span>
+      </button>
+      <div class="dropdown-menu" style="align-content:center;" ngbDropdownMenu>
+        <div><input class="form-control form-rounded" [(ngModel)]="rptname" style="width:100%;" (click)="$event.stopPropagation(); myDrop.open();" /></div>
+        <div style="min-height:0; max-height:70vh;width:25vw; overflow:hidden;overflow-y:auto;">
+          <div *ngFor="let r of reports | filter:rptname ;let x = index;" class="dropdown-item">
+            <a href="javascript:void(0)" (click)="changeName(r,'1'); myDrop.close();" style="font-size:12px; color:black; padding:2px; margin:2px;">
+              {{r.page_Name}}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-group" ngbDropdown #myDateRange="ngbDropdown" style="margin-bottom: 3px;margin-right: 8px;">
+      <button class="btn btn-outline-secondary" style="border: 1px solid grey;width:15vw; text-align:right;font-size:12px;" id="dropdownConfig" ngbDropdownToggle>
+        <span style="float:left;">
+          <i class="fas fa-calendar-alt" style="margin-left:10px;"></i>
+          <span style="vertical-align:middle;font-size:14px;font-weight:bold;margin-left:10px;">{{filter}}</span>
+        </span>
+      </button>
+      <div class="dropdown-menu" style="align-content:center;font-size:14px;" ngbDropdownMenu>
+        <button class="dropdown-item" (click)="ApplyFilter('Today');isCollapsed = true;">Today</button>
+        <button class="dropdown-item" (click)="ApplyFilter('This Week')">ThisWeek</button>
+        <button class="dropdown-item" (click)="ApplyFilter('This Month')">ThisMonth</button>
+        <button class="dropdown-item" (click)="ApplyFilter('This Quarter')">This Quarter</button>
+        <button class="dropdown-item" (click)="ApplyFilter('This Year')">This Year</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Yesterday')">Yesterday</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Previous Week')">Previous Week</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Previous Month')">Previous Month</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Previous Quarter')">Previous Quarter</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Previous Year')">Previous Year</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Custom')">Custom </button>
+      </div>
+    </div>
+    <button type="button" class="btn btn-outline-secondary" style="    margin-bottom: 3px;border: 1px solid grey;" (click)="(isCollapsed = !isCollapsed); myDrop.close();"
+            [attr.aria-expanded]="!isCollapsed" aria-controls="custmizeReport">
+      <i class="fa fa-cog"></i> <span>Customize Report</span>
+    </button>
+    <div class="pull-right">
+      <button class="btn  btn-outline-secondary pull-right" style="margin-left:5vw;margin-right:0.25vw;border: 1px solid grey; " [routerLink]="['/dashboard']">
+        <i class="fa fa-close"></i>
+      </button>
+      <div ngbDropdown class="d-inline-block  pull-right" style="margin-left:1vw;margin-right:0.25vw; ">
+        <button class="btn  btn-outline-secondary" id="dropdownExport" style="border: 1px solid grey;" ngbDropdownToggle>  <i class="fa fa-download"></i></button>
+        <div ngbDropdownMenu aria-labelledby="dropdownExport">
+          <button class="dropdown-item" (click)="export('pdf'); myDrop.close();">
+            <i class="fa fa-file-pdf-o"></i> PDF
+          </button>
+          <button class="dropdown-item" (click)="export('excel');; myDrop.close();">
+            <i class="fa fa-file-excel-o"></i> Excel
+          </button>
+          <button class="dropdown-item" (click)="export('word');; myDrop.close();">
+            <i class="fa fa-file-word-o"></i> Word
+          </button>
+        </div>
+      </div>
+      <!--<button class="btn  btn-outline-secondary pull-right" (click)="onprint('myFrame') ; myDrop.close();">
+        <i class="fa fa-print"></i>
+      </button>-->
+    </div>
+  </div>
+  <div (click)="myDrop.close();" id="custmizeReport" class="doNotPrint" [ngbCollapse]="!isCollapsed" style="z-index:1; position:absolute;margin-top:3.4%;width:99.8%; background:white;padding:0vw 1vw 0vw 1vw ;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);">
+    <div class="row" style="min-height:400px;">
+      <div class="col-md-2" style="padding:0px">
+        <div id="btn1" style="margin:0px;background-color:#ffc103; border-right-width: 10px;" class="row">
+          <a class="col-md-12" style="cursor:pointer;padding:9px 10px;font-size:15px;font-weight:500;line-height: 25px; " (click)="toggleTab('hide')">Customize Filter Criteria</a>
+        </div>
+      </div>
+
+      <!--<angular2-multiselect [data]="dropdownList" [(ngModel)]="selectedItems"
+                            [settings]="dropdownSettings"
+                            (onSelect)="onItemSelect($event)"
+                            (onDeSelect)="OnItemDeSelect($event)"
+                            (onSelectAll)="onSelectAll($event)"
+                            (onDeSelectAll)="onDeSelectAll($event)"></angular2-multiselect>-->
+
+
+
+
+      <div id="tab1" class="col-md-10" style="padding:0px;border: #ffc107 1px solid;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);line-height: 37px;">
+        <div class="card mb-3">
+        <div class="card-header" *ngIf="subreportShow"  style="    background: blanchedalmond;border: #ffc107 1px solid;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);">
+         <div class="row">
+          <div class="col-md-auto">
+          <div class="form-check">
+            <input type="radio" class="form-check-input" style="margin-top: .8rem;" id="detail" name="detail" [(ngModel)]="flagradio" (click)="changeSubName(detailPageId);"  [value]="detailPageId" />
+         
+            <label for="detail" class="form-check-label" >{{Rlabels[0]}} </label>
+          </div>
+        </div>
+          <div class="col-md-auto">
+          <div class="form-check" >
+            <input type="radio" class="form-check-input" style="margin-top: .8rem;" id="summary" name="summary" (click)="changeSubName(summaryPageId);" [(ngModel)]="flagradio" [value]="summaryPageId"  />
+          
+            <label for="summary"  class="form-check-label">{{Rlabels[1]}} </label>
+          </div>
+        </div>
+        <div class="col-md-auto">
+          <div  class="form-group" *ngIf="flagradio==summaryPageId"> 
+            <select class="form-control"  [(ngModel)]="selectedGroupId" id="selectedGroupId" style="width: 200px;height: 100%;"  (change)="changeSubName(selectedGroupId);" >
+              <option *ngFor="let c of subreports" [value]="c.page_Code">{{c.page_Name}}</option>
+            </select> 
+          </div>
+        </div>
+      </div>
+        </div>
+        <div id="divBody" class="card-body" style="padding-left: 10px; padding-right: 10px;padding-bottom: 10px;height: 100%; ">
+        <div class="row">
+          <div class="col-md-4">
+          <div *ngIf="officeShow" class="form-group">
+         
+            <div *ngIf="hideSelect2; then lblSelect else lblSelect1"> </div>
+            <ng-template #lblSelect>
+              <label>Office</label>
+              <ng-select2 [data]="offices" id="officeID" [value]="officeID" (valueChanged)="changeOffice($event)" width="350px">
+
+              </ng-select2>
+            </ng-template>
+
+            <ng-template #lblSelect1>
+            
+                <label>Office</label>
+                <angular2-multiselect [data]="officess" [(ngModel)]="OfficeId" [settings]="settings1" (ngModelChange)="onChange($event)"  name="ddloffice">
+                </angular2-multiselect>
+              
+            </ng-template>
+          </div>
+        </div>
+          <div *ngIf="dateFromShow" class="form-group col-md-4">
+            <span *ngIf="dateToShow">Date From:</span>
+            <span *ngIf="!dateToShow">Date:</span>
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="DateFrom.model" ngbDatepicker #dd="ngbDatepicker" style="height:41px">
+              <button class="btn" (click)="dd.toggle()">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="dateToShow" class="form-group col-md-4">
+            <span>Date To:</span>
+            <div class="input-group" >
+              <input class="form-control" name="dp" [(ngModel)]="DateTo.model" ngbDatepicker #ddd="ngbDatepicker" style="height:41px">
+
+              <button class="btn" (click)="ddd.toggle()">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div *ngIf="areaShow" class="form-group col-md-4">
+            <label for="Area">Area:</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="areas" [(ngModel)]="AreaId" [settings]="settings" (onDeSelect)="OnAreaDeSelect($event)" name="Area">
+              </angular2-multiselect>
+            </div>
+          </div>
+        
+
+       
+          <div *ngIf="officerShow" class="form-group col-md-4">
+            <label for="Officer">Officer:</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="officers" [(ngModel)]="UserId" [settings]="settings1" (onDeSelect)="OnOfficersDeSelect($event)" name="ddlOfficer">
+              </angular2-multiselect>
+            </div>
+          </div>
+
+          <div *ngIf="vehicleShow" class="form-group col-md-4">
+            <div><label>Vehicle</label></div>
+            <ng-select2 [data]="vehicles" id="vehicleID" [value]="vehicle_ID"
+              (valueChanged)="changeVehicle($event)" width="350px"></ng-select2>
+          </div>
+        </div>
+
+        <div class="row">
+          <div *ngIf="customerShow" class="form-group col-md-4">
+            <div *ngIf="sessionEnableTextboxCustomer!=1; then DropDownCustomerSelect2 else DropDownCustomerSearch"> </div>
+            <ng-template #DropDownCustomerSelect2>
+              <label for="customer">Customer:</label>
+              <div style="border: 1px solid #ccc">
+                <angular2-multiselect [data]="customers" [(ngModel)]="CustomerId" [settings]="settings1" name="ddlCustomer">
+                </angular2-multiselect>
+              </div>
+            </ng-template>
+            <ng-template #DropDownCustomerSearch>
+              <label for="customer">Customer:</label>
+              <div class="col-md-12" style="display: inline-flex;padding: 0px;">
+                <input type="text" id="textboxCustomer" [(ngModel)]="textboxCustomerName" onClick="this.select()" (change)="SearchCustomerByID(textboxCustomerName)" class="form-control" autocomplete="off" />
+                <div>
+                  <div>
+                    <div ngbDropdown [open]="false" autoClose="outside" class="nav navbar-nav" #myCustomerSearch="ngbDropdown" placement="bottom-right">
+                      <button class="btn" type="button" (click)="setCustomerSearchFocus()" style="line-height: 25px;" ngbDropdownToggle>
+                        <span class="caret"></span>
+                      </button>
+                      <div ngbDropdownMenu aria-labelledby="myCustomerSearch" class="dropdown-menu "
+                           style="overflow:hidden auto;position:absolute;width:600px;max-height:400px;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);padding-left: 15px;margin-left:100px;">
+                        <div class="row" style="margin:4px 0px 2px 0px">
+                          <div class="col-sm-11" style="display:inline-flex;padding:0px 4px 0px 0px;">
+                            <input type="text" [(ngModel)]="textboxCustomerSearch" id="textboxCustomerSearch" class="form-control" placeholder="Type Here To Search!" />
+                          </div>
+                          <button type="button" class="btn btn-small" (click)="SearchCustomerDropDown(textboxCustomerSearch)">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="row" style="width:102%">
+                          <table class="table table-hover table-striped" style="width:100%">
+                            <thead style="display: block;width:99%;">
+                              <tr class="thclr row">
+                                <th style="width:40%;margin-left:15px;">Name</th>
+                                <th style="width:20%">City</th>
+                                <th style="width:20%">Cell</th>
+                                <th style="width:17%">Phone</th>
+                              </tr>
+                            </thead>
+                            <tbody style="max-height: 250px;overflow: hidden scroll;display: block;width:100.5%;">
+                              <tr class="row" *ngIf="!searchGridCustomer?.length > 0 ">
+                                <td style="width:40%;margin-left:15px;">No Results To Show!</td>
+                                <td style="width:20%"></td>
+                                <td style="width:20%"></td>
+                                <td style="width:17%"></td>
+                              </tr>
+                              <tr class="row" *ngFor="let i of searchGridCustomer | filter:textboxCustomerSearch  | paginate: { itemsPerPage: 100, currentPage: g};" (click)="setSelectedCustomer(i.customer_ID,i.customer_Name);myCustomerSearch.close();" style="cursor:pointer">
+                                <td style="width:40%;margin-left:15px;">{{i.customer_Name}}</td>
+                                <td style="width:20%">{{i.city}}</td>
+                                <td style="width:20%">{{i.cell}}</td>
+                                <td style="width:17%">{{i.phone}}</td>
+                              </tr>
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--  <pagination-controls class="hide-page-numbers" (pageChange)="g = $event;"   style="float:right;"></pagination-controls>-->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+          <div *ngIf="supplierShow" class="form-group col-md-4">
+            <div *ngIf="sessionEnableTextboxSupplier!=1; then DropDownSupplierSelect2 else DropDownSupplierSearch"> </div>
+            <ng-template #DropDownSupplierSelect2>
+              <div class="col-md-12">
+                <label for="supplier">Supplier:</label>
+                <div style="border: 1px solid #ccc">
+                  <angular2-multiselect [data]="suppliers" [(ngModel)]="SupplierId" [settings]="settings1" name="ddlSupplier">
+                  </angular2-multiselect>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #DropDownSupplierSearch>
+              <label for="supplier">Supplier:</label>
+              <div class="col-md-12" style="display: inline-flex;padding: 0px;">
+                <input type="text" id="textboxSupplier" [(ngModel)]="textboxSupplierName" onClick="this.select()" (change)="SearchSupplierByID(textboxSupplierName)" class="form-control" autocomplete="off" />
+                <div>
+                  <div>
+                    <div ngbDropdown [open]="false" autoClose="outside" class="nav navbar-nav" #mySupplierSearch="ngbDropdown" placement="bottom-right">
+                      <button class="btn" type="button" (click)="setSupplierSearchFocus()" tabindex="10" style="line-height: 25px;" ngbDropdownToggle>
+                        <span class="caret"></span>
+                      </button>
+                      <div ngbDropdownMenu aria-labelledby="mySupplierSearch" class="dropdown-menu "
+                           style="    overflow: hidden auto;
+    position: absolute;
+    width: 600px;
+    max-height: 400px;
+    box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);
+    padding-left: 15px;
+    margin-left: 250px;">
+                        <div class="row" style="margin:4px 0px 2px 0px">
+                          <div class="col-sm-11" style="display:inline-flex;padding:0px 4px 0px 0px;">
+                            <input type="text" [(ngModel)]="textboxSupplierSearch" id="textboxSupplierSearch" class="form-control" placeholder="Type Here To Search!" />
+                          </div>
+                          <button type="button" class="btn btn-small" (click)="SearchSupplierDropDown(textboxSupplierSearch)">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="row" style="width:102%">
+                          <table class="table table-hover table-striped" style="width:100%">
+                            <thead style="display: block;width:99%;">
+                              <tr class="thclr row">
+                                <th style="width:40%;margin-left:15px;">Name</th>
+                                <th style="width:20%">City</th>
+                                <th style="width:20%">Cell</th>
+                                <th style="width:17%">Phone</th>
+                              </tr>
+                            </thead>
+                            <tbody style="max-height: 250px;overflow: hidden scroll;display: block;width:100.5%;">
+                              <tr class="row" *ngIf="!searchGridSupplier?.length > 0 ">
+                                <td style="width:40%;margin-left:15px;">No Results To Show!</td>
+                                <td style="width:20%"></td>
+                                <td style="width:20%"></td>
+                                <td style="width:17%"></td>
+                              </tr>
+                              <tr class="row" *ngFor="let i of searchGridSupplier | filter:textboxSupplierSearch  | paginate: { itemsPerPage: 100, currentPage: g};" (click)="setSelectedSupplier(i.supplier_ID,i.supplier_Name);mySupplierSearch.close();" style="cursor:pointer">
+                                <td style="width:40%;margin-left:15px;">{{i.supplier_Name}}</td>
+                                <td style="width:20%">{{i.city}}</td>
+                                <td style="width:20%">{{i.cell}}</td>
+                                <td style="width:17%">{{i.phone}}</td>
+                              </tr>
+
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--  <pagination-controls class="hide-page-numbers" (pageChange)="g = $event;"   style="float:right;"></pagination-controls>-->
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+
+
+          </div>
+          <div *ngIf="customerCategoryShow" class="form-group col-md-4">
+            <label for="category">Category:</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="personCategories" [(ngModel)]="PersonCategoryId" [settings]="settings" name="ddlpersonCategory">
+              </angular2-multiselect>
+            </div>
+
+          </div>
+        </div>
+        <div class="row">
+          <div *ngIf="invoiceShow" class="form-group col-md-4">
+            <label for="invoice">Invoice #:</label>
+
+            <input ngModel class="form-control" name="InvoiceID" #invoice="ngModel" />
+
+          </div>
+          <!--  col-md-3   -->
+          <div *ngIf="saleOrderShow" class="form-group col-md-4">
+            <label for="saleorder">Sale Order:</label>
+
+            <input ngModel class="form-control" name="SaleOrderID" #saleorder="ngModel" />
+
+          </div>
+          <div  class="form-group col-md-4">
+           
+          </div>
+          <!--  col-md-3   -->
+        </div>
+        <div class="row">
+          <div *ngIf="warehouseShow" class="form-group col-md-4">
+            <div><label>Warehouse</label></div>
+            <ng-select2 [data]="warehouses" id="warehouseID" [value]="warehouseID" (valueChanged)="changeWarehouse($event)" width="350px"></ng-select2>
+          </div>
+          <div *ngIf="itemCategoryShow" class="form-group col-md-4">
+            <label>Category</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="categories" [(ngModel)]="CategoryId" [settings]="settings1" name="ddlcategory">
+              </angular2-multiselect>
+            </div>
+
+          </div>
+          <div *ngIf="subCategoryShow" class="form-group col-md-4">
+            <label>Sub Category</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="subcategories" [(ngModel)]="SubCategoryId" [settings]="settings1" name="ddlsubcategory">
+              </angular2-multiselect>
+            </div>
+
+          </div>
+        </div>
+        <div class="row">
+          <div *ngIf="itemShow" class="form-group col-md-4">
+            <div *ngIf="sessionEnableTextboxItem!=1; then DropDownItemSelect2 else DropDownItemSearch"> </div>
+            <ng-template #DropDownItemSelect2>
+              <div class="col-md-12">
+                <span>Item:</span>
+                <div style="border: 1px solid #ccc">
+                  <angular2-multiselect [data]="items" [(ngModel)]="ItemId" [settings]="settings1" name="ddlItem">
+                  </angular2-multiselect>
+                </div>
+
+              </div>
+            </ng-template>
+            <ng-template #DropDownItemSearch>
+              <label>Item:</label>
+              <div class="col-md-12" style="display: inline-flex;padding: 0px;">
+                <input type="text" id="textboxItem" [(ngModel)]="textboxItemName" onClick="this.select()" (change)="SearchItemByID(textboxItemName)" class="form-control" autocomplete="off" style="height:38px;" />
+                <div class="form-group">
+                  <div>
+                    <div ngbDropdown [open]="false" autoClose="outside" class="nav navbar-nav" #myItemSearch="ngbDropdown" placement="bottom-right">
+                      <button class="btn" type="button" (click)="setItemSearchFocus()" ngbDropdownToggle>
+                        <span class="caret"></span>
+                      </button>
+
+                      <div ngbDropdownMenu aria-labelledby="myItemSearch" class="dropdown-menu "
+                           style="overflow:hidden auto;position:absolute;width:550px;max-height:400px;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);padding-left: 15px;">
+                        <div class="row" style="margin:4px 0px 2px 0px">
+                          <div class="col-sm-11" style="display:inline-flex;padding:0px 4px 0px 0px;">
+                            <input type="text" [(ngModel)]="textboxItemSearch" id="textboxItemSearch" class="form-control" placeholder="Type Here To Search!" />
+                          </div>
+                          <button type="button" class="btn btn-small" (click)="SearchItemDropDown(textboxItemSearch)">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="row" style="width:102%">
+                          <table class="table table-hover table-striped" style="width:100%">
+                            <thead style="display: block;width:99%;">
+                              <tr class="thclr row">
+                                <th style="width:40%;margin-left:15px;">Name</th>
+                                <th style="width:20%">Barcode</th>
+                                <th style="width:20%">Writer</th>
+                                <th style="width:17%">Stock</th>
+                              </tr>
+                            </thead>
+                            <tbody style="max-height: 250px;overflow: hidden scroll;display: block;width:100.5%;">
+                              <tr class="row" *ngIf="!searchGridItem?.length > 0 ">
+                                <td style="width:40%;margin-left:15px;">No Results To Show!</td>
+                                <td style="width:20%"></td>
+                                <td style="width:20%"></td>
+                                <td style="width:17%"></td>
+                              </tr>
+                              <tr class="row" *ngFor="let i of searchGridItem | filter:textboxItemSearch  | paginate: { itemsPerPage: 100, currentPage: g};" (click)="setSelectedItem(i.item_Code,i.item_Name);myItemSearch.close();" style="cursor:pointer">
+                                <td style="width:40%;margin-left:15px;">{{i.item_Name}}</td>
+                                <td style="width:20%">{{i.barcode}}</td>
+                                <td style="width:20%">{{i.writer}}</td>
+                                <td style="width:17%">{{i.stock}}</td>
+                              </tr>
+
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--  <pagination-controls class="hide-page-numbers" (pageChange)="g = $event;"   style="float:right;"></pagination-controls>-->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+
+          </div>
+          <div *ngIf="provinceShow" class="form-group col-md-4">
+            <label for="Province">Province</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="provinces" [(ngModel)]="ProvinceId" [settings]="settings1" name="Province" (ngModelChange)="loadRegions($event)">
+              </angular2-multiselect>
+            </div>
+          </div>
+          <div *ngIf="regionShow" class="form-group col-md-4">
+            <label for="Region">Region</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="regions" [(ngModel)]="RegionId" [settings]="settings1" name="Region" (onSelect)="loadAreas($event)" (onDeSelect)="unloadAreas($event)">
+              </angular2-multiselect>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div *ngIf="cityShow" class="form-group col-md-4">
+            <label for="Tehsil">City:</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="cities" [(ngModel)]="TehsilId" [settings]="settings1" (onSelect)="onCitySelect($event)"
+                                    (onDeSelect)="OnCityDeSelect($event)" name="Tehsil">
+              </angular2-multiselect>
+            </div>
+          </div>
+
+          <div *ngIf="orderShow" class="form-group col-md-4">
+            <label for="order">Order #:</label>
+
+            <input type="number" id="order" name="order" [(ngModel)]="order" class="form-control" />
+
+          </div>
+        </div>
+        <div class="row">
+          <div *ngIf="cancelShow==1" class="form-group col-md-1">
+            <label for="cancel">Cancel :</label>
+          </div>
+          <div *ngIf="cancelShow==1" class="form-group col-md-1" style="padding-top:3px;">
+            <input type="checkbox" class="" id="cancel" name="Cancel" [(ngModel)]="cancel" />
+          </div>
+          <div *ngIf="exchangeShow==1" class="form-group col-md-1">
+            <label for="exchange">Exchange :</label>
+          </div>
+          <div *ngIf="exchangeShow==1" class="form-group col-md-1" style="padding-top:3px;">
+            <input type="checkbox" class="" id="exchange" name="Exchange" [(ngModel)]="exchange" />
+          </div>
+        </div>
+        <div class="row">
+          <div *ngIf="subjectShow" class="form-group col-md-4">
+            <label for="subject">Subject:</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="subjects" [(ngModel)]="SubjectId" [settings]="settings1" name="subject">
+              </angular2-multiselect>
+            </div>
+          </div>
+          <div *ngIf="publisherShow" class="form-group col-md-4">
+            <div *ngIf="sessionEnableTextboxSupplier!=1; then DropDownSupplierSelect2 else DropDownSupplierSearch"> </div>
+            <ng-template #DropDownSupplierSelect2>
+              <div class="col-md-12">
+                <label for="supplier">Publisher:</label>
+                <div style="border: 1px solid #ccc">
+                  <angular2-multiselect [data]="suppliers" [(ngModel)]="SupplierId" [settings]="settings1" name="ddlSupplier">
+                  </angular2-multiselect>
+                </div>
+
+              </div>
+            </ng-template>
+            <ng-template #DropDownSupplierSearch>
+              <label for="supplier">Publisher:</label>
+              <div class="col-md-12" style="display: inline-flex;padding: 0px;">
+                <input type="text" id="textboxSupplier" [(ngModel)]="textboxSupplierName" onClick="this.select()" (change)="SearchSupplierByID(textboxSupplierName)" class="form-control" autocomplete="off" style="height:38px" />
+                <div class="form-group">
+                  <div>
+                    <div ngbDropdown [open]="false" autoClose="outside" class="nav navbar-nav" #mySupplierSearch="ngbDropdown" placement="bottom-right">
+                      <button class="btn" type="button" (click)="setSupplierSearchFocus()" tabindex="10" ngbDropdownToggle>
+                        <span class="caret"></span>
+                      </button>
+                      <div ngbDropdownMenu aria-labelledby="mySupplierSearch" class="dropdown-menu "
+                           style="overflow:hidden auto;position:absolute;width:550px;max-height:400px;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);padding-left: 15px;margin-left:250px;">
+                        <div class="row" style="margin:4px 0px 2px 0px">
+                          <div class="col-sm-11" style="display:inline-flex;padding:0px 4px 0px 0px;">
+                            <input type="text" [(ngModel)]="textboxSupplierSearch" id="textboxSupplierSearch" class="form-control" placeholder="Type Here To Search!" />
+                          </div>
+                          <button type="button" class="btn btn-small" (click)="SearchSupplierDropDown(textboxSupplierSearch)">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="row" style="width:102%">
+                          <table class="table table-hover table-striped" style="width:100%">
+                            <thead style="display: block;width:99%;">
+                              <tr class="thclr row">
+                                <th style="width:40%;margin-left:15px;">Name</th>
+                                <th style="width:20%">City</th>
+                                <th style="width:20%">Cell</th>
+                                <th style="width:17%">Phone</th>
+                              </tr>
+                            </thead>
+                            <tbody style="max-height: 200px;overflow: hidden scroll;display: block;width:100.5%;">
+                              <tr class="row" *ngIf="!searchGridSupplier?.length > 0 ">
+                                <td style="width:40%;margin-left:15px;">No Results To Show!</td>
+                                <td style="width:20%"></td>
+                                <td style="width:20%"></td>
+                                <td style="width:17%"></td>
+                              </tr>
+                              <tr class="row" *ngFor="let i of searchGridSupplier | filter:textboxSupplierSearch  | paginate: { itemsPerPage: 100, currentPage: g};" (click)="setSelectedSupplier(i.supplier_ID,i.supplier_Name);mySupplierSearch.close();" style="cursor:pointer">
+                                <td style="width:40%;margin-left:15px;">{{i.supplier_Name}}</td>
+                                <td style="width:20%">{{i.city}}</td>
+                                <td style="width:20%">{{i.cell}}</td>
+                                <td style="width:17%">{{i.phone}}</td>
+                              </tr>
+
+                            </tbody>
+                          </table>
+                        </div>
+                        <!--  <pagination-controls class="hide-page-numbers" (pageChange)="g = $event;"   style="float:right;"></pagination-controls>-->
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+          <div *ngIf="quantityShow" class="form-group col-md-4">
+            <label for="quantity">Stock:</label>
+            <input type="number" id="quantity" name="quantity" [(ngModel)]="quantity" class="form-control" />
+          </div>
+        </div>
+        </div> 
+        <div class="card-footer" style="margin-bottom: -16px;">
+         <div class="row">
+          <div class="col-4 col-md-4">
+            <div *ngIf="companyshow">
+              <angular2-multiselect class="form-control"   [data]="companies" [(ngModel)]="CompnayId" [settings]="settings1" name="Company">
+              </angular2-multiselect>
+            </div>
+            </div>
+            <div class="col-4 col-md-4">
+            <div *ngIf="!companyshow" class="form-group">
+
+            </div> 
+          </div>
+          <div class="col-4 col-md-4">
+            <div class="form-group" >
+              <button type="button" class="btn btn-alert pull-right" style="margin-left:10px;" (click)="(isCollapsed = !isCollapsed);">Cancel</button>
+              <button type="button" class="btn btn-warning pull-right" (click)="(isCollapsed = !isCollapsed);changeReport(selectedReport,'0');showPWText();">View Report</button>
+            </div>
+          </div>
+        </div>
+    
+      </div>
+    </div>
+      </div>
+
+  </div>
+</div>
+
+
+<div id="rptBody" name="rptBody" class="rptBody card-body table-responsive" style="    overflow-x: hidden;">
+  <!--style="overflow:hidden;background:url('assets/images/Spinner2.gif') center 200px no-repeat; width:100%;height:100vh ">-->
+  <div class="row">
+    <h1 style="position:absolute;margin-top:400px; margin-left:400px;color:black;font-weight:900" [style.display]="showPS">PLEASE SPECIFY REPORT CRITERIA</h1>
+    <h1 style="position:absolute;margin-top:400px; margin-left:400px;color:black;font-weight:900" [style.display]="showPW">PLEASE WAIT REPORT IS LOADING</h1>
+    <h1 style="position:absolute;margin-top:400px; margin-left:500px;color:red;font-weight:900" [style.display]="showER">Report Laoding Fail! <h3>Please Contact System Administrator</h3></h1>
+    <div class="col-md-12" style="overflow:hidden;margin:0px;padding:0px;">
+      <div id="mydiv">
+      </div>
+
+      <!--<router-outlet></router-outlet>-->
+    </div>
+  </div>
+</div>
+<div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:80vh;position :absolute;z-index:10000;overflow:hidden;">
+
+  <spinner [visible]="isLoading" style="position: absolute;left: 50%;top: 17%;z-index:10010"></spinner>
+
+</div>
+<div class="row" *ngIf="isLoadingRpt" style="background-color:transparent; width: 100%;height:80vh;position :absolute;z-index:10000;overflow:hidden;">
+
+  <spinner [visible]="isLoadingRpt" style="position: absolute;left: 50%;top: 17%;z-index:10010"></spinner>
+
+</div>
+
+
+</div>

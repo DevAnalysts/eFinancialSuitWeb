@@ -1,0 +1,276 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;"  placeholder="search..." class="form-control" />
+            <button class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>k
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Contact Person</th>
+              <th>Supplier</th>
+              <th>Job Title</th>
+              <th>Phone</th>
+              <th>Cell</th>
+              <th>Fax</th>
+              <th>City</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let c of contacts  | paginate: { itemsPerPage: 17, currentPage: p};">
+              <td>{{c.contactid}}</td>
+              <td>{{c.contactname}}</td>
+              <td>{{c.suppliername}}</td>
+              <td>{{c.jobtitle}}</td>
+              <td>{{c.bphone}}</td>
+              <td>{{c.mphone}}</td>
+              <td>{{c.fax}}</td>
+              <td>
+                {{c.cityname}}
+                <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                  <button class="btn btn-small btn-warning tip" (click)="open(content);getDetailsByID(c.contactid);" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h4 class="modal-title">{{FUNCTIONALITYDETAILNAME}}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click');Cancel();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="row">
+
+        <div class="col-sm-1">
+          <span>Name</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="contactname" id="contactname" [style.border]="checkname" (change)="checkName()">
+          </div>
+        </div>
+
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>Company Name</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <ng-select2 [data]="suppliers" id="supplierid" [value]="supplierid" (valueChanged)="getSupplierChange($event)" [width]="310">
+            </ng-select2>
+          </div>
+        </div>
+
+        <div class="col-sm-1">
+          <span>Job Title</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="jobtitle" id="jobtitle">
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+
+        <div class="col-sm-1">
+          <span>CNIC</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="cnic" id="cnic" [textMask]="{mask: mask2}" placeholder="33202-5019403-7">
+          </div>
+        </div>
+
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>Father Name</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="fathername" id="fathername">
+          </div>
+        </div>
+
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>Gender</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="gender" id="gender">
+              <option value="1">Male</option>
+              <option value="2">Female</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>Business Phone</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="bphone" id="bphone" [textMask]="{mask: mask1}" placeholder="(314)3449619">
+          </div>
+        </div>
+
+        <div class="col-sm-1">
+          <span>Mobile Phone</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="mphone" id="mphone" [textMask]="{mask: mask1}" placeholder="(314)3449619">
+          </div>
+        </div>
+
+        <div class="col-sm-1">
+          <span>Fax</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="fax" id="fax">
+          </div>
+        </div>
+
+
+      </div>
+      <div class="row">
+
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>Email</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="email" id="email">
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>Primary Contact</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="checkbox" [checked]="unchecked" pointer-events="none" style="margin-top: 8px;" [(ngModel)]="pcontact" id="pcontact">
+          </div>
+        </div>
+        <div class="col-sm-1">
+          <span>Status</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="checkbox" [checked]="unchecked" pointer-events="none" style="margin-top: 8px;" [(ngModel)]="status" id="status">
+          </div>
+
+        </div>
+      </div>
+      <b>ADDRESS INFORMATION</b>
+      <div class="row" style="margin-top:10px;">
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>Line 1</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="line1" id="line1">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>Line 2</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="line2" id="line2">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>Line 3</span>
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="line3" id="line3">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+
+
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>City</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <ng-select2 [data]="city" id="citycode" [value]="citycode" (valueChanged)="getCityChange($event)" [width]="200">
+            </ng-select2>
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>State</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="provincename" id="provincename" readonly="readonly">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-1" style="padding-right: 0px;">
+          <span>Country</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="countryname" id="countryname" readonly="readonly">
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-small btn-warning tip" (click)="saveContact(contactname, supplierid, jobtitle, cnic, fathername, bphone, mphone, fax,email,gender,mstatus, pcontact, status,line1,line2,line3,citycode,provincecode,countrycode);" [style.display]="hidesave"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      <button type="button" id="x" class="btn btn-small" (click)="Cancel();c('Close click');"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+    </div>
+  </ng-template>
+  </div>

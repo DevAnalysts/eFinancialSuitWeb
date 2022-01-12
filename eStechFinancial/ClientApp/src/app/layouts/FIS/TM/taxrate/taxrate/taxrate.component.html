@@ -1,0 +1,328 @@
+<!-- Row -->
+<div class="row">
+
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <!--  <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>-->
+          <span style="font-size:large;font-weight:bold;">TAX RATE</span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input (keyup)="getGrid(input.value)" [(ngModel)]="ID" id="ID" placeholder="search..." class="form-control" />
+
+            <button [style.display]="PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Title</th>
+              <th>Tax Rate</th>
+              <th>Tax Type</th>
+
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of grid | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.taxRateID}}</td>
+              <td>{{dt.title}}</td>
+              <td>{{dt.taxrate  | number: '1.2-5'}}</td>
+              <td>{{getTaxType(dt.taxtypeid)}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.taxRateID,content) "
+                          id="edit">
+                    <span class="fa fa-pencil "></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        <!--{{FUNCTIONALITYDETAILNAME}}-->
+        TAX RATE DETAIL
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Sales Tax Type:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-trello" style="font-size:medium" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="taxtypeid" id="taxtypeid" (change)="ChangeTaxType()">
+                <option value="1">Individual Sales Tax</option>
+                <option value="2">Group Sales Tax</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Status:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="checkbox" [(ngModel)]="status" id="status" pointer-events="none" style="margin-top: 8px;">
+          </div>
+        </div>
+
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Title:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-tag" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="title" id="title" tabindex="2">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-6">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-align-justify" aria-hidden="true"></i>
+            <fieldset class="form-group">
+              <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                        rows="3" tabindex="3"></textarea>
+            </fieldset>
+          </div>
+        </div>
+
+
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Tax Rate:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="number" min="0" class="form-control" [(ngModel)]="taxrate" id="taxrate" (change)="changeTaxRate()">
+            </div>
+
+          </div>
+        </div>
+        <div class="col-md-2" [style.display]="showTaxAgency">
+          <span>Tax Agency:</span>
+        </div>
+        <div class="col-md-2" [style.display]="showTaxAgency">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-group" style="font-size:medium" aria-hidden="true"></i>
+              <ng-select2 [data]="taxagencyList" id="taxagency" [value]="taxagencycode" (valueChanged)="getTaxAgencyChange($event)" [width]="200">
+              </ng-select2>
+            </div>
+
+          </div>
+        </div>
+
+
+      </div>
+
+      <div class="row table-shadow-padding " [style.display]="showGroupGrid">
+
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th style="width:4%;margin-left:17px">Sr#.</th>
+              <th style="width:25%">Tax Item</th>
+              <th style="width:10%">Tax Rate</th>
+              <th style="width:25%">Tax Agency</th>
+              <th style="width:25%">Tax Description</th>
+              <th style="width:8%">Action</th>
+            </tr>
+          </thead>
+          <tbody style="min-height: 300px;max-height: 500px;overflow: hidden scroll;display: block;width:100%;">
+            <tr *ngFor="let i of taxRateDetails | paginate: { itemsPerPage: 15, currentPage: g, id:'2nd'}; let idx = index" class="row">
+              <td style="width:4%;margin-left:15px">{{(idx+1)+(g-1)*15}}</td>
+              <td style="width:25%">
+                <div *ngIf="i.edit_Mode; then selectName else viewName"> </div>
+                <ng-template #viewName>
+                  <span ng-show="editMode">
+                    {{i.taxRateNAME}}
+                  </span>
+                </ng-template>
+                <ng-template #selectName>
+
+                  <ng-select2 [data]="taxrateList" id="taxratecode" [value]="taxratecode" (valueChanged)="getTaxRateChange($event)" [width]="300">
+                  </ng-select2>
+
+                </ng-template>
+              </td>
+
+              <td style="width:10%">
+                <div *ngIf="i.edit_Mode; then selectRate else viewRate"> </div>
+                <ng-template #viewRate>
+                  <span>{{i.taxRate | number:'1.2-5'}}</span>
+                </ng-template>
+                <ng-template #selectRate>
+                  <span>{{taxrateDG | number:'1.2-5'}}</span>
+                </ng-template>
+              </td>
+              <td style="width:25%">
+                <div *ngIf="i.edit_Mode; then selectAgency else viewAgency"> </div>
+                <ng-template #viewAgency>
+                  <span>{{i.taxAgencyNAME}}</span>
+                </ng-template>
+                <ng-template #selectAgency>
+                  <span>{{taxagencynameDG}}</span>
+                </ng-template>
+              </td>
+              <td style="width:25%">
+                <div *ngIf="i.edit_Mode; then selectRemarks else viewRemarks"> </div>
+                <ng-template #viewRemarks>
+                  <span>{{i.remarks}}</span>
+                </ng-template>
+                <ng-template #selectRemarks>
+                  <span>{{remarksDG}}</span>
+                </ng-template>
+
+              </td>
+              <td style="width:8%">
+                <div class="btn-group" *ngIf="i.edit_Mode; then ok else pencel">
+                  <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button" value="Delete" id="remove">
+                    <span class="fa fa-remove"></span>
+                  </button>
+                </div>
+                <ng-template #ok>
+                  <button class="btn btn-small btn-success tip" data-original-title="Quick save" type="button" (click)="changeMode(idx,i,0)" id="update" style="padding-right:11px;margin-right:-1px;">
+                    <span class="fa fa-check"></span>
+                  </button>
+                </ng-template>
+                <ng-template #pencel>
+                  <button class="btn btn-small btn-warning tip" data-original-title="Hide" type="button" (click)="changeMode(idx,i,1)" [disabled]="EditItemButton" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+
+                </ng-template>
+
+                <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button" value="Delete" id="remove" [disabled]="RemoveItemButton"
+                        (click)="changeMode(idx,i,2)">
+                  <span class="fa fa-remove"></span>
+                </button>
+
+              </td>
+            </tr>
+            <tr id="AddNewItemRow" class="row">
+              <td style="width:4%;margin-left:15px">
+                <input type="text" id="txt" style="width:3px" />
+              </td>
+              <td style="width:25%">
+                <ng-select2 [data]="taxrateList" id="taxrate" [value]="taxratecode" (valueChanged)="getTaxRateChange($event)" [width]="250">
+                </ng-select2>
+              </td>
+              <td style="width:10%">
+                <span>{{taxrateDG | number:'1.2-5'}}</span>
+              </td>
+              <td style="width:25%">
+                <span>{{taxagencynameDG}}</span>
+              </td>
+              <td style="width:25%">
+                <span>{{remarksDG}}</span>
+              </td>
+              <td style="width:8%">
+                <button type="button" class="btn btn-small btn-warning tip"
+                        (click)="addGrid(taxratecode)"
+                        data-original-title="Quick save" ng-click="addrow()" id="adds">
+                  <span class="fa fa-check"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th style="width:4%;margin-left:17px"></th>
+              <th style="width:25%">Total :</th>
+              <th style="width:10%">{{taxrate | number:'1.2-5'}}</th>
+              <th style="width:25%"></th>
+              <th style="width:25%"></th>
+              <th style="width:8%"></th>
+            </tr>
+          </thead>
+        </table>
+
+      </div>
+      <pagination-controls (pageChange)="g = $event" id="2nd" style="float:right;" [style.display]="showGroupGrid"></pagination-controls>
+
+      <div class="row">
+     
+      </div>
+
+    </div>
+    <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+    <div class="modal-footer">
+
+
+      <div *ngIf="btnMode; then submitAdd else  submitUpdate "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" tabindex="23" class="btn btn-small btn-warning tip" (click)="saveData()">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close.
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <div class="row" style="position: absolute;left: 30px;">
+
+
+        </div>
+
+        <button [style.display]="PermissionEdit" id="submitUpdate" type="button" tabindex="23" class="btn btn-small btn-warning tip" (click)="updateSupplier()">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close
+        </button>
+      </ng-template>
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click')" tabindex="24"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>
+
+
+

@@ -1,0 +1,232 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;"placeholder="search..." class="form-control" />
+            <button [style.display]="PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <!--<div class="card-header">
+        <div class="page-title-list">
+          {{FUNCTIONALITYNAME}}
+        </div>
+        <div style="float:right; margin-right:-16px">
+          <input class="form-control" type="text" name="search" placeholder="search..." [(ngModel)]="filter" style="float:left; width:200px;margin:3px;">
+          <button class=" btn btn-small btn-warning tip" style="margin:3px;" id="myInput" (click)="open(content)">
+            <i class="fa fa-plus"></i>
+          </button>
+        </div>
+      </div>-->
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+
+            <tr class="thclr">
+              <th style="width: 5%">ID</th>
+              <th style="width: 5%">Order #</th>
+              <th style="width: 7%">Order Date</th>
+              <th style="width: 10%">Route</th>
+              <th style="width: 15%">Scheme Item</th>
+              <th style="width: 10%">Scheme Amount</th>
+              <th style="width: 10%">Total Scheme  Qty</th>
+              <th style="width: 10%">Total Scheme  Amount</th>
+              <th style="width: 10%">Total Actual  Amount</th>
+              <th style="width: 5%">Status</th>
+              <th style="width: 7%"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let e of gridlist   | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{e.schemecode}}</td>
+              <td>{{e.so}}</td>
+              <td>{{e.sodate}}</td>
+              <td>{{e.route}}</td>
+              <td>{{e.item}}</td>
+              <td>{{e.amount}}</td>
+              <td>{{e.totalqty}}</td>
+              <td>{{e.totalamount}}</td>
+              <td>{{e.totalactualqty}}</td>
+              <td>{{e.cancel}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.schemecode,content)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header" style="padding-bottom: 30px;">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click');routeInvoice();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-2">
+          Date
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div *ngIf="btnmode; then schemedateAdd else schemedateUpdate"> </div>
+            <ng-template #schemedateAdd>
+              <div class="input-group">
+                <input class="form-control" name="dp" [(ngModel)]="schemedate.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="getRouteWiseSchemes()">
+                <div class="input-group-append">
+                  <button class="btn btn-small " (click)="dd.toggle()">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #schemedateUpdate>
+              <div class="input-group">
+                <input class="form-control" name="dp" [(ngModel)]="schemedate.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="getRouteWiseSchemes()" disabled>
+                <div class="input-group-append">
+                  <button class="btn btn-small " (click)="dd.toggle()" disabled>
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="row">
+        <div class="col-md-2">
+          Route :
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-map-marker" style="font-size:medium" aria-hidden="true"></i>
+              <div *ngIf="btnmode; then areaAdd else areaUpdate"> </div>
+              <ng-template #areaAdd>
+                <select class="form-control" [(ngModel)]="areacode" id="areacode" (change)="getRouteWiseSchemes()">
+                  <option *ngFor="let u of area " [value]="u.areacode">{{u.areaname}}</option>
+                </select>
+              </ng-template>
+              <ng-template #areaUpdate>
+                <select class="form-control" [(ngModel)]="areacode" id="areacode" (change)="getRouteWiseSchemes()" disabled>
+                  <option *ngFor="let u of area " [value]="u.areacode">{{u.areaname}}</option>
+                </select>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:10%;margin-left:15px">Order #</th>
+              <th style="width:20%">Customer</th>
+              <th style="width:30%">Item</th>
+              <th style="width:10%">Sale Qty</th>
+              <th style="width:10%">Scheme Qty</th>
+              <th style="width:10%">Scheme Amount</th>
+              <th style="width:8%"></th>
+             <!-- <th style="width:10%">Actual Qty</th>-->
+            </tr>
+          </thead>
+          <tbody style="height: 280px;overflow: hidden scroll;display: block;width:100%;">
+            <tr *ngFor="let i of schemeList let idx = index" class="row">
+              <td style="width:10%;margin-left:15px">{{i.saleOrder_ID}}</td>
+              <td style="width:20%">{{i.customer}}</td>
+              <td style="width:30%">{{i.item}}</td>
+              <td style="width:10%">{{i.saleQty}}</td>
+              <td style="width:10%">{{i.schemeQty}}</td>
+              <td style="width:10%">{{i.schemeAmount}}</td>
+
+              <div *ngIf="i.disabled; then mON else mOFF"> </div>
+              <ng-template #mON>
+                <td style="width:8%"><input type="checkbox" pointer-events="none" [(ngModel)]="i.marked" style="margin-top: 4px;" disabled></td>
+              </ng-template>
+              <ng-template #mOFF>
+                <td style="width:8%"><input type="checkbox" pointer-events="none" [(ngModel)]="i.marked" style="margin-top: 4px;"></td>
+              </ng-template>
+              <!--<td style="width:10%">{{i.actualQty}}</td>-->
+            </tr>
+          </tbody>
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:10%;margin-left:15px"></th>
+              <th style="width:20%"></th>
+              <th style="width:30%"></th>
+              <th style="width:10%">Total :</th>
+              <th style="width:10%">{{ TotalSchemeQty()}}</th>
+              <th style="width:10%">{{ TotalSchemeAmount()}}</th>
+              <th style="width:8%"></th>
+              <!--<th style="width:10%">{{ TotaActualQty()}}</th>-->
+            </tr>
+          </thead>
+        </table>
+      </div>
+    </div>
+
+    <div class="modal-footer" style="margin-bottom: 10px;padding-top: 15px;">
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveData();"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <div class="row" style="position: absolute;left: 30px;">
+
+          <!--Cancel Mail-->
+          <button type="button" id="cancelBtn" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="cancelScheme()"><i class="fa fa-window-close-o" aria-hidden="true"></i> Cancel</button>
+        </div>
+        <button [style.display]="PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateData();"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      </ng-template>
+      <button type="button" class="btn btn-small" (click)="c('Close click');routeInvoice();"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+
+</div>
+
+
+

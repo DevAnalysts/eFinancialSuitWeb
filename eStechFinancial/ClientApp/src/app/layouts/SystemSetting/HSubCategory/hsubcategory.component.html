@@ -1,0 +1,116 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div [class]="card1style">
+      <div class="row  card-header" style="height:40px;">
+        <div class="col-md-10" style="padding-top:5px;">
+          <div class="page-title-list">
+            <span style="font-size:large;font-weight:bold;">  SUB-CATEGORY DETAIL</span>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" name="search" placeholder="search..." [(ngModel)]="ID" style="float:left; width:100px;margin:3px;">
+            <button class=" btn btn-small btn-warning tip" style="margin:3px;" (click)="Add()" [style.display]="addbutton">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div></div>
+        </div>
+        <div class="card-body table-responsive" style="padding:5px;">
+          <table class="table table-hover table-striped" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176)">
+            <thead>
+              <tr class="thclr">
+                <th>ID</th>
+                <th>SubCategory</th>
+                <th>Category code</th>
+                <th>Status</th>
+                <th></th>
+                <!--<th [style.display]="addbutton">Department</th>-->
+
+              </tr>
+            </thead>
+            <tbody>
+              <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+              <tr *ngFor="let u of category | paginate: { itemsPerPage: 20, currentPage: p};">
+                <td>{{u.subcategorY_CODE}}</td>
+                <td>{{u.subcategorY}}</td>
+                <td>{{u.categorY_CODE}}</td>
+                <td>
+                  <div *ngIf="true == u.activE; then on else off"></div>
+
+                  <ng-template #on>
+                    <input type="checkbox" [checked]="checked" pointer-events="none" disabled="disabled" style="margin-top: 8px;">
+                  </ng-template>
+                  <ng-template #off>
+                    <input type="checkbox" [checked]="unchecked" pointer-events="none" disabled="disabled" style="margin-top: 8px;">
+                  </ng-template>
+                </td>
+                <td>
+                  <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                    <button class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.subcategorY_CODE);Edit();" id="edit">
+                      <span class="fa fa-pencil"></span>
+                    </button>
+                  </div>
+
+                </td>
+
+                <!--<td [style.display]="addbutton">{{u.department}}</td>-->
+              </tr>
+            </tbody>
+          </table>
+          <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+        </div>
+
+      </div>
+      <div [class]="card2style" style="padding:0px;margin:0px;border:0px;" [style.display]="card2display">
+        <div class="card-header" style="height:40px;">
+          <div class="page-title-list">
+            <span style="font-size:large;font-weight:bold;">  SUB-CATEGORY</span>
+</div>
+        </div>
+        <div class="card-body" style="margin-top:20px;">
+          <div class='container-fluid'>
+            <div class='row'>
+              <div class="col-md-4">
+                <span>Category Name</span>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input type="text" class="form-control" [(ngModel)]="subcategorY" id="subcategorY">
+                </div>
+              </div>
+            </div>
+            <div class='row'>
+              <div class="col-md-4">
+                <span>Category Code</span>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input type="text" class="form-control" [(ngModel)]="categorY_CODE" id="categorY_CODE">
+                </div>
+              </div>
+            </div>
+            <div class='row'>
+              <div class="col-md-4">
+                <span>Status</span>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input type="checkbox" [(ngModel)]="activE" id="activE" />
+                </div>
+              </div>
+            </div>
+
+            <div class='row'>
+              <div class="col-md-4"></div>
+              <div class="col-md-6">
+                <button type="button" class=" btn" style="float:right;margin:3px;" (click)="Cancel()"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+                <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp1" (click)="saveSubject( subcategorY, categorY_CODE,1)"> <i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+                <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp2" (click)="UpdateSubject(subcategorY, categorY_CODE,1)"> <i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+              </div>
+            </div>
+
+          </div>
+    </div>
+  </div></div></div>
+

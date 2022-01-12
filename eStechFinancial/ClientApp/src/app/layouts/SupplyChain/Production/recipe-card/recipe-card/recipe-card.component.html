@@ -1,0 +1,261 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> Recipe Card</span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text"  #input (keyup.enter)="$event.target.blur()" (blur)="getRecipeCard(input.value)" [(ngModel)]="ID" id="ID" placeholder="search..." class="form-control" />
+            <button [style.display]="PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Recipe No</th>
+              <th>Product</th>
+              <th>Recipe Date</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of recipes  | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.rC_ID}}</td>
+              <td>{{dt.rC_NO}}</td>
+              <td>{{dt.item_Code}}:{{dt.item_Name}}</td>
+              <td>{{dt.rC_Date | date:"dd/MM/yy"}} </td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView"  class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.rC_ID,content)"
+                     id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        Recipe Card Detail
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+      <div class="row" style="padding-bottom:10px">
+        <div class="col-md-4">
+          <span>Product:</span>
+        </div>
+        <div class="col-md-2">
+
+        </div>
+        <div class="col-md-2">
+          <span>Material For:</span>
+        </div>
+        <div class="col-md-2">
+          <span>Max Batch Size:</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <ng-select2 [data]="item" id="item_ID" [value]="item_ID" (valueChanged)="changeI($event)" width="600px">
+            </ng-select2>
+          </div>
+        </div>
+        <div class="col-md-2">
+
+        </div>
+        <div class="col-md-2" style="padding-left:40px">
+          <div class="input-group-append">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input type="number" onClick="this.select();" class="form-control" style="width: 100%;" [(ngModel)]="materialfor" id="materialfor" min="1">
+            </div>
+            <div *ngIf="Mode; then viewUnit else selectUnit"></div>
+              <ng-template #selectUnit>
+                <label style="margin: 5px auto 5px auto">{{this.prod_unit}}</label> 
+               <!--  <select class="form-control" [(ngModel)]="prod_unit" id="unit" style="display: inline-flex; width: 80%; background-color: lightgray;font-size: smaller;">
+                  <option *ngFor="let j of unitList " [value]="j.unitID">{{j.unit}}</option>
+                </select> -->
+              </ng-template>
+              <ng-template #viewUnit>
+                <label style="margin: 5px auto 5px auto">{{this.unit}}</label> 
+                <!-- <span style="text-align: center;font-size: smaller;">{{this.unit}}</span> -->
+              </ng-template>
+          </div>
+        </div>
+        <div class="col-md-2" style="padding-left:40px">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="maxbatchsize" id="maxbatchsize" min="1">
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="row table-shadow-padding">
+
+        <table class="table table-hover table-striped" style="width:100%">
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;">Sr#.</th>
+              <th style="width:40%">Raw Material</th>
+              <th style="width:20%">Raw Material Details</th>
+              <th style="width:20%">Quantity</th>
+              <th style="width:13%">Action</th>
+            </tr>
+          </thead>
+          <tbody style="max-height: 300px;overflow: hidden scroll;display: block;width:100%;">
+            <tr class="row" *ngFor="let i of recipeCardDetails let idx = index">
+              <td style="width:5%;margin-left:25px;">{{idx+1}}</td>
+              <td style="width:40%">
+                <div *ngIf="i.edit_Mode; then selectName else viewName"> </div>
+                <ng-template #viewName>
+                  <span ng-show="editMode">{{i.item_Name}}</span>
+                </ng-template>
+                <ng-template #selectName>
+                  <ng-select2 [data]="items" id="itemEdit" [value]="item_Code" (valueChanged)="updateItem(i,$event)" width="300px">
+                  </ng-select2>
+                </ng-template>
+              </td>
+              <td style="width:20%">
+                <div *ngIf="i.edit_Mode; then selectPrice else viewPrice"> </div>
+                <ng-template #viewPrice>
+                  <span ng-show="editMode">{{i.item_Detail}}</span>
+                </ng-template>
+                <ng-template #selectPrice>
+                  <input type="text" class="form-control" [(ngModel)]="i.item_Detail" (keyup.enter)="changeMode(idx,i,0)" />
+                </ng-template>
+              </td>
+              <td style="width:20%">
+                <div *ngIf="i.edit_Mode; then selectQty else viewQty"> </div>
+                <ng-template #viewQty>
+                  <span ng-show="editMode">{{i.quantity}} {{getUnitName(i.unit)}} </span>
+                </ng-template>
+                <ng-template #selectQty>
+                  <input type="number" style="width: 40%;" onClick="this.select();" class="form-control" [(ngModel)]="i.quantity" min="1" (change)="changeQuantityEdit(i,i.quantity)" (keyup.enter)="changeMode(idx,i,0)" />
+                 <label>{{this.unit}}</label>
+                  <!-- <select class="form-control pt-1" [(ngModel)]="unit" id="unit" style="display: inline-flex; width: 30%; background-color: lightgray;" (change)="changeUnitID()">
+                    <option *ngFor="let i of unitList " [value]="i.unitID">{{i.unit}}</option>
+                </select> -->
+                </ng-template>
+              </td>
+              <td style="width:13%">
+                <div class="btn-group" *ngIf="i.edit_Mode; then ok else pencel">
+                  <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button" value="Delete" id="remove">
+                    <span class="fa fa-remove text-white"></span>
+                  </button>
+                </div>
+                <ng-template #ok>
+                  <button class="btn btn-small btn-success tip" data-original-title="Quick save" type="button" (click)="changeMode(idx,i,0)"
+                          id="update">
+                    <span class="fa fa-check text-white"></span>
+                  </button>
+                </ng-template>
+                <ng-template #pencel>
+                  <button class="btn btn-small btn-warning tip" data-original-title="Hide" type="button" (click)="changeMode(idx,i,1)" id="edit">
+                    <span class="fa fa-pencil text-white"></span>
+                  </button>
+                  <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button" value="Delete" id="remove" (click)="changeMode(idx,i,2)">
+                    <span class="fa fa-remove text-white"></span>
+                  </button>
+                </ng-template>
+              </td>
+            </tr>
+            <tr class="row">
+              <td style="width:5%;margin-left:25px;">
+                <input type="text" id="txt" (keyup.enter)="addGrid(item_Code,item_Name,item_Detail,quantity)" style="width:3px" />
+              </td>
+              <td style="width:40%">
+                <ng-select2 [data]="items" id="item_Code" [value]="item_Code" (valueChanged)="changeItems($event)" width="300px">
+                </ng-select2>
+              </td>
+              <td style="width:20%">
+                <input type="text" [(ngModel)]="item_Detail" class="form-control" ng-hide="editMode" min="1"
+                       (keyup.enter)="addGrid(item_Code,item_Name,item_Detail,quantity)" />
+              </td>
+              <td style="width:20%">
+                <input type="number" style ="width: 40%" onClick="this.select();" [(ngModel)]="quantity" class="form-control" ng-hide="editMode" min="1" (change)="changeQuantity(quantity)" (keyup.enter)="addGrid(item_Code,item_Name,item_Detail,quantity)" />
+                <label >{{this.unit}}</label>
+                <!-- <select class="form-control pt-1" [(ngModel)]="unit" id="unit" style="display: inline-flex; width: 30%; background-color: lightgray;" (change)="changeUnitID()">
+                  <option *ngFor="let i of unitList " [value]="i.unitID">{{i.unit}}</option>
+                </select> -->
+              </td>
+              <td style="width:13%" class="btn-group">
+                <button type="button" class="btn btn-small btn-warning tip" (click)="addGrid(item_Code,item_Name,item_Detail,quantity)"
+                        (keyup.enter)="addGrid(item_Code,item_Name,item_Detail,quantity)"
+                        data-original-title="Quick save" ng-click="addrow()" id="adds">
+                  <span class="fa fa-check text-white"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+      <div class="modal-footer"></div>
+      <div class="row">
+        <div class="col-md-1">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-5">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" id="de" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+
+      </div>
+    </div>
+
+
+
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="mode; then submitUpdate else  submitAdd "> </div>
+      <ng-template #submitAdd>
+        <!--Save-->
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveRecipe(item_ID)"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <!--Update-->
+        <button [style.display]="PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateRecipe(item_ID)"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      </ng-template>
+        <!--Cancel-->
+        <button type="button" class="btn btn-small" id="x" (click)="c('Close click')"><i class="fa fa-window-close-o" aria-hidden="true"></i> Close</button>
+    </div>
+
+  </ng-template>
+</div>

@@ -1,0 +1,338 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" #input (keyup)="getGrid(input.value)" [(ngModel)]="ID" id="ID" placeholder="search..." class="form-control" style="margin-right:5px;">
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Asset #</th>
+              <th>Name</th>
+              <th>Office</th>
+              <th>Status</th>
+              <th>Condition</th>
+              <th>Acquisition Date</th>
+              <th>Written Down Value</th>
+              <th>Model</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of grid | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.assetID}}</td>
+              <td>{{dt.assetno}}</td>
+              <td>{{dt.assetname}}</td>
+              <td>{{dt.office}}</td>
+              <td>{{dt.status}}</td>
+              <td>{{dt.condition}}</td>
+              <td>{{dt.acquisitiondate}}</td>
+              <td>{{dt.writtenvalue}}</td>
+              <td>{{dt.model}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.assetID,content) "
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-2">
+          <span>Category:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="categoryname" id="Category" readonly>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Depreciation Rate (%):</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="number" class="form-control" [(ngModel)]="depreciationrate" id="depreciationrate" readonly>
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Sub Catagory:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="subcategoryname" id="SubCategory" readonly>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <span>Office Name:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="officename" id="Office" readonly>
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Asset Name:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="assetname" id="assetname" readonly>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Asset Code:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="assetno" id="assetno" readonly>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>Acquisition Date:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="acquisitiondate" id="assetcode" readonly>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Depriciation Date:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="depreciationdate" id="depreciationdate" readonly>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>Department:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="departmentname" id="departmentname" readonly>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Issue To:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <ng-select2 [data]="emp" id="emp" [value]="empcodeM" (valueChanged)="changeEmployee($event)" [width]="194.16">
+            </ng-select2>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>Color:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="color" id="color">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Size:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="size" id="size">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>Make:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="make" id="make">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Model:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="model" id="model">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>Useful Life:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="useful" id="useful">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Status:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="statusname" id="status" readonly>
+            
+          </div>
+        </div>
+      </div>
+      <!--<div class="row">
+
+        <div class="col-md-2">
+          <span>Condition:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="balance_Type_ID" id="balance_Type_ID" tabindex="8">
+              <option *ngFor="let b of balanceTypeList " [value]="b.balance_Type_ID">{{b.balance_Type}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Residual Value:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" tabindex="6" readonly>
+          </div>
+        </div>
+      </div>-->
+
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>IMEI #:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="imei" id="imei">
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+
+          <h6>Vehicle Related Information</h6>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>Engine #:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="engine" id="engine">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Chassis #:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="chasis" id="chasis">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>Registration #:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="registration" id="registration">
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Remarks:</span>
+        </div>
+        <div class="col-md-6">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4" tabindex="13"></textarea>
+          </fieldset>
+
+        </div>
+
+
+      </div>
+    </div>
+    <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnMode; then submitAdd else  submitUpdate "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" tabindex="23" class="btn btn-small btn-warning tip" (click)="saveSupplier()">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button [style.display]="PermissionEdit" id="submitUpdate" type="button" tabindex="23" class="btn btn-small btn-warning tip" (click)="saveSupplier()">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i> Save
+        </button>
+      </ng-template>
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click')" tabindex="24"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>

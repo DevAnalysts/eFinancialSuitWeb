@@ -1,0 +1,134 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header" style="height: auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group">
+            <input type="text" style="margin-top:1px;" #input (keydown.enter)='$event.target.blur()' (blur)="getFiscalPeriod(input.value)" [(ngModel)]="id" id="id" placeholder="search..." class="form-control" />
+            <div class="input-group-append order-last">
+              <button  [style.display]="permissionUtility.PermissionAdd" style="margin: 2px;" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>            
+          </div>
+        </div>
+      </div>
+
+
+
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>Fiscal Year</th>
+              <th>Fiscal Day</th>
+              <th>Close</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--  <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of fiscalPeriod | paginate: { itemsPerPage: 21, currentPage: p};let idx = index">
+              <td>{{dt.fiN_YR}}</td>
+              <td>{{dt.fiN_DAY | date:"dd/MM/yy"}}</td>
+              <td>{{dt.iS_CLOSE}}</td>
+              <td>
+                <div *ngIf="idx==0; then BPV else A "> </div>
+                <ng-template #BPV>
+                  <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" id="edit" (click)="CloseDay(dt.fiN_YR,dt.fiN_DAY)">
+                    Close
+                  </button>
+                </ng-template>
+                <ng-template #A>
+
+                </ng-template>
+              </td>
+              <!--<td>
+            <div class="btn-group" style="float:right; ">
+              <a class="btn btn-small btn-warning tip" id="edit" (click)="getDetailsByID(dt.fiN_YR,content)">
+                <span class="fa fa-pencil text-white"></span>
+              </a>
+            </div>
+          </td>-->
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+
+        {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-1">
+          
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Period From:</span>
+            <div class="input-group" style="width: 330px;">
+              <input class="form-control" name="dp" [(ngModel)]="starT_DT.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="changeSDate($event)">
+              <div class="input-group-append" style="margin-top: 5px;">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-1">
+          
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Period To:</span>
+            <div class="input-group" style="width: 330px;">
+              <input class="form-control" name="dp" [(ngModel)]="enD_DT.model" ngbDatepicker #ddd="ngbDatepicker" (ngModelChange)="changeEDate($event)">
+              <div class="input-group-append" style="margin-top: 5px;">
+                <button class="btn btn-small " (click)="ddd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+    <div class="modal-footer">
+      <div *ngIf="mode; then submitUpdate else submitAdd "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="c('Close click')" (click)="saveFiscalPeriod()">
+          Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+      </ng-template>
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click')" tabindex="24"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+  </div>

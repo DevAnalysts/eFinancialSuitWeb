@@ -1,0 +1,206 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div id="PageGrid" [class]="card1style">
+      <div class="row card-header" style="height:auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2 ">
+          <div class="input-group">
+            <input class="form-control" type="text" name="search" style="margin-top:1px;" placeholder="search..." [(ngModel)]="ID">
+            <div class="input-group-append order-last">
+              <button class=" btn btn-small btn-warning tip" style="margin:2px;" (click)="Add()" [style.display]="permissionUtility.PermissionAdd">
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="card-body table-responsive" style="padding:5px;">
+          <table class="table table-hover table-striped" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176)">
+            <thead>
+              <tr class="thclr">
+                <th>ID</th>
+                <th>Allowances</th>
+                <th class="col_1">Allowance/Fixed</th>
+                <th class="col_1">Percentage</th>
+                <th class="col_1">Fixed Amount</th>
+                <th>Parent Allowance</th>
+                <th class="col_1">Taxable</th>
+                <th>Status</th>
+                <th></th>
+
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of grid | filter:ID | paginate: { itemsPerPage: 17, currentPage: p};">
+                <td>{{u.packageallowancecode}}</td>
+                <td>{{u.packageallowancename}}</td>
+                <td class="col_1">
+                  <!--{{u.basicgrossallow}}-->
+                  <div *ngIf="'A' == u.basicgrossallow; then A else FG"></div>
+                  <ng-template #A>
+                  Allowance
+                  </ng-template>
+                  <ng-template #FG>
+                    <div *ngIf="'F' == u.basicgrossallow; then F else G"></div>
+                    <ng-template #F>
+                      Fixed
+                    </ng-template>
+                    <ng-template #G>
+                      Gross
+                    </ng-template>
+                  </ng-template>
+                </td>
+                <td class="col_1">{{u.percent}}</td>
+                <td class="col_1">{{u.fixedamount}}</td>
+                <td>{{u.parentallowancecode}}</td>
+                <td class="col_1">
+                  <div *ngIf="true == u.taxable; then taxableon else taxableoff"></div>
+                  <ng-template #taxableon>
+                    Yes
+                  </ng-template>
+                  <ng-template #taxableoff>
+                    No
+                  </ng-template>
+                </td>
+                <td>
+                  <div *ngIf="true == u.active; then on else off"></div>
+
+                  <ng-template #on>
+                    Active
+                  </ng-template>
+                  <ng-template #off>
+                    Disabled
+                  </ng-template>
+                </td>
+                <td>
+                  <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                    <button [style.display]="permissionUtility.PermissionView" style="padding: 6px 7px;" class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.packageallowancecode);View();" id="view">
+                      <span><img src="../../../../../../assets/images/icon/report.png" ></span>
+                    </button>
+                  </div>
+                  <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                    <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.packageallowancecode);Edit();" id="edit">
+                      <span class="fa fa-pencil"></span>
+                    </button>
+                  </div>
+
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+        </div>
+
+      </div>
+      <div id="frm" [class]="card2style" style="padding:0px;margin:0px;border:0px;" [style.display]="card2display">
+        <div class="card-header" style="height:40px;">
+          <div class="page-title-list">
+            <span style="font-size:large;margin-left:10px; font-weight:bold;">{{permissionUtility.FUNCTIONALITYDETAILNAME}}</span>
+</div>
+        </div>
+        <div class="card-body" style="margin-top:20px;margin-left:50px;width:300px;">
+          <div class='container-fluid'>
+            <div class='row'>
+              <div class="col-sm-6"></div>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <span>Name</span>
+                  <input type="text" class="form-control" maxlength="100" (keypress)="valid.onlyAlphabet($event)" [(ngModel)]="packageallowancename" id="packageallowancename" required>
+                </div>
+              </div>
+            </div>
+            <div class='row'>
+              <div class="col-sm-6"></div>
+              <div class="col-sm-12">
+                <div class="form-group" style="margin-right:10px;">
+                  <span>% Allowance / Fixed</span>
+                  <div class="col-md-8">
+                    <input type="radio" style="margin-right:4px;" [checked]="CheckBoxAllowance" id="1" (click)="caseShowAllowanceRow()" /> <b>% Allowance</b>
+                  </div>
+                  <div class="col-md-8">
+                    <input type="radio" style="margin-right:4px;" [checked]="CheckBoxFixedAmount" id="3" (click)="caseShowFixedAmountRow()" /> <b>Fixed Amount</b>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row" [style.display]="ShowAllowanceRow">
+             <div class="col-sm-6"></div>
+              <div class="col-sm-12" style="margin-right:-10px;">
+                <div class="form-group">
+                  <span>Percentage</span>
+                  <input type="number" class="form-control" [(ngModel)]="percent" id="percent">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"></div>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <span>% of</span>
+                  <ng-select2 [data]="allowance" id="citycode" [value]="allowancecodeM" (valueChanged)="changeAllowance($event)" [width]="280">
+                  </ng-select2>
+                </div>
+              </div>
+            </div>            
+            
+            <div class="row" [style.display]="ShowFixedAmountRow">
+              <div class="col-sm-6"></div>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <span>Fixed Amount</span>
+                  <input type="number" class="form-control" [(ngModel)]="fixedamount" id="fixedamount">
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-6"></div>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <span>Account</span>
+                  <ng-select2 [data]="account" id="accountcode" [value]="accountcodeM" (valueChanged)="changeAccount($event)" [width]="280">
+                  </ng-select2>
+                </div>
+              </div>
+            </div>
+            <div class='row'>
+              <div class="col-sm-6"></div>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <span>Category</span>
+                  <select class="form-control" [(ngModel)]="categorycode" id="categorycode">
+                    <option *ngFor="let o of category" [value]="o.categorycode">{{o.categoryname}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class='row'>
+              <div class="col-sm-6"></div>
+              <div class="col-sm-12">
+                <div class="form-group">
+                  <span>Status</span>
+                  <input type="checkbox" style="margin-left:5px;" [(ngModel)]="active" id="active" (change)="checkValue(active?true:false)" />
+                </div>
+              </div>
+            </div>
+            <div class='row'>
+              <div class="col-sm-6"></div>
+              <div class="col-sm-12">
+                <button type="button" class=" btn" style="float:right;margin:3px;" (click)="Cancel()"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+                <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp1"
+                        (click)="saveData()">
+                  <i class="fa fa-floppy-o" aria-hidden="true"></i>    Save
+                </button>
+                <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp2"
+                        (click)="updateData()">
+                  <i class="fa fa-floppy-o" aria-hidden="true"></i>    Save
+                </button>
+              </div>
+            </div>
+
+          </div>
+    </div>
+  </div>
+    </div></div>

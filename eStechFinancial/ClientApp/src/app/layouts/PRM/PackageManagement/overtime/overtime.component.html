@@ -1,0 +1,251 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" name="search" placeholder="search..." #input (keydown.enter)='$event.target.blur()' (blur)="getGrid()(input.value)" [(ngModel)]="id"
+              style="float:left; width:100px;margin:3px 0px 3px 3px;">
+            <button class=" btn btn-small btn-warning tip" style="margin:3px 3px 3px 0px;" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th style="width: 5%">ID</th>
+              <th style="width: 20%">Name</th>
+              <th style="width: 10%">Designation</th>
+              <th style="width: 10%">Department</th>
+              <th style="width: 10%">Office</th>
+              <th style="width: 10%">Overtime(hrs)</th>
+              <th style="width: 15%">Special Overtime(hrs)</th>
+              <th style="width: 10%">Holiday(hrs)</th>
+              <th style="width: 5%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>
+            <tr *ngFor="let e of gridlist    | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{e.overtimeId}}</td>
+              <td>{{e.name}}</td>
+              <td>{{e.designatioN_DESC}}</td>
+              <td>{{e.departmenT_NAME}}</td>
+              <td>{{e.office}}</td>
+              <td>{{e.totalHours  }}</td>
+              <td>{{e.totalSpecial  }}</td>
+              <td>{{e.totalHoliday  }}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView" class="btn btn-small btn-warning tip"
+                    (click)="getDetailsByID(e.overtimeId,e.empId,e.overtimeDate,content)" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Overtime Date:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="overtimeDate.model" ngbDatepicker #dd="ngbDatepicker"
+                (ngModelChange)="changeDate()">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Employee:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-user" style="font-size:medium" aria-hidden="true"></i>
+              <div *ngIf="btnmode; then On else Off"> </div>
+              <ng-template #On>
+                <ng-select2 [data]="emplist" id="empcode" [value]="empmodel" (valueChanged)="getEmployeesChange($event)"
+                  [width]="190">
+                </ng-select2>
+              </ng-template>
+              <ng-template #Off>
+                <ng-select2 [data]="emplist" id="empcode" [value]="empmodel" (valueChanged)="getEmployeesChange($event)"
+                  [width]="190" disabled="true">
+                </ng-select2>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span>Designation:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-user-md" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="designationname" id="designationname"
+                readonly="readonly">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span>Department:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-building-o" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="departmentname" id="departmentname"
+                readonly="readonly">
+            </div>
+          </div>
+
+
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Office:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-building" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="officename" id="officename" readonly="readonly">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span>Employement Type:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-legal" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="emptypename" id="emptypename" readonly="readonly">
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-2">
+          <span>Joining Date:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-calendar-o" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="joining" id="joining" readonly="readonly">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12" style="border:ridge;padding-right:0px;padding-left:0px">
+        <div #dvScroll style="min-height: 500px; overflow-y: auto;-ms-overflow-style: -ms-autohiding-scrollbar;">
+          <table class="table table-hover table-striped" style="width:100%">
+            <thead>
+              <tr class="thclr">
+                <th style="width:2%">Sr.#</th>
+                <th style="width:23%">Date</th>
+                <th style="width:5%">Present</th>
+                <th style="width:19%">Worked(hrs)</th>              
+                <th style="width:15%">Hours Overtime(hrs)</th>
+                <th style="width:15%">Special Overtime(hrs)</th>
+                <th style="width:15%">Holiday Overtime(hrs)</th>
+                <th style="width:5%"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let i of overtimeDetails let idx = index">
+                <td style="width:2%">{{idx+1}}</td>
+                <td style="width:23%">
+                  <input type="text" class="form-control" [(ngModel)]="i.overtimeDate" name="overtimeDate"
+                    readonly />
+                </td>
+                <td style="width:5%">
+                  <input type="checkbox" id="present" name="present" [(ngModel)]="i.present"
+                    />
+                </td>
+                <td style="width:19%">
+                  <input type="number" onClick="this.select();" id="hours" name="hours" [(ngModel)]="i.hours" style="width: 40%;" />
+                  <span><b>&nbsp; : &nbsp;</b></span>
+                  <input type="number" onClick="this.select();" id="minutes" name="minutes" [(ngModel)]="i.minutes" style="width: 40%;" />
+                </td>
+                <td style="width:15%">
+                  <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="i.overtime" name="overtime"
+                    (change)="changeRate(i,i.overtime,i.special,i.holiday)" min="0" />
+                </td>
+                <td style="width:15%">
+                  <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="i.special" name="special"
+                    (change)="changeRate(i,i.overtime,i.special,i.holiday)" min="0" />
+                </td>
+                <td style="width:15%">
+                  <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="i.holiday" name="holiday"
+                    (change)="changeRate(i,i.overtime,i.special,i.holiday)" min="0" />
+                </td>
+                <td style="width:5%">
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" tabindex="45" class="btn btn-small btn-warning tip" (click)="saveData();">
+          Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button [style.display]="PermissionEdit" id="submitUpdate" type="button" tabindex="45"
+          class="btn btn-small btn-warning tip" (click)="updateData();">
+          Save & Close
+        </button>
+      </ng-template>
+      <button type="button" id="x" class="btn btn-small" tabindex="46" (click)="c('Close click')">Close</button>
+    </div>
+  </ng-template>
+
+</div>

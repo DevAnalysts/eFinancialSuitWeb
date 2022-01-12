@@ -1,0 +1,368 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" name="search" placeholder="search..." style="float:left; width:100px;margin:3px;">
+            <button [style.display]="PermissionAdd" class=" btn btn-small btn-warning tip" style="margin:3px;" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+
+            <tr class="thclr">
+              <th style="width: 5%">ID</th>
+              <th style="width: 10%">To</th>
+              <th style="width: 15%">Subject</th>
+              <th style="width: 50%">Message</th>
+              <th style="width: 10%">Date</th>
+              <th style="width: 10%">Attachment</th>
+              <th style="width: 10%">Status</th>
+              <th style="width: 10%"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let e of gridlist  | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{e.mailId}}</td>
+              <td>{{e.toMailAddress}}</td>
+              <td>{{e.subject}}</td>
+              <td>{{e.messageBody}}</td>
+              <td>{{e.creationDate |  date:"dd/MM/yyyy"}}</td>
+              <td>
+                <div *ngIf="e.filename=='0'; then AA else AN"> </div>
+                <ng-template #AA>
+
+                </ng-template>
+                <ng-template #AN>
+                  <i class="fa fa-paperclip" style="font-size:24px;padding-left:10px"></i>
+                </ng-template>
+              </td>
+              <td>
+                <div *ngIf="e.status=='0'; then Pending else Other"> </div>
+                <ng-template #Pending>
+                  Pending
+                </ng-template>
+                <ng-template #Other>
+                  <div *ngIf="e.status=='1'; then Sent else Cancel"> </div>
+                  <ng-template #Sent>
+                    Sent
+                  </ng-template>
+                  <ng-template #Cancel>
+                    Cancelled
+                  </ng-template>
+                </ng-template>
+              </td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView"  class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.mailId,e.status,content)"
+                     id="edit">
+                    <span class="fa fa-pencil text-white"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header" style="padding-bottom: 30px;">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click');">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-2">
+          <span>Category:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div *ngIf="btnmode; then CategoryAdd else CategoryUpdate"> </div>
+            <ng-template #CategoryAdd>
+              <ng-select2 [data]="category" id="categorycode" [value]="categorycodeM" (valueChanged)="changeCategory($event)" [width]="200">
+              </ng-select2>
+
+            </ng-template>
+            <ng-template #CategoryUpdate>
+              <ng-select2 [data]="category" id="categorycode" [value]="categorycodeM" (valueChanged)="changeCategory($event)" [width]="200" [disabled]="true">
+              </ng-select2>
+            </ng-template>
+
+
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Customer:</span>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <div *ngIf="btnmode; then CustomerAdd else CustomerUpdate"> </div>
+            <ng-template #CustomerAdd>
+              <div class="col-md-12" id="DropDownCustomerSearch" style="display: inline-flex;">
+                <input type="text" id="textboxCustomer" [(ngModel)]="textboxCustomerName" onClick="this.select()" (change)="SearchCustomerByID(textboxCustomerName)" class="form-control" autocomplete="off" />
+                <div class="form-group">
+                  <div>
+                    <div ngbDropdown [open]="false" autoClose="outside" class="nav navbar-nav" #myCustomerSearch="ngbDropdown" placement="bottom-right">
+                      <button class="btn btn-small" type="button" (click)="setCustomerSearchFocus()" ngbDropdownToggle>
+                        <span class="caret"></span>
+                      </button>
+                      <div ngbDropdownMenu aria-labelledby="myCustomerSearch" class="dropdown-menu "
+                           style="overflow:hidden auto;position:absolute;width:600px;max-height:400px;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);padding-left: 15px;margin-left:100px;">
+                        <div class="row" style="margin:4px 0px 2px 0px">
+                          <div class="col-sm-11" style="display:inline-flex;padding:0px 4px 0px 0px;">
+                            <input type="text" [(ngModel)]="textboxCustomerSearch" (ngModelChange)="setTRowActiveClass('CROW')" id="textboxCustomerSearch" class="form-control" placeholder="Type Here To Search!" autocomplete="off" />
+                          </div>
+                          <button type="button" class="btn btn-small" (click)="SearchCustomerDropDownByCategory(textboxCustomerSearch)">
+                            <i class="fa fa-search" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                        <div class="row table-shadow-padding">
+                          <table class="table table-hover table-striped table-shadow">
+                            <thead>
+                              <tr class="thclr">
+                                <th style="width:40%">Name</th>
+                                <th style="width:20%">City</th>
+                                <th style="width:40%">Email</th>
+
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr *ngIf="!searchGridCustomer?.length > 0 ">
+                                <td>No Results To Show!</td>
+                                <td></td>
+                                <td></td>
+
+                              </tr>
+                              <tr *ngFor="let i of searchGridCustomer | paginate: { itemsPerPage: 100, currentPage: g};let x = index;" (click)="setSelectedCustomer(i.customer_ID,i.customer_Name);myCustomerSearch.close();" style="cursor:pointer" id="CROW-{{1+x}}" [ngClass]="{'active':(x==0)}">
+                                <td>{{i.customer_Name}}</td>
+                                <td>{{i.city}}</td>
+                                <td>{{i.cell}}</td>
+
+                              </tr>
+
+                            </tbody>
+                          </table>
+                        </div>
+
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </ng-template>
+            <ng-template #CustomerUpdate>
+              <input type="text" id="textboxCustomer" [(ngModel)]="textboxCustomerName" class="form-control" autocomplete="off" disabled />
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div *ngIf="btnmode; then TemplateAdd else TemplateUpdate"> </div>
+      <ng-template #TemplateAdd>
+        <div class="row" style="margin-bottom:15px;">
+          <div class="col-md-2">
+            <span>Template:</span>
+          </div>
+          <div class="col-md-2">
+            <div class="form-group">
+              <ng-select2 [data]="template" id="templatecode" [value]="templatecodeM" (valueChanged)="changeTemplate($event)" [width]="200">
+              </ng-select2>
+
+            </div>
+          </div>
+        </div>
+      </ng-template>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Subject:</span>
+        </div>
+        <div class="col-md-8">
+          <div class="form-group">
+            <div *ngIf="btnmode; then subjectAdd else subjectUpdate"> </div>
+            <ng-template #subjectAdd>
+              <input type="text" class="form-control" [(ngModel)]="templatesubject" id="subject">
+            </ng-template>
+            <ng-template #subjectUpdate>
+              <input type="text" class="form-control" [(ngModel)]="templatesubject" id="subject" readonly="readonly">
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Message:</span>
+        </div>
+        <div class="col-md-8">
+          <div class="form-group">
+            <div *ngIf="btnmode; then BodyAdd else BodyUpdate"> </div>
+            <ng-template #BodyAdd>
+              <fieldset class="form-group">
+                <textarea [(ngModel)]="templatebody" id="templatebody" name="textarea" (change)="characterCount()" placeholder="Please text here..." class="form-control" style="height:auto;"
+                          rows="8"></textarea>
+              </fieldset>
+            </ng-template>
+            <ng-template #BodyUpdate>
+              <fieldset class="form-group">
+                <textarea [(ngModel)]="templatebody" disabled id="templatebody" name="textarea" (change)="characterCount()" placeholder="Please text here..." class="form-control" style="height:auto;"
+                          rows="16"></textarea>
+              </fieldset>
+            </ng-template>
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-9">
+
+        </div>
+        <div class="col-md-1">
+          <span>{{charactercount}}</span>
+        </div>
+      </div>
+      <!--<div class="row">
+        <div class="col-sm-2">
+
+          <span>Attachment:</span>
+        </div>
+        <div *ngIf="btnmode; then fileAdd else fileUpdate"> </div>
+        <ng-template #fileAdd>
+
+          <div class="col-sm-2">
+            <div class="form-group">
+              <div class="image-upload">
+                <input id="file-input" type="file" (change)="handleFileInput($event.target.files)" />
+              </div>
+            </div>
+          </div>
+
+        </ng-template>
+        <ng-template #fileUpdate>
+          <div class="col-sm-2">
+            {{ATTACHMENT}}
+          </div>
+          <div class="col-sm-2" [style.display]="showATTACHMENT">
+
+            <button id="viewAttachment" type="button" class="btn btn-small btn-warning tip" (click)="loadBlob();"><i class="fa fa-floppy-o" aria-hidden="true"></i>View</button>
+          </div>
+
+        </ng-template>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <div id="mydiv">
+          </div>
+        </div>
+
+      </div>-->
+
+      <div class="row" >
+        <div class="col-sm-2">
+          <div class="form-group">
+            <span>Attachment:</span>
+          </div>
+        </div>
+      </div>
+      <div class="row" >
+
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="image-upload">
+              <!--<input type="button" class="btn" id="uploadFile" value="Upload" onclick="document.getElementById('file-input').click();" />-->
+              <label for="file-input">
+                <img [src]="imageUrl" style="width:100px;height:100px;position: absolute;cursor:pointer">
+              </label>
+              <input id="file-input" type="file" (change)="handleFileInput($event.target.files)" style="display:none;" />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-sm-8">
+
+          <table class="table table-hover table-striped table-shadow">
+            <thead style="display: block;width:98%;">
+              <!--<tr class="thclr row">
+            <th style="width:4%;margin-left:15px">Sr#.</th>
+            <th style="width:83%">Attachments</th>
+            <th style="width:10%"></th>
+          </tr>-->
+            </thead>
+            <tbody style="height: 100px;overflow: hidden scroll;display: block;width:100%;">
+              <tr *ngFor="let i of attachments let idx = index" class="row">
+                <td style="width:4%;margin-left:15px">{{idx+1}}</td>
+                <td style="width:83%;cursor:pointer;" (click)="getMailAttachmentByID(i.fileId)">
+                  {{i.fileName}}
+                </td>
+                <td style="width:10%">
+                  <div class="btn-group" style="float:right; ">
+                    <button class="btn btn-small btn-warning tip" (click)="getMailAttachmentByID(i.fileId)">
+                      <span class="fa fa-eye"></span>
+                    </button>
+                    <button class="btn btn-small btn-danger tip" data-original-title="Remove" type="button" value="Delete" [style.display]="PermissionEdit" (click)="cancelFile(i.fileId)"
+                            id="remove">
+                      <span class="fa fa-trash"></span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer" style="margin-bottom: 10px;padding-top: 15px;">
+
+
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveData();"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <div class="row" style="position: absolute;left: 30px;">
+
+          <!--Cancel Mail-->
+          <button [style.display]="PermissionDelete" type="button" id="cancelBtn" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="cancelAlertNotification();"><i class="fa fa-window-close-o" aria-hidden="true"></i> Cancel</button>
+        </div>
+        <!-- <button id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateData();"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save</button>-->
+      </ng-template>
+      <button type="button" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>
+
+
+
+

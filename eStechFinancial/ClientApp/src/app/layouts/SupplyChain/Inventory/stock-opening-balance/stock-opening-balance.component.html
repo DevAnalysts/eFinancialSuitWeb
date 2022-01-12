@@ -1,0 +1,330 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header" style="height: auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group">
+            <input type="text" style="margin-top:1px;" #input (keydown.enter)='$event.target.blur()' (blur)="getStockOpeningBalance(input.value)" [(ngModel)]="ID" id="ID" placeholder="search..." class="form-control" />
+            <div class="input-group-append order-last">
+              <button [style.display]="permissionUtility.PermissionAdd" style="margin: 2px;" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button>
+             
+
+            </div>            
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Date</th>
+              <th>Item</th>
+              <th>Office</th>
+              <th>Stock</th>
+              <th>Unit Cost</th>
+              <th>Total Cost</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of vouchers  | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.iD}}</td>
+              <td>{{dt.date| date:"dd/MM/yy" }}</td>
+              <td>{{dt.item }}</td>
+              <td>{{dt.officE_NAME }}</td>
+              <td>{{dt.openingStock}}</td>
+              <td>{{dt.openingUnitCost}}</td>
+              <td>{{dt.openingBalance}}</td>
+
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <!-- <button [style.display]="PermissionEdit"  class="btn btn-small btn-warning tip" id="edit" (click)="getDetailsByID(dt.trans_ID,content)">
+                    <span class="fa fa-pencil"></span>
+                  </button> -->
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+       Stock {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <!-- <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p> -->
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-1">
+          
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Transaction Date	:</span>
+            <div *ngIf="mode; then dpUpdate else dpAdd "> </div>
+            <ng-template #dpAdd>
+              <div class="input-group" style="width: 330px;">
+                <input class="form-control" required name="dp" [(ngModel)]="voucheR_DATE.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="changeVDate($event)">
+                <div class="input-group-append" style="margin-top: 5px;">
+                  <button class="btn btn-small " (click)="dd.toggle()">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #dpUpdate>
+              <div class="input-group">
+                <input class="form-control" required name="dp" [(ngModel)]="voucheR_DATE.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="changeVDate($event)" disabled>
+                <div class="input-group-append">
+                  <button class="btn btn-small " (click)="dd.toggle()" disabled>
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+ 
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Office:</span>
+            <div *ngIf="mode; then officesUpdate else officesAdd "> </div>
+            <ng-template #officesAdd>
+              <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+                <i class="fa fa-building-o" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                <select class="form-control" [(ngModel)]="officE_CODE" id="officE_CODE" (change)="getChangeOffices(officE_CODE)">
+                  <option *ngFor="let u of offices " [value]="u.officE_CODE">{{u.officE_NAME}}</option>
+                </select>
+              </div>
+            </ng-template>
+            <ng-template #officesUpdate>
+              <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+                <i class="fa fa-building-o" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                <select class="form-control" [(ngModel)]="officE_CODE" id="officE_CODE" disabled>
+                  <option *ngFor="let u of offices " [value]="u.officE_CODE">{{u.officE_NAME}}</option>
+                </select>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Warehouse:</span>
+            <div *ngIf="mode; then warehouseUpdate else warehouseAdd "> </div>
+            <ng-template #warehouseAdd>
+              <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+                <i class="fa fa-building-o" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                <select class="form-control" [(ngModel)]="warehouseID" id="officE_CODE">
+                  <option *ngFor="let u of warehouses " [value]="u.warehouseID">{{u.warehouseName}}</option>
+                </select>
+              </div>
+            </ng-template>
+            <ng-template #warehouseUpdate>
+              <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+                <i class="fa fa-building-o" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                <select class="form-control" [(ngModel)]="warehouseID" id="warehouseID" disabled>
+                  <option *ngFor="let u of warehouses " [value]="u.warehouseID">{{u.warehouseName}}</option>
+                </select>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="width:102%">
+
+        <table class="table table-hover table-striped" style="width:100%">
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;">Sr#.</th>
+              <th style="width:30%">Item</th>
+              <th style="width:10%">Opening Stock</th>
+              <th style="width:10%">Loose Stock</th>
+              <th style="width:10%">Opening Unit Cost</th>
+              <th style="width:10%">Total Opening Cost</th>
+              <th style="width:13%"></th>
+              <th style="width:10%">Action</th>
+            </tr>
+          </thead>
+          <tbody style="max-height: 300px;overflow: hidden scroll;display: block;width:100%;">
+            <tr class="row" *ngFor="let i of stockOpeningBalanceDetail let idx = index">
+              <td style="width:5%;margin-left:15px;">{{idx+1}}</td>
+              <td style="width:30%">
+                <div *ngIf="i.edit_Mode; then selectName else viewName"> </div>
+                <ng-template #viewName>
+                  <span ng-show="editMode">{{i.itemName}}</span>
+                </ng-template>
+                <ng-template #selectName>
+                  <ng-select2 [data]="accounts" id="itemEdit" [value]="itemCode" (valueChanged)="getChangeAccounts($event)" [width]="400">
+                  </ng-select2>
+                </ng-template>
+              </td>
+              <td style="width:10%">
+                <div *ngIf="i.edit_Mode; then selectPrice else viewPrice"> </div>
+                <ng-template #viewPrice>
+                  <span ng-show="editMode">{{i.openingStock}} {{i.unit}}</span>
+                </ng-template>
+                <ng-template #selectPrice>
+                  <input type="text" style="width: 600%;" [(ngModel)]="i.openingStock" class="form-control" (keyup.enter)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)" (change)="changeDC(i)"/>
+                  <input type="text" style="width: 40%;"[(ngModel)]="i.unit" class="form-control" ng-hide="editMode" disabled />
+                </ng-template>
+              </td>
+              <td style="width:10%">
+                <div *ngIf="i.edit_Mode; then selectLooseStock else viewLooseStock"> </div>
+                <ng-template #viewLooseStock>
+                  <span ng-show="editMode">{{i.openingLooseStock}} {{i.uoM}}</span>
+                </ng-template>
+                <ng-template #selectLooseStock>
+                  <input type="text"  style="width: 60%;" [(ngModel)]="i.openingLooseStock" class="form-control" (keyup.enter)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)" (change)="changeDC(i)"/>
+                  <input type="text" style="width: 40%;"[(ngModel)]="i.uoM" class="form-control" ng-hide="editMode" disabled />
+                </ng-template>
+              </td>
+              <td style="width:10%">
+                <div *ngIf="i.edit_Mode; then selectCost else viewCost"> </div>
+                <ng-template #viewCost>
+                  <span ng-show="editMode">{{i.openingUnitCost}}</span>
+                </ng-template>
+                <ng-template #selectCost>
+                  <input type="number" [disabled]="openingUnitCostDisable" value="1" min="1" max="9999999999999" onkeypress="if(this.value.length == 13) return false" [(ngModel)]="i.openingUnitCost" class="form-control" (change)="changeDC(i)" (keyup.enter)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)" />
+                </ng-template>
+              </td>
+              <td style="width:10%">
+                <div *ngIf="i.edit_Mode; then selectRate else viewRate"> </div>
+                <ng-template #viewRate>
+                  <span ng-show="editMode">{{i.openingBalance}}</span>
+                </ng-template>
+                <ng-template #selectRate>
+                  <input type="number" [disabled]="openingBalanceDisable"  min="1" max="9999999999999" onkeypress="if(this.value.length == 13) return false" [(ngModel)]="i.openingBalance" class="form-control" (keyup.enter)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)" readonly/>
+                </ng-template>
+              </td>
+              <td style="width:10%">
+                <!-- <div *ngIf="i.edit_Mode; then selectRate else viewRate"> </div>
+                <ng-template #viewRate>
+                  <span ng-show="editMode">{{i.openingBalance}}</span>
+                </ng-template>
+                <ng-template #selectRate>
+                  <input type="number" [disabled]="openingBalanceDisable"  min="0" max="9999999999999" onkeypress="if(this.value.length == 13) return false" [(ngModel)]="i.openingStock" class="form-control"  (keyup.enter)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)" />
+                </ng-template> -->
+              </td>
+              <td style="width:10%">
+                <div class="btn-group" *ngIf="i.edit_Mode; then ok else pencel">
+                  <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button" value="Delete" id="remove">
+                    <span class="fa fa-remove text-white"></span>
+                  </button>
+                </div>
+                <ng-template #ok>
+                  <button class="btn btn-small btn-success tip" data-original-title="Quick save" type="button" (click)="changeMode(idx,i,0);"
+                          id="update">
+                    <span class="fa fa-check text-white"></span>
+                  </button>
+                </ng-template>
+                <ng-template #pencel>
+                  <button class="btn btn-small btn-warning tip" data-original-title="Hide" [disabled]="EditItemButton" type="button" (click)="changeMode(idx,i,1); changeDC(i.openingBalance, i.openingUnitCost)" id="edit">
+                    <span class="fa fa-pencil text-white"></span>
+                  </button>
+                   <button class="btn btn-small btn-danger tip" data-original-title="Delete user" [disabled]="RemoveItemButton" type="button" value="Delete" id="remove" (click)="changeMode(idx,i,2)"> 
+                    <span class="fa fa-remove text-white"></span>
+                  </button>
+                </ng-template>
+              </td>
+            </tr>
+            <tr class="row" id="AddNewItemRow">
+              <td style="width:5%;margin-left:15px;">
+                <input type="text" id="txt" style="width:3px" />
+              </td>
+              <td style="width:30%">
+                <ng-select2 [data]="accounts" id="itemCode" [value]="itemCode" (valueChanged)="getChangeAccounts($event)" [width]="400">
+                </ng-select2>
+              </td>
+              <td style="width:10%">
+                <input type="number" style="width: 60%;" value="1" min="1" onClick="this.select();" [(ngModel)]="openingStock" class="form-control" ng-hide="editMode" (keyup.enter)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)" (change)="changeOpeningStock(openingStock,openingUnitCost,openingLooseStock)" />
+                <input type="text" style="width: 40%;"[(ngModel)]="unit" class="form-control" ng-hide="editMode" disabled />
+                
+              </td>
+              <td style="width:10%">
+                <input type="number" style="width: 60%;"  value="0" min="0" onClick="this.select();" [(ngModel)]="openingLooseStock" class="form-control" ng-hide="editMode" (keyup.enter)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)" (change)="changeOpeningStock(openingStock,openingUnitCost, openingLooseStock)" />
+                <input type="text" style="width: 40%;"[(ngModel)]="uoM" class="form-control" ng-hide="editMode" disabled />
+              </td>
+              <td style="width:10%">
+                <input type="number" value="1" min="1" onClick="this.select();" max="9999999999999" onkeypress="if(this.value.length == 13) return false" id="openingUnitCost" [(ngModel)]="openingUnitCost" class="form-control" ng-hide="ediktMode" (change)="changeOpeningUnitCost(openingStock,openingUnitCost, openingLooseStock)" (keyup.enter)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)"/>
+              </td>
+              <td style="width:10%">
+                <input type="number" value="1" min="1" onClick="this.select();" max="9999999999999" onkeypress="if(this.value.length == 13) return false" id="openingBalance" [(ngModel)]="openingBalance" class="form-control" ng-hide="editMode" (keyup.enter)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)" readonly />
+              </td>
+              <td style="width:10%">
+                <!-- <input type="number" min="0" max="9999999999999" onkeypress="if(this.value.length == 13) return false" id="openingBalance" [(ngModel)]="openingBalance" class="form-control" ng-hide="editMode" /> -->
+              </td>
+              <td class="btn-group" style="width:10%">
+                <button type="button" class="btn btn-small btn-warning tip" (click)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)"
+                        (keyup.enter)="addGrid(itemCode,itemName,openingStock,cosT_CENTER_CODE,openingUnitCost,openingBalance)"
+                        data-original-title="Quick save" ng-click="addrow()" id="adds">
+                  <span class="fa fa-check text-white"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;"></th>
+              <th style="width:40%"></th>
+              <th style="width:10%">Total:</th>
+              <th style="width:10%">{{TotalopeningUnitCost()}}</th>
+              <th style="width:23%">{{TotalopeningBalance()}}</th>
+              <th style="width:10%"></th>
+              <!-- <th style="width:10%">Difference: {{TotalopeningUnitCost()-TotalopeningBalance()}}</th> -->
+            </tr>
+
+          </thead>
+
+        </table>
+
+      </div>
+      <div class="row">
+        <div class="col-md-1">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-5">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <!--Save-->
+      <button  id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveVoucher(voucheR_DATE,officE_CODE,TotalopeningUnitCost(),TotalopeningBalance())"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+      <!--Update-->
+      <!-- <button  id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateVoucher(voucheR_DATE,officE_CODE,TotalopeningUnitCost(),TotalopeningBalance())"><i class="fa fa-floppy-o" aria-hidden="true" ></i> Save & Close</button> -->
+      <!--Cancel-->
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o" aria-hidden="true"></i> Close</button>
+    </div>
+  </ng-template>
+</div>

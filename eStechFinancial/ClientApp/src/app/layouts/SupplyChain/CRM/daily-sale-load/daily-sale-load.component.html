@@ -1,0 +1,274 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" [(ngModel)]="id" id="id" placeholder="search..." class="form-control" />
+            <button [style.display]="PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+
+      <div class="card-body table-responsive">
+        <table class="table table-hover table-striped">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Date</th>
+              <th>Area</th>
+              <th>Sale Officer</th>
+              <th>Total Load</th>
+              <th>Less Return</th>
+              <th>Gross Sale</th>
+              <th>RP</th>
+              <th>Net Sale</th>
+              <th>LPD</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let e of gridlist   | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{e.dailySaleLoadID}}</td>
+              <td>{{e.date}}</td>
+              <td>{{e.area}}</td>
+              <td>{{e.saleofficer}}</td>
+              <td>{{e.totalLoad}}</td>
+              <td>{{e.totalLessReturn}}</td>
+              <td>{{e.totalGrossSale}}</td>
+              <td>{{e.totalRP}}</td>
+              <td>{{e.totalNetSale}}</td>
+              <td>{{e.totalLPD}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.dailySaleLoadID,content)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header" style="padding-bottom: 30px;">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click');">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Date:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div *ngIf="btnmode; then DateToOn else DateTooff"> </div>
+            <ng-template #DateToOn>
+              <div class="input-group">
+                <input class="form-control" name="a" [(ngModel)]="duedate.model"
+                       displayMonths="1" navigation="none" ngbDatepicker #a="ngbDatepicker">
+                <div class="input-group-append">
+                  <button class="btn btn-small" (click)="a.toggle()">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #DateTooff>
+              <div class="input-group">
+                <input class="form-control" name="a" [(ngModel)]="duedate.model"
+                       displayMonths="1" navigation="none" ngbDatepicker #a="ngbDatepicker" disabled="disabled">
+                <div class="input-group-append">
+                  <button class="btn btn-small" (click)="a.toggle()" disabled="disabled">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+
+          </div>
+        </div>
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-2">
+          <span>Sale Officer:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-male" aria-hidden="true"></i>
+              <div *ngIf="btnmode; then submitAddSaleofficer else submitUpdateSaleofficer"> </div>
+              <ng-template #submitAddSaleofficer>
+                <select class="form-control" [(ngModel)]="saleofficercode" id="order_Envoy">
+                  <option *ngFor="let u of saleofficer " [value]="u.order_Envoy">{{u.emp_Name}}</option>
+                </select>
+              </ng-template>
+              <ng-template #submitUpdateSaleofficer>
+                <select class="form-control" [(ngModel)]="saleofficercode" id="order_Envoy" disabled="disabled">
+                  <option *ngFor="let u of saleofficer " [value]="u.order_Envoy">{{u.emp_Name}}</option>
+                </select>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Area:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-map-marker" aria-hidden="true"></i>
+              <div *ngIf="btnmode; then submitAddArea else submitUpdateArea"> </div>
+              <ng-template #submitAddArea>
+                <select class="form-control" [(ngModel)]="areacode" id="areacode" (change)="getCustomers(areacode)">
+                  <option *ngFor="let i of area " [value]="i.areacode">{{i.areaname}}</option>
+                </select>
+              </ng-template>
+              <ng-template #submitUpdateArea>
+                <select class="form-control" [(ngModel)]="areacode" id="areacode" (change)="getCustomers(areacode)" disabled="disabled">
+                  <option *ngFor="let i of area " [value]="i.areacode">{{i.areaname}}</option>
+                </select>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Load Request:</span>
+        </div>
+        <div class="col-sm-1">
+          <div class="form-group">
+            <input type="radio" [checked]="loadOutRequest" (click)="changeLoadRequest()" tabindex="30">
+          </div>
+        </div>
+
+        <div class="col-md-1">
+          <span>Load Return:</span>
+        </div>
+        <div class="col-sm-1">
+          <div class="form-group">
+            <input type="radio" [checked]="loadOutReturn" (click)="changeLoadReturn()" tabindex="31">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <table class="table table-hover table-striped">
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width: 15%;margin-left:15px;"></th>
+              <th style="width: 5%;"></th>
+              <th style="width: 14%; text-align:center;border:1px solid white" colspan="2">Load Out</th>
+              <th style="width: 8%;"></th>
+              <th style="width: 14%; text-align:center;border:1px solid white" colspan="2">Load Return</th>
+              <th style="width: 8%;"></th>
+              <th style="width: 8%;"></th>
+              <th style="width: 10%;"></th>
+              <th style="width: 8%;"></th>
+              <th style="width: 8%;"></th>
+            </tr>
+            <tr class="thclr row">
+              <th style="width: 15%;margin-left:15px;">Item Name</th>
+              <th style="width: 5%;">Pack</th>
+              <th style="width: 7%;text-align:center;border:1px solid white">(In Case)</th>
+              <th style="width: 7%;text-align:center;border:1px solid white">(In Pcs)</th>
+              <th style="width: 8%;">Total Load</th>
+              <th style="width: 7%;text-align:center;border:1px solid white">(In Case)</th>
+              <th style="width: 7%;text-align:center;border:1px solid white">(In Pcs)</th>
+              <th style="width: 8%;">Less Return</th>
+              <th style="width: 8%;">Gross Sales</th>
+              <th style="width: 10%;">RP</th>
+              <th style="width: 8%;">Net Sale</th>
+              <th style="width: 8%;">LPD</th>
+            </tr>
+          </thead>
+          <tbody style="max-height: 275px;overflow: hidden scroll;display: block;width:100%;">
+
+            <tr *ngFor="let io of ItemsOrderGrid;let i = index " class="row">
+              <td style="width: 15%;margin-left:15px;">{{io.iteM_CODE}}-{{  io.iteM_NAME}}</td>
+              <td style="width: 5%;">{{io.quantity}}</td>
+              <td style="width: 7%;"><input type="number" class="form-control" id="loadInCase" [(ngModel)]="io.loadInCase" (change)="addGrid(io.iteM_CODE,io.quantity,io.loadInCase,io.loadInPcs,io.returnInCase,io.returnInPcs,io.rp)" min="0" [disabled]="loadOutReturn" /></td>
+              <td style="width: 7%;"><input type="number" class="form-control" id="loadInPcs" [(ngModel)]="io.loadInPcs" (change)="addGrid(io.iteM_CODE,io.quantity,io.loadInCase,io.loadInPcs,io.returnInCase,io.returnInPcs,io.rp)" min="0" [disabled]="loadOutReturn" /></td>
+              <td style="width: 8%;">{{io.totalLoad}}</td>
+              <td style="width: 7%;"><input type="number" class="form-control" id="returnInCase" [(ngModel)]="io.returnInCase" (change)="addGrid(io.iteM_CODE,io.quantity,io.loadInCase,io.loadInPcs,io.returnInCase,io.returnInPcs,io.rp)" min="0" [disabled]="loadOutRequest" /></td>
+              <td style="width: 7%;"><input type="number" class="form-control" id="returnInPcs" [(ngModel)]="io.returnInPcs" (change)="addGrid(io.iteM_CODE,io.quantity,io.loadInCase,io.loadInPcs,io.returnInCase,io.returnInPcs,io.rp)" min="0" [disabled]="loadOutRequest" /></td>
+              <td style="width: 8%;">{{io.lessReturn}}</td>
+              <td style="width: 8%;">{{io.grossSale}}</td>
+              <td style="width: 10%;"><input type="number" class="form-control" id="rp" [(ngModel)]="io.rp" (change)="addGrid(io.iteM_CODE,io.quantity,io.loadInCase,io.loadInPcs,io.returnInCase,io.returnInPcs,io.rp)" min="0" /></td>
+              <td style="width: 8%;">{{io.netSale}}</td>
+              <td style="width: 8%;">{{ io.netSale/io.quantity | number:'1.2-5'}}</td>
+            </tr>
+
+          </tbody>
+        </table>
+      </div>
+      <!--<div>
+        <pagination-controls (pageChange)="a = $event" style="float:right;"></pagination-controls>
+      </div>-->
+      <div class="row">
+        <div class="col-md-2">
+          <span>Remarks:</span>
+        </div>
+        <div class="col-md-8">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-align-justify" aria-hidden="true"></i>
+            <fieldset class="form-group">
+              <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please type here..." class="form-control" style="height:auto;"
+                        rows="3"></textarea>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+    <div class="modal-footer" style="margin-bottom: 10px;padding-top: 15px;">
+      <div class="row" style="position: absolute;left: 30px;">
+        <!--RDLC Show-->
+        <button type="button" id="viewRDLC" style="cursor:pointer; margin-left:5px;" class="btn btn-small btn-warning tip" (click)="onNavigate('/dsl-rpt-rdlc')"><i class="fa fa-eye"></i></button>
+      </div>
+      <!--Show Order View-->
+      <div id="viewBtn">
+        <span>Show</span>
+        <input type="checkbox" id="isView" name="isView" [(ngModel)]="isView" />
+      </div>
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveData(0);"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button [style.display]="PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateData(0);"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close..</button>
+      </ng-template>
+      <button type="button" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>
+<!-- End Row -->

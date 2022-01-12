@@ -1,0 +1,264 @@
+<!-- ============================================================== -->
+<!-- toggle and nav items -->
+<!-- ============================================================== -->
+<ul class="navbar-nav mr-auto float-left">
+  <li (click)="toggleSidebar.emit()" class="nav-item m-l-10 d-block d-lg-none"> <a class="nav-link sidebartoggler text-muted waves-effect waves-dark" href="javascript:void(0)"><i class="ti-menu"></i></a> </li>
+</ul>
+<!-- ============================================================== -->
+<!-- User profile and search -->
+<!-- ============================================================== -->
+<ul class="navbar-nav my-lg-0 float-right">
+
+
+  <!-- ============================================================== -->
+  <!-- Profile -->
+  <!-- ============================================================== -->
+  <li class="nav-item dropdown" ngbDropdown placement="bottom-right">
+    <a ngbDropdownToggle class="nav-link dropdown-toggle text-muted waves-effect waves-dark" href="javascript:void(0)" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><img [src]="userimage" style="height:40px;width:40px;margin-right: 2vw;" alt="user" class="profile-pic" /></a>
+    <div class="dropdown-menu animated slideInDown" ngbDropdownMenu>
+      <ul class="dropdown-user">
+        <li>
+          <div class="dw-user-box">
+            <div class="u-img"><img [src]="userimage" alt="user" (error)="setDefaultPic()"> </div>
+            <div class="u-text">
+              <h4>{{employeeName}}</h4>
+              <p class="text-muted">
+                {{designation}}
+                <!--wasim.sattar@hotmail.com-->
+              </p>
+            </div>
+          </div>
+        </li>
+        <li role="separator" class="divider"></li>
+        <li><a (click)="openToDoList(toDoListContent)" style="cursor:pointer;"><i class="ti-list"></i>To Do List</a></li>
+        <li role="separator" class="divider"></li>
+        <li><a [routerLink]="['/dashsetting']"><i class="ti-settings"></i> Account Setting</a></li>
+        <li><a (click)="open(content)" style="cursor:pointer;"><i class="fa fa-lock"></i> Change Password</a></li>
+        <li><a (click)="open(contentID);ngFillOfficesAndWarehouses();" style="cursor:pointer;"><i class="fa fa-user"></i> Change Office Branch</a></li>
+        <li><a (click)="onLoggedout()" style="cursor:pointer;"><i class="fa fa-power-off"></i> Logout</a></li>
+      </ul>
+    </div>
+  </li>
+</ul>
+<!--<div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;"></div>-->
+<!--Change Password-->
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Change Password</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-8">
+        <div class="row">
+          <div class="offset-md-1 col-md-4">
+            <span>Old Password:</span>
+          </div>
+          <div class="col-md-6">
+            <input type="password" id="oldPassword" (keyup)="onOldPassword($event)" class="form-control" />
+          </div>
+        </div>
+        <br />
+        <div class="row">
+          
+          <div class="offset-md-1 col-md-4">
+            <span>New Password:</span>
+          </div>
+          <div class="col-md-6">
+            <input type="password" id="abc" #password class="form-control" maxlength="8" [pattern]="'^[A-Za-z0-9~!@#$%^&*()]+$'" (keyup)="onNewPassword($event);instruction(password.value);" (focus)="instruction(password.value);" />
+            
+          </div> 
+          
+        </div> 
+      <br/>
+        <div class="row">
+          <div class="offset-md-1 col-md-4">
+            <span>Confirm Password:</span>
+          </div>
+          <div class="col-md-6">
+            <input type="password" maxlength="8" class="form-control" (keyup)="onConfirmPassword($event);" />
+          </div>
+        </div>  
+        
+      </div>
+      <div class="col-md-4"> 
+        <div id="inst" class=" ml-auto bg-light p-3"[style.display] = "instvalue"  style="width: fit-content;height: fit-content;">
+          <h4><b><i>instruction:</i></b></h4>
+          <p *ngIf="smallletter==true" class="text-success"><i class="fa fa-check fa-7x"> &nbsp;</i>small letter: done</p>
+          <p *ngIf="smallletter==false" class="text-danger"><i class="fa fa-times fa-7x"> &nbsp;</i>at least one small letter</p>
+          <p *ngIf="capitalletter==true" class="text-success"><i class="fa fa-check"> &nbsp;</i>capital letter: done</p>
+          <p *ngIf="capitalletter==false" class="text-danger"><i class="fa fa-times"> &nbsp;</i>at least one capital letter</p>
+          <p *ngIf="num==true" class="text-success"><i class="fa fa-check"> &nbsp;</i>number: done</p>
+          <p *ngIf="num==false" class="text-danger"><i class="fa fa-times"> &nbsp;</i>at least one number</p>
+          <p *ngIf="specialchar==true" class="text-success"><i class="fa fa-check"> &nbsp;</i>special character: done</p>
+          <p *ngIf="specialchar==false" class="text-danger"><i class="fa fa-times"> &nbsp;</i>at least one special character</p>
+          <p *ngIf="maxlength==true" class="text-success"><i class="fa fa-check"> &nbsp;</i>maximum length: done</p>
+          <p *ngIf="maxlength==false" class="text-danger"><i alt="fa fa-times" class="fa fa-times"> &nbsp;</i>maximum length between 6 and 8</p>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <button type="button" id="submitSave"  class="btn btn-small btn-warning tip" (click)="changePassword()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+    <button type="button" id="x" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o" aria-hidden="true"></i> Close</button>
+  </div>
+</ng-template>
+
+
+
+<!--Change Office Branch-->
+<ng-template #contentID let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Change Office Branch</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-3">
+        <span>User Office:</span>
+      </div>
+      <div class="col-md-4">
+        <input type="text" id="userOffice" [(ngModel)]="userOffice" class="form-control" disabled />
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+    <br />
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-3">
+        <span>User Warehouse:</span>
+      </div>
+      <div class="col-md-4">
+        <input type="text" id="userWarehouse" [(ngModel)]="userWarehouse" class="form-control" disabled />
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+    <br />
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-3">
+        <span>Current Office:</span>
+      </div>
+      <div class="col-md-4">
+
+        <select class="form-control" [(ngModel)]="officE_CODE" id="userCurrentOffice" (change)="changeOffice(officE_CODE)">
+          <option *ngFor="let u of offices " [value]="u.officE_CODE">{{u.officE_NAME}}</option>
+        </select>
+     
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+    <br />
+    <div class="row">
+      <div class="col-md-2"></div>
+      <div class="col-md-3">
+        <span>Current Warehouse:</span>
+      </div>
+      <div class="col-md-4">
+        <select class="form-control" [(ngModel)]="warehouseID" id="userCurrentWarehouse" (change)="changeWarehouse(warehouseID)">
+          <option *ngFor="let w of warehouses " [value]="w.warehouseID">{{w.warehouseName}}</option>
+        </select>
+      </div>
+      <div class="col-md-2"></div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" id="save"  class="btn btn-small btn-warning tip" (click)="changeUserOfficeAndWarehouse()"><i class="fa fa-thumbs-up" aria-hidden="true"></i> Ok</button>
+    <button type="button" id="x" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o" aria-hidden="true"></i> Close</button>
+  </div>
+</ng-template>
+
+
+
+
+<!--To Do List-->
+<ng-template #toDoListContent let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">To Do List</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="card">
+    <div class="card-body">
+
+      <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-sm-10">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="todo" (change)="setTask()">
+          </div>
+        </div>
+      </div>
+      <ngb-accordion [closeOthers]="true" activeIds="static-1">
+
+        <ngb-panel id="static-1" title="Pending" (click)="showPending()">
+          <ng-template ngbPanelContent>
+            <br />
+            <div class="row" [style.display]="showpending">
+              <div class="col-sm-1"></div>
+              <div class="col-sm-10">
+                <table class="table">
+                  <tbody>
+                    <tr *ngFor="let e of pendingtask ">
+                      <div class="row">
+                        <div class="col-sm-10">
+                          <div class="form-group">
+                            <input type="text" class="form-control" [(ngModel)]="e.task" [title]="e.task+' - Dated: '+e.date" (click)="getTaskDetailsByID(e.taskid,e.task,e.date,e.status,task)">
+                          </div>
+                        </div>
+                        <div class="col-sm-2">
+                          <div class="form-group">
+                            <div class="btn-group" style="float:right; ">
+                              <button type="button" class="btn btn-small btn-warning tip" id="edit" (click)="setTaskCompleted(e.taskid)">
+                                <span class="fa fa-check text-white"></span>
+                              </button>
+                              <button type="button" class="btn btn-small" id="edit" (click)="deleteTask(e.taskid)">
+                                <span class="fa fa-times text-white"></span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </ng-template>
+        </ngb-panel>
+        <ngb-panel id="static-2" title="Completed" (click)="showCompleted()">
+          <ng-template ngbPanelContent>
+            <br />
+            <div class="row" [style.display]="showcompleted">
+              <div class="col-sm-1"></div>
+              <div class="col-sm-10">
+                <table class="table ">
+                  <tbody>
+                    <tr *ngFor="let e of completedtask ">
+                      <div class="row">
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-10">
+                          <div class="form-group">
+                            <input type="text" class="form-control" [(ngModel)]="e.task" [title]="e.task+' - Dated: '+e.date" (click)="getTaskDetailsByID(e.taskid,e.task,e.date,e.status,task)" readonly>
+                          </div>
+                        </div>
+                      </div>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </ng-template>
+        </ngb-panel>
+      </ngb-accordion>
+    </div>
+  </div>
+  <div class="modal-footer"></div>
+</ng-template>

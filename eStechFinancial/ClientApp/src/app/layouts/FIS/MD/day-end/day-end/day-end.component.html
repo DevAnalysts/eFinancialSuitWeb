@@ -1,0 +1,360 @@
+<!-- Row -->
+<div class="row">
+
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissomUtility.FUNCTIONALITYNAME}} </span>
+          <!--<span style="font-size:large;font-weight:bold;">TAX RATE</span>-->
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input (keydown.enter)="$event.target.blur()" (blur)="getGrid(input.value)" [(ngModel)]="id" id="id" placeholder="search..." class="form-control" />
+
+            <button class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Office</th>
+              <th>Date</th>
+              <th>Opening Cash</th>
+              <th>Closing Cash</th>
+              <th>Cash Sales</th>
+              <th>Cash Expense</th>
+              <th>Cash Payment</th>
+
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of grid | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.day_Id}}</td>
+              <td>{{dt.officeName}}</td>
+              <td>{{dt.posday | date:"dd/MM/yy"}}</td>
+              <td>{{dt.openingcash | number: '1.2-5'}}</td>
+              <td>{{dt.closingCash  | number: '1.2-5'}}</td>
+              <td>{{dt.sales | number: '1.2-5'}}</td>
+              <td>{{dt.expense  | number: '1.2-5'}}</td>
+              <td>{{dt.payments | number: '1.2-5'}}</td>
+
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.day_Id,dt.branchid,dt.officeName,content) "
+                          id="edit">
+                    <span class="fa fa-pencil "></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissomUtility.FUNCTIONALITYDETAILNAME}}
+        <!--TAX RATE DETAIL-->
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="c('Close click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-1">
+          
+        </div>
+        <div class="col-md-3">
+          <div class="form-group" >
+            <span>Day:</span>
+            <div class="input-group" style="width: 330px;margin-top: 5px;">
+              <input class="form-control" name="dp" [(ngModel)]="poS_Day.model" ngbDatepicker #d="ngbDatepicker" disabled="disabled">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="d.toggle()" disabled="disabled">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-3">
+          <div class="form-group" style=" width: 330px;">
+            <span>Office:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-map-marker" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="userCurrentOfficeName" id="userCurrentOfficeName" readonly>
+            </div>
+          </div>
+        </div>  
+      </div>
+
+      <div class="row">
+        <div class="col-md-1"> 
+        </div>
+        <div class="col-md-3" >
+          <div class="form-group" style="width: 330px;">
+            <span>Opening Cash:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="openingCash  | number : '1.2-5'" id="openingCash" readonly>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3" >
+          <div class="form-group" style="width: 330px;">
+            <span>Owners Cash:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="ownerCash" id="ownerCash" (change)="changeOwner(ownerCash)">
+            </div>
+          </div>
+        </div>
+         
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Borrow Cash:</span>
+            <div class="row" style="margin-left: 27px;margin-top: 5px;">
+               
+                <div class="inner-addon left-addon" style="width: 140px;">
+                  <i class="fa fa-money" aria-hidden="true"></i>
+                  <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="borrowCash" id="borrowCash" (change)="changeBorrowCash(borrowCash)">
+                </div>               
+               
+                <input type="text"  style="width: 144px;margin-left: 5px;" class="form-control" [(ngModel)]="borrowRemarks" id="borrowRemarks" >
+               
+
+            </div>
+          </div>
+        </div> 
+      </div>
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Cash Sales:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="sales  | number : '1.2-5'" id="sales" readonly>
+            </div>
+          </div>
+        </div> 
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Credit Sale:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="creditsale  | number : '1.2-5'" id="creditcash" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-1"></div> 
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Credit Reciept (Cash):</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="creditrecieptcash  | number : '1.2-5'" id="creditrecieptcash" readonly>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Credit Reciept  (Bank):</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="creditrecieptbank  | number : '1.2-5'" id="creditrecieptbank" readonly>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Net Cash:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="netCash  | number : '1.2-5'" id="netCash" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-1"> 
+        </div> 
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Cash Expenses:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="expense  | number : '1.2-5'" id="expense" readonly>
+            </div>
+          </div>
+        </div>
+ 
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Cash Payments:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="payments  | number : '1.2-5'" id="payments" readonly>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-1">
+          
+        </div>
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Bank Payment:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="bankpayment  | number : '1.2-5'" id="bankpayment" readonly>
+            </div>
+          </div>
+        </div> 
+        
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Bank Deposit:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="bankDeposit" id="bankDeposit" (change)="changeBankDeposit(bankDeposit)">
+            </div>
+          </div>
+        </div>
+ 
+        <div class="col-md-3" id="lblBankAccountTitle">
+          <div class="form-group" style="width: 330px;">
+            <span>Bank Accounts:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-credit-card-alt" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="bank_Acct_No" id="bank_Acct_No">
+                <option *ngFor="let u of bankAccounts " [value]="u.bank_Acct_No">{{u.bank_Acct_TITLE}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-1">
+          
+        </div>
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Closing Cash:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-money" aria-hidden="true"></i>
+              <input class="form-control" [ngModel]="closingCash  | number : '1.2-5'" id="closingCash" readonly>
+            </div>
+          </div>
+        </div>  
+      </div>
+
+      <div class="row" [style.display]="ShowNextDay">
+        <div class="col-md-1">
+          
+        </div>
+        <div class="col-md-3">
+          <div class="form-group" style="width: 330px;">
+            <span>Day to Open:</span>
+            <div class="input-group" style="margin-top:5px">
+              <input class="form-control" name="dp" [(ngModel)]="nextDay.model" ngbDatepicker #dd="ngbDatepicker" [disabled]="enableOpenDay">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()"> <i class="fa fa-calendar" aria-hidden="true"></i></button>
+              </div>
+            </div>
+          </div>
+          <!--<div class="form-group">
+            <input type="date" class="form-control" [(ngModel)]="nextDay" id="nextDay">
+          </div>-->
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-1"></div>
+        <div class="col-md-5">
+          <div class="form-group">
+            <span>Remarks:</span>
+            <div class="inner-addon left-addon" style="margin-top: 5px;margin-left: 30px;">
+              <i class="fa fa-align-justify" aria-hidden="true"></i>
+              <fieldset class="form-group">
+                <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;margin-bottom: -50px;"
+                          rows="4"></textarea>
+              </fieldset>
+            </div>
+          </div>          
+        </div>
+      </div>
+    </div>
+    <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+    <div class="modal-footer">
+      <div class="row" style="position: absolute;left: 30px;">
+
+        <div *ngIf="btnMode; then viewRDLC else  viewRDLC1 "> </div>
+        <ng-template #viewRDLC>
+          <button type="button" id="viewRDLC" style=" cursor:pointer; margin-right:5px;padding: 6px 7px;" class="btn btn-small btn-warning tip" (click)="onNavigate('/daysummary-rpt-rdlc')">
+            <img src="../../../../../../assets/images/icon/report.png" >
+          </button>
+        </ng-template>
+      </div>
+
+      <div *ngIf="btnMode; then submitAdd else  submitUpdate "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" tabindex="23" class="btn btn-small btn-warning tip" (click)="saveDayEnd(isClose)()">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click')" tabindex="24"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+
+
+
+
+
+
+
+    </div>
+  </ng-template>
+</div>
+
+
+

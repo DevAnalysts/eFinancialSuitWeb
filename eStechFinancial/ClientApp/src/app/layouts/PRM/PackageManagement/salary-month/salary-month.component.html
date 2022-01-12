@@ -1,0 +1,155 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header" style="height: auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group">
+            <input class="form-control" type="text" name="search" placeholder="search..." #input (keydown.enter)='$event.target.blur()' (blur)="getGrid(input.value)" [(ngModel)]="id" style="margin:1px;">
+            <div class="input-group-append order-last">
+              <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip" style="margin: 1px 0px 1px 0px" id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>            
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>Office</th>
+              <th>Current Month</th>
+              <th>Current Status</th>
+              <th>Close Status</th>
+
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let e of gridlist   | paginate: { itemsPerPage: 21, currentPage: p};">
+              <td>{{e.office}}</td>
+              <td>{{e.month}}</td>
+              <td *ngIf="e.iscurrent==true">Yes</td>
+              <td *ngIf="e.iscurrent==false">No</td>
+              <td *ngIf="e.isclose==true">Yes</td>
+              <td *ngIf="e.isclose==false">No</td>
+
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click');">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-sm-1">
+          
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group" style="width: 300px;margin-left: 30px;">
+            <span>Office</span>
+            <select class="form-control" [(ngModel)]="officecode" id="officecode" (change)="getMonth(officecode)">
+              <option *ngFor="let o of office" [value]="o.officecode">{{o.officename}}</option>
+            </select>
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-sm-1">
+          
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group" style="width: 300px;margin-left: 30px;">
+            <span>Current Month</span>
+            <input type="text" class="form-control" [(ngModel)]="monthname" id="monthname" readonly="readonly">
+          </div>
+        </div>
+        <div class="col-sm-3 ml-3">
+          <div class="form-group" style="width: 300px;margin-left: 30px;">
+            <span>Next Month</span>
+            <input type="text" class="form-control" [(ngModel)]="nextmonth" id="nextmonth" readonly="readonly">
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-sm-1">
+          
+        </div>
+        <div class="col-sm-3">
+          <div class="form-group" style="margin-left: 30px;">
+            <span>isCurrent ?</span>
+            <input type="checkbox" style="margin-left: 5px;" [(ngModel)]="iscurrent" id="iscurrent" disabled="disabled">
+          </div>
+        </div>
+
+      </div>
+      <!--<div class="row">
+        <div class="col-sm-2">
+          <span>Close</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+
+            <input type="checkbox" [(ngModel)]="close">
+          </div>
+        </div>
+
+      </div>-->
+
+    </div>
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" tabindex="3" class="btn btn-small btn-warning tip"
+                (click)="saveData();">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button [style.display]="permissionUtility.PermissionEdit" id="submitUpdate" type="button" tabindex="3" class="btn btn-small btn-warning tip"
+                (click)="updateData();">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+      <button type="button" id="x" class="btn btn-small" tabindex="4" (click)="c('Close click');"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+  </div>
+

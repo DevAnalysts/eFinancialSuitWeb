@@ -1,0 +1,196 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header" style="height: auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group">
+            <input type="text" #input (keyup)="getGrid()" [(ngModel)]="id" id="id" placeholder="search..." class="form-control" style="margin:1px;">
+            <div class="input-group-append order-last">
+              <button [style.display]="PermissionView" style="margin: 1px 0px 1px 0px;" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>            
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>Voucher ID</th>
+              <th>Voucher #</th>
+              <th>Voucher Date</th>
+              <th>Office</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of grid  | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.voucher_ID}}</td>
+              <td>{{dt.voucherno}} </td>
+              <td>{{dt.voucherdate  | date:"dd/MM/yy"}}</td>
+              <td>{{dt.office}}</td>
+              <td>{{dt.approved}}</td>
+              <td>{{dt.status}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionAdd" class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.disposalID,dt.approved,content)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-1">
+          
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Date:</span>
+            <div *ngIf="btnmode; then dateon else dateoff"></div>
+            <ng-template #dateon>
+              <div class="input-group" style="width: 330px;">
+                <input class="form-control" name="dp" [(ngModel)]="voucherdate.model" ngbDatepicker #dd="ngbDatepicker">
+                <div class="input-group-append" style="margin-top: 5px;">
+                  <button class="btn btn-small " (click)="dd.toggle()">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #dateoff>
+              <div class="input-group" style="width:330px;">
+                <input class="form-control" name="dp" [(ngModel)]="voucherdate.model" ngbDatepicker #dd="ngbDatepicker" disabled>
+                <div class="input-group-append" style="margin-top: 5px;">
+                  <button class="btn btn-small " (click)="dd.toggle()" disabled>
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        
+        <div class="col-md-3 ml-5">
+          <div class="form-group" style="width: 330px;">
+            <span>Office:</span>
+            <div *ngIf="btnMode; then Office else  UNLOADOffice"> </div>
+            <ng-template #Office>
+              <select class="form-control" [(ngModel)]="officecode" id="officecode" (change)="changeOffice()">
+                <option *ngFor="let o of office " [value]="o.officecode">{{o.officename}}</option>
+              </select>
+            </ng-template>
+            <ng-template #UNLOADOffice>
+              <select class="form-control" [(ngModel)]="officecode" id="officecode" disabled>
+                <option *ngFor="let o of office " [value]="o.officecode">{{o.officename}}</option>
+              </select>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-1">
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <div *ngIf="btnmode; then checkOn else checkoff"> </div>
+            <ng-template #checkOn>
+              <button type="button" class="btn btn-small btn-warning tip" id="getRecords" (click)="getRecords()">Load</button>
+            </ng-template>
+            <ng-template #checkoff>
+              <button type="button" class="btn btn-small btn-warning tip" id="getRecords" (click)="getRecords()" hidden="hidden">Load</button>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+      <div class="row table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;">Sr#.</th>
+              <th style="width:5%">ID</th>
+              <th style="width:10%">Asset Code</th>
+              <th style="width:33%">Name</th>
+              <th style="width:10%">Office</th>
+              <th style="width:10%">Sale Price</th>
+              <th style="width:15%">Disposal Date</th>
+              <th style="width:10%"></th>
+            </tr>
+          </thead>
+          <tbody style="max-height: 300px;overflow: hidden scroll;display: block;width:100%;">
+            <tr class="row" *ngFor="let i of vouchers let idx = index">
+              <td style="width:5%;margin-left:15px;">{{idx+1}}</td>
+              <td style="width:5%">{{i.disposalID}}</td>
+              <td style="width:10%">{{i.assetno}}</td>
+              <td style="width:33%">{{i.assetname}}</td>
+              <td style="width:10%">{{i.office}}</td>
+              <td style="width:10%">{{i.salePrice}}</td>
+              <td style="width:15%">{{i.ddate}}</td>
+              <td style="width:10%">
+                <div *ngIf="btnmode; then checkOn else checkoff"> </div>
+                <ng-template #checkOn>
+                  <input type="checkbox" [(ngModel)]="i.status">
+                </ng-template>
+                <ng-template #checkoff>
+                  <!--<td><input type="checkbox" [(ngModel)]="i.status" disabled="disabled"></td>-->
+                </ng-template>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div *ngIf="btnmode; then SaveMode else UpdateMode"> </div>
+      <ng-template #SaveMode>
+        <!--Save-->
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveData()"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save</button>
+      </ng-template>
+      <ng-template #UpdateMode>
+        <!--<div class="row" style="position: absolute;left: 30px;">
+          <button type="button" id="Approve" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="Approve()">Approve</button>
+        </div>-->
+        <!--Update-->
+        <!--  <button [style.display]="PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateData()"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save</button>-->
+      </ng-template>
+      <!--Cancel-->
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click')"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>

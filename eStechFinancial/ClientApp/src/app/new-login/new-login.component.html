@@ -1,0 +1,110 @@
+<div class="class-container">
+  <div class="background_wrapper"> 
+      <svg class="bottom-svg" viewBox="0 0 1170 120" fill="none" xmlns="http://www.w3.org/2000/svg"> 
+          <path d="M690 4.08004C518 -9.91998 231 4.08004 -6 176.361L231 197.08L1170 219.08C1113.33 175.747 909.275 21.928 690 4.08004Z" fill="white" fill-opacity="0.1">
+
+          </path> 
+      </svg> 
+  </div>
+  <div class="split-left">
+      
+          <div class="centered left-centered"> 
+             <div class="logos_wrapper ng-scope" ng-if="pic_url.length > 0 ">
+                 <div class="display-inline m-5 p-10 ng-scope" ng-repeat="pic in pic_url track by versionTracker(pic,$id(pic))"> 
+                   <span style="font-size:xx-large;font-weight:bold;">
+                     <img id="profile_pic_preview" class="profile_pic_preview" src="assets/images/favicone.png" width="40px"> Sagacity
+                    </span>
+                    </div>
+                     </div>
+                     <div class="login-outer bg-white "> 
+                         <form #loginForm="ngForm" (ngSubmit)="loginForm.valid && Login(login,password_Value)" > 
+                             <div class="form-group control-group"> 
+                                 <i class="fa fa-user">
+                                  </i> 
+                                  <input id="login" [(ngModel)]="login" class="form-control underline-input " name="login"  placeholder="Username"   > 
+                              </div> 
+                                  <div class="form-group control-group"> 
+                                      <i class="fa fa-lock"></i> 
+                                      <input name="password" id="password" [(ngModel)]="password_Value" type="password" placeholder="Password" class="form-control underline-input "  > 
+                                  </div> 
+                                  <div class="control-group" id="error">
+                                    <div class="alert alert-error btn btn-block form-control">
+                                      Error! Invalid User / Password...
+                                    </div>
+                                  </div>
+                                  
+                                  
+                                  <div class="form-group text-left mt-20"> 
+                                      <button type="submit" class="btn btn-submit-full b-0 br-2 mr-5 ng-binding">Sign In</button> 
+                                      
+                                  </div> 
+                              </form> 
+                              <!-- <form  >
+                                  <div class="loginBox" style="background-color:white;width:350px;">
+                                   
+                                    <div class="row" style="background-color:transparent;">
+                                    </div>
+                                    <div class="control-group">
+                                      
+                                      <input type="text" id="login"  class="form-control underline-input" placeholder="Username" name="login" style="background-color:white;" />
+                                    </div>
+                                    <div class="control-group">
+                                      
+                                      <input type="password" id="password" class="form-control" placeholder="Password" name="password" style="background-color:white;" />
+                                    </div>
+                          
+                                    <div class="control-group" id="error">
+                                      <div class="alert alert-error btn btn-block form-control">
+                                        Error! Invalid User / Password...
+                                      </div>
+                                    </div>
+                          
+                                    <div class="form-actions" style="text-align:center; background-color :white; border-top-color :#f1f1f1 ;">
+                                      <button type="submit" style="background-color :#ffc103;align-items:center;width:285px;">Sign in</button>
+                                    </div>
+                                  </div>
+                                </form> -->
+                          </div> 
+                      </div> 
+                      <div class="page-copyright ng-binding"> © <span><a target="_blank" href="http://sagacitech.com/"> Sagacitech Systems(Pvt.) Ltd.</a></span> 2021. All Rights Reserved. 
+                      </div> 
+                 
+  </div>
+  <div class="split-right">
+      <svg class="first_svg" fill="none" viewBox="0 0 515.25 1023" xmlns="http://www.w3.org/2000/svg"> 
+          <path d="M116.21 472.5C55.1239 693.5 78.5219 837.5 114.349 1023H1030.5V-1L0 -106C147.5 21.5 172.311 269.536 116.21 472.5Z" fill="url(#paint0_linear)">
+
+          </path> 
+          <defs> 
+              <linearGradient id="paint0_linear" x1="515.25" y1="-106" x2="515.25" y2="1023" gradientUnits="userSpaceOnUse">
+               <stop class="first-svg-top-gradient" stop-color="#0a6f87"></stop>
+                <stop class="first-svg-bottom-gradient" offset="1" stop-color="#151529"></stop> 
+              </linearGradient> 
+          </defs> 
+          
+      </svg>
+      <svg class="second_svg" viewBox="0 0 649.5 1017" fill="none" xmlns="http://www.w3.org/2000/svg"> 
+          <path d="M226.002 466.5C164.935 687.5 188.326 831.5 224.141 1017H1140V-7L0 -109.5C142.5 -7.5 282.085 263.536 226.002 466.5Z" fill="url(#paint0_linear)" fill-opacity="0.1">
+
+          </path> 
+          <defs> 
+              <linearGradient id="paint0_linear" x1="649.5" y1="-7" x2="649.5" y2="1017" gradientUnits="userSpaceOnUse"> 
+                  <stop class="second-svg-top-gradient" stop-color="#5851D8"></stop> 
+                  <stop class="second-svg-bottom-gradient" offset="1" stop-color="#817AE3"></stop> 
+              </linearGradient> 
+          </defs> 
+
+      </svg>
+      <div class="right-text centered-text"> 
+          <div class="column"> 
+              <img ng-if="getSubdomain() !='sbca'" ng-src="assets/images/favicone.png" width="150" class="ng-scope" src="assets/images/favicone.png">
+              
+          </div>
+          <h1  class="ng-binding ng-scope">Empowering Businesses Smartly<br>
+          </h1>
+          <p ng-if="getSubdomain() !='sbca'" class="ng-binding ng-scope"> Sagacity is a secure, scale-able &amp; comprehensive cloud based ERP Solution.<br> 
+          </p>
+      </div>
+      
+  </div>
+</div>

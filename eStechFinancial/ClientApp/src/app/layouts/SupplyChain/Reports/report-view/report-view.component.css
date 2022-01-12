@@ -1,0 +1,143 @@
+.dnd-drag-start {
+    -moz-transform: scale(0.8);
+    -webkit-transform: scale(0.8);
+    transform: scale(0.8);
+    opacity: 0.7;
+    border: 2px dashed #000;
+}
+
+.dnd-drag-enter {
+    opacity: 0.7;
+    border: 2px dashed #000;
+}
+
+.dnd-drag-over {
+    border: 2px dashed #000;
+}
+
+.dnd-sortable-drag {
+    -moz-transform: scale(0.9);
+    -webkit-transform: scale(0.9);
+    transform: scale(0.9);
+    opacity: 0.7;
+    border: 1px dashed #000;
+}
+
+/*//New_ Recipts Css classes*/
+#invoice-POS {
+    box-shadow: 0 0 1in -0.25in rgba(0, 0, 0, 0.5);
+    padding: 2mm;
+    margin: 0 auto;
+    width: 44mm;
+    background: #FFF;
+    :: selection
+
+{
+    background: #f31544;
+    color: #FFF;
+}
+
+::moz-selection {
+    background: #f31544;
+    color: #FFF;
+}
+
+h1 {
+    font-size: 1.5em;
+    color: #222;
+}
+
+h2 {
+    font-size: .9em;
+}
+
+h3 {
+    font-size: 1.2em;
+    font-weight: 300;
+    line-height: 2em;
+}
+
+p {
+    font-size: .7em;
+    color: #666;
+    line-height: 1.2em;
+}
+
+#top, #mid, #bot { /* Targets all id with 'col-' */
+    border-bottom: 1px solid #EEE;
+}
+
+#top {
+    min-height: 100px;
+}
+
+#mid {
+    min-height: 10px;
+}
+
+#bot {
+    min-height: 50px;
+}
+
+#top .logo {
+    background-size: 20px 20px;
+    border-radius: 5px;;
+    background: url(http://michaeltruong.ca/images/logo1.png) no-repeat;
+    background-size: 20px 20px;
+}
+
+.clientlogo {
+    float: right;
+    height: 20px;
+    width: 20px;
+    background: url(http://michaeltruong.ca/images/client.jpg) no-repeat;
+    background-size: 20px 20px;
+    border-radius: 5px;
+}
+
+.info {
+    display: block;
+    //float:left;
+    margin-left: 0;
+}
+
+.title {
+    float: right;
+}
+
+    .title p {
+        text-align: right;
+    }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td {
+    //padding: 5px 0 5px 15px;
+    //border: 1px solid #EEE
+}
+
+.tabletitle {
+    //padding: 5px;
+    font-size: .5em;
+    background: #EEE;
+}
+
+.service {
+    border-bottom: 1px solid #EEE;
+}
+
+.item {
+    width: 24mm;
+}
+
+.itemtext {
+    font-size: .5em;
+}
+
+#legalcopy {
+    margin-top: 5mm;
+}
+}

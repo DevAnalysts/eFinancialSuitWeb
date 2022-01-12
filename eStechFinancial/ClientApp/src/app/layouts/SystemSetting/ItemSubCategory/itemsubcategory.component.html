@@ -1,0 +1,168 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div id="PageGrid" [class]="card1style">
+      <div class="row card-header" style="height:auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2 ">
+          <div class="input-group">
+            <input class="form-control" type="text" name="search" style="margin-top:1px;" placeholder="search..." [(ngModel)]="ID">
+            <div class="input-group-append order-last">
+              <button class=" btn btn-small btn-warning tip" style="margin:2px;" (click)="Add()" [style.display]="permissionUtility.PermissionAdd">
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive" style="padding:5px;">
+        <table class="table table-hover table-striped" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176)">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Name</th>
+              <th>Category</th>
+              <!--<th>Inventory Account</th>
+              <th>Sale Account</th>
+              <th>CoGS Account</th>-->
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let u of subcategory | filter:ID | paginate: { itemsPerPage: 10, currentPage: p};">
+              <td>{{u.subcategorycode}}</td>
+              <td>{{u.subcategoryname}}</td>
+              <td>{{u.category}}</td>
+              <!--<td>{{u.inventoryaccount}}</td>
+              <td>{{u.saleaccount}}</td>
+              <td>{{u.cogsaccount}}</td>-->
+              <td>
+                <div *ngIf="true == u.active; then on else off"></div>
+                <ng-template #on>
+                  Active
+                </ng-template>
+                <ng-template #off>
+                  Disabled
+                </ng-template>
+              </td>
+              <td>
+                <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                  <button [style.display]="permissionUtility.PermissionView" style="padding: 6px 7px;" class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.subcategorycode);View();" id="view">
+                    <span><img src="../../../../../../assets/images/icon/report.png" ></span>
+                  </button>
+                </div>
+                <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                  <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.subcategorycode);Edit();" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+    <div id="frm" [class]="card2style" style="padding:0px;margin:0px;border:0px;" [style.display]="card2display">
+      <div class="card-header" style="height:40px;">
+        <div class="page-title-list">
+          <span style="font-size:large;margin-left:10px; font-weight:bold;"> {{permissionUtility.FUNCTIONALITYDETAILNAME}}</span>
+        </div>
+      </div>
+      <div class="card-body" style="margin-top:20px;margin-left:50px;width:300px;">
+        <div class='container-fluid'>
+          <div class='row'>
+            <div class="col-sm-6">
+
+            </div>
+            <div class="col-sm-12">
+              <div class="form-group">
+                <span>Name</span>
+                <input type="text" class="form-control" maxlength="100" (keypress)="valid.onlyAlphaNumeric($event)"  [(ngModel)]="subcategoryname" id="subcategoryname" required>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-sm-6">
+
+            </div>
+            <div class="col-sm-12">
+              <div class="form-group">
+                <span>Category</span>
+                <select class="form-control" [(ngModel)]="categorycode" id="categorycode" required>
+                  <option *ngFor="let c of category" [value]="c.categorycode">{{c.categoryname}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+            
+
+            <!--<div class="col-md-4">
+              <span>Inventory Account</span>
+            </div>
+            <div class="col-md-8">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="inventoryaccountcode" id="inventoryaccountcode" >
+                  <option *ngFor="let d of inventory" [value]="d.inventoryaccountcode">{{d.inventoryaccountname}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <span>Sale Account</span>
+            </div>
+            <div class="col-md-8">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="saleaccountcode" id="saleaccountcode">
+                  <option *ngFor="let n of sale" [value]="n.saleaccountcode">{{n.saleaccountname}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <span>CoGS Account</span>
+            </div>
+            <div class="col-md-8">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="cogsaccountcode" id="cogsaccountcode">
+                  <option *ngFor="let m of cogs" [value]="m.cogsaccountcode">{{m.cogsaccountname}}</option>
+                </select>
+
+              </div>
+            </div>-->
+        <div class="row">
+          <div class="col-sm-6">
+
+          </div>
+          <div class="col-sm-12">
+            <div class="form-group">
+              <span>Status</span>
+              <input type="checkbox" style="margin-left:5px;" [(ngModel)]="active" id="active" (change)="checkValue(active?true:false)" />
+            </div>
+          </div>
+        </div>
+            
+         
+
+        <div class='row'>
+          <div class="col-sm-6">
+
+          </div>
+          <div class="col-sm-12">
+            <button type="button" class=" btn" style="float:right;margin:3px;" (click)="Cancel()"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+            <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp1" (click)="saveData()"> <i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+            <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp2" (click)="updateData()"> <i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+          </div>
+        </div>
+
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

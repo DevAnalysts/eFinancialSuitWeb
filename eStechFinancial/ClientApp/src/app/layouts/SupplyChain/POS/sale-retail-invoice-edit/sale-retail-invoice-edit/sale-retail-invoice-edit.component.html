@@ -1,0 +1,909 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+          </div>
+        </div>
+      </div>
+      <div class="modal-body">
+        <div class="row" style="display:none">
+          <div class="col-md-2">
+            <span>Date:</span>
+          </div>
+          <div class="col-md-2">
+            <input type="date" class="form-control" [(ngModel)]="sO_Date" id="sO_Date" placeholder="dd-mm-yyyy">
+          </div>
+          <div class="col-md-2">
+            <span>Due Date:</span>
+          </div>
+          <div class="col-md-2">
+            <input type="date" class="form-control" [(ngModel)]="delivery_Date" id="Due_Date" />
+          </div>
+          <div class="col-md-2">
+            <span>Sale Officer:</span>
+          </div>
+          <div class="col-md-2" style="padding-left:40px">
+            <div class="form-group">
+
+              <div class="inner-addon left-addon">
+                <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+                <select class="form-control" [(ngModel)]="order_Envoy" id="order_Envoy">
+                  <option *ngFor="let u of users " [value]="u.order_Envoy">{{u.emp_Name}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!--  <div class="row" style="padding-bottom:5px">
+          <div class="col-md-2" [style.display]="areashow">
+            <span>Area:</span>
+          </div>
+        </div>
+        <div class="row">
+       
+        </div>
+        -->
+        <div class="row" style="padding-bottom:5px;">
+          <div class="col-md-2">
+            <span>Area:</span>
+          </div>
+          <div class="col-md-4">
+            <span>Customer:</span>
+          </div>
+          <div class="col-md-2">
+            <span>Contact:</span>
+          </div>
+          <div class="col-md-2">
+            <span>Credit Limit:</span>
+          </div>
+          <div class="col-md-2">
+            <span>Pre: Balance:</span>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-2" [style.display]="areashow" style="padding-left:40px">
+            <div class="form-group">
+              <div class="inner-addon left-addon">
+                <i class="fa fa-map-marker" style="font-size:medium" aria-hidden="true"></i>
+                <select class="form-control" [(ngModel)]="areacode" id="areacode"
+                  (change)="changeCustomerDropDownByArea(areacode)">
+                  <option *ngFor="let i of area " [value]="i.areacode">{{i.areaname}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4" id="DropDownCustomerSelect2" style="display:inline-flex;padding-left:40px">
+            <div class="form-group">
+              <div class="input-group   inner-addon left-addon">
+                <i class="fa fa-group" style="font-size:medium" aria-hidden="true"></i>
+                <ng-select2 [data]="customers" id="customer_ID" [value]="customer_ID"
+                  (valueChanged)="changeCustomer($event)" [width]="360">
+                </ng-select2>
+              </div>
+            </div>
+            <button type="button" class="btn btn-small btn-warning tip" (click)="CustomerAddNew(customercontent)"
+              data-original-title="Quick save">
+              <span class="fa fa-plus text-white"></span>
+            </button>
+          </div>
+          <div class="col-md-4" id="DropDownCustomerSearch" style="display: inline-flex;">
+            <input type="text" id="textboxCustomer" [(ngModel)]="textboxCustomerName" 
+              (change)="SearchCustomerByID(textboxCustomerName)" class="form-control" autocomplete="off"
+              style="height:15px;margin:2px" />
+            <div class="form-group">
+              <div>
+                <div ngbDropdown [open]="false" autoClose="outside" class="nav navbar-nav"
+                  #myCustomerSearch="ngbDropdown" placement="bottom-right">
+                  <button class="btn btn-small" type="button" (click)="setCustomerSearchFocus()" ngbDropdownToggle>
+                    <span class="caret"></span>
+                  </button>
+
+                  <div ngbDropdownMenu aria-labelledby="myCustomerSearch" class="dropdown-menu "
+                    style="overflow:hidden auto;position:absolute;width:600px;max-height:400px;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);padding-left: 15px;margin-left:250px;">
+                    <div class="row" style="margin:4px 0px 2px 0px">
+                      <div class="col-sm-11" style="display:inline-flex;padding:0px 4px 0px 0px;">
+                        <input type="text" [(ngModel)]="textboxCustomerSearch"
+                          (ngModelChange)="setTRowActiveClass('CROW')" id="textboxCustomerSearch" class="form-control"
+                          placeholder="Type Here To Search!" autocomplete="off" />
+                      </div>
+                      <button type="button" class="btn btn-small"
+                        (click)="SearchCustomerDropDown(textboxCustomerSearch)">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <div class="row" style="width:102%">
+                      <table class="table table-hover table-striped" style="width:100%">
+                        <thead style="display: block;width:99%;">
+                          <tr class="thclr row">
+                            <th style="width:40%;margin-left:15px;">Name</th>
+                            <th style="width:20%">City</th>
+                            <th style="width:20%">Cell</th>
+                            <th style="width:17%">Phone</th>
+                          </tr>
+                        </thead>
+                        <tbody style="max-height: 300px;overflow: hidden scroll;display: block;width:100.5%;">
+                          <tr class="row" *ngIf="searchGridCustomer.length > 0 ">
+                            <td style="width:40%;margin-left:15px;">No Results To Show!</td>
+                            <td style="width:20%"></td>
+                            <td style="width:20%"></td>
+                            <td style="width:17%"></td>
+                          </tr>
+                          <tr class="row"
+                            *ngFor="let i of searchGridCustomer | filter:textboxCustomerSearch  | paginate: { itemsPerPage: 100, currentPage: g};let x = index;"
+                            (click)="setSelectedCustomer(i.customer_ID,i.customer_Name);myCustomerSearch.close();"
+                            style="cursor:pointer" id="CROW-{{1+x}}" [ngClass]="{'active':(x==0)}">
+                            <td style="width:40%;margin-left:15px;">{{i.customer_Name}}</td>
+                            <td style="width:20%">{{i.city}}</td>
+                            <td style="width:20%">{{i.cell}}</td>
+                            <td style="width:17%">{{i.phone}}</td>
+                          </tr>
+
+                        </tbody>
+                      </table>
+                    </div>
+                    <!--  <pagination-controls class="hide-page-numbers" (pageChange)="g = $event;"   style="float:right;"></pagination-controls>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="form-group">
+              <button type="button" class="btn btn-small btn-warning tip" (click)="CustomerAddNew(customercontent)"
+                data-original-title="Quick save">
+                <span class="fa fa-plus text-white"></span>
+              </button>
+            </div>
+          </div>
+          <div class="col-md-2" style="padding-left:40px">
+            <div class="form-group">
+              <div class="inner-addon left-addon">
+                <i class="fa fa-address-book-o" style="font-size:medium" aria-hidden="true"></i>
+                <select id="ddlcontact" [(ngModel)]="contact_ID" class="form-control">
+                  <option *ngFor="let c of contacts" [value]="c.contact_ID" [selected]="c.contact_ID">{{c.contact_Name}}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-md-2" style="padding-left:40px">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" id="credit_Limit" [(ngModel)]="credit_Limit" class="form-control" readonly />
+            </div>
+          </div>
+          <div class="col-md-2" style="padding-left:40px">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" id="netPayable" [(ngModel)]="netPayable" class="form-control" readonly />
+            </div>
+          </div>
+
+
+
+        </div>
+        <div class="row" style="padding-bottom:5px;">
+          <div class="col-md-4">
+            <span>Item:</span>
+          </div>
+          <div class="col-md-1">
+            <span>U Price:</span>
+          </div>
+          <div class="col-md-1">
+            <span>Quantity:</span>
+          </div>
+          <div class="col-md-1">
+            <span>Discount:</span>
+          </div>
+          <div class="col-md-1" id="lblTax">
+            <span>Tax Rate:</span>
+          </div>
+          <div class="col-md-4">
+            <span>Serial # /IMEI#:<input type="number" onClick="this.select();" [(ngModel)]="imeiLength" min="3" max="15" id="number" (keyup)="ImeiNumberValue($event)" style="width: 50px;"
+                (change)="changeIMEILength(imeiLength)" /></span>
+          </div>
+
+        </div>
+        <div class="row">
+          <div class="col-md-4" id="DropDownItemSelect2" style="padding-left:40px">
+            <div class="form-group">
+              <div class="inner-addon left-addon">
+                <i class="fa fa-address-book-o" style="font-size:medium" aria-hidden="true"></i>
+                <ng-select2 [data]="items" id="item_ID" [value]="item_Code" (valueChanged)="changeItems($event,sender)"
+                  [width]="400">
+                </ng-select2>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4" id="DropDownItemSearch" style="display: inline-flex">
+            <input type="text" id="textboxItem" [(ngModel)]="textboxItemName" onClick="this.select();"
+              (change)="SearchItemByID(textboxItemName)" class="form-control" autocomplete="off"
+              style="height:15px;margin:2px" />
+            <div class="form-group">
+              <div>
+                <div ngbDropdown [open]="false" autoClose="outside" class="nav navbar-nav" #myItemSearch="ngbDropdown"
+                  placement="bottom-right">
+                  <button class="btn btn-small" type="button" (click)="setItemSearchFocus()" ngbDropdownToggle>
+                    <span class="caret"></span>
+                  </button>
+
+                  <div ngbDropdownMenu aria-labelledby="myItemSearch" class="dropdown-menu "
+                    style="overflow:hidden auto;position:absolute;width:600px;max-height:400px;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);padding-left: 15px;margin-left:200px;">
+                    <div class="row" style="margin:4px 0px 2px 0px">
+                      <div class="col-sm-11" style="display:inline-flex;padding:0px 4px 0px 0px;">
+                        <input type="text" [(ngModel)]="textboxItemSearch" (ngModelChange)="setTRowActiveClass('IROW')"
+                          id="textboxItemSearch" class="form-control" placeholder="Type Here To Search!"
+                          autocomplete="off" />
+                      </div>
+                      <button type="button" class="btn btn-small" (click)="SearchItemDropDown(textboxItemSearch)">
+                        <i class="fa fa-search" aria-hidden="true"></i>
+                      </button>
+                    </div>
+                    <div class="row" style="width:102%">
+                      <table class="table table-hover table-striped" style="width:100%">
+                        <thead style="display: block;width:99%;">
+                          <tr class="thclr row">
+                            <th style="width:40%;margin-left:15px;">Name</th>
+                            <div *ngIf="isBook; then isBookTrue else isBookFalse"> </div>
+                            <ng-template #isBookTrue>
+                              <th style="width:20%">Publisher</th>
+                            </ng-template>
+                            <ng-template #isBookFalse>
+                              <th style="width:20%">Barcode</th>
+                            </ng-template>
+                            <th style="width:20%">Writer</th>
+                            <th style="width:17%">Stock</th>
+                          </tr>
+                        </thead>
+                        <tbody style="max-height: 300px;overflow: hidden scroll;display: block;width:100.5%;">
+                          <tr class="row" *ngIf="searchGridItem.length > 0 ">
+                            <td style="width:40%;margin-left:15px;">No Results To Show!</td>
+                            <td style="width:20%"></td>
+                            <td style="width:20%"></td>
+                            <td style="width:17%"></td>
+                          </tr>
+                          <tr class="row"
+                            *ngFor="let i of searchGridItem | filter:textboxItemSearch  | paginate: { itemsPerPage: 100, currentPage: g};let x = index;"
+                            (click)="setSelectedItem(i.item_Code,i.item_Name);myItemSearch.close();"
+                            style="cursor:pointer" id="IROW-{{1+x}}" [ngClass]="{'active':(x==0)}">
+                            <td style="width:40%;margin-left:15px;">{{i.item_Name}}</td>
+                            <div *ngIf="isBook; then isBookTrue else isBookFalse"> </div>
+                            <ng-template #isBookTrue>
+                              <td style="width:20%">{{i.supplier}}</td>
+                            </ng-template>
+                            <ng-template #isBookFalse>
+                              <td style="width:20%">{{i.barcode}}</td>
+                            </ng-template>
+                            <td style="width:20%">{{i.writer}}</td>
+                            <td style="width:17%">{{i.stock}}</td>
+                          </tr>
+
+                        </tbody>
+                      </table>
+                    </div>
+                    <!--  <pagination-controls class="hide-page-numbers" (pageChange)="g = $event;"   style="float:right;"></pagination-controls>-->
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-1" style="padding-left:40px">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" [(ngModel)]="unit_Price" class="form-control" />
+            </div>
+          </div>
+          <div class="col-md-1" style="padding-left:40px">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-address-book-o" style="font-size:medium" aria-hidden="true"></i>
+              <input type="number" onClick="this.select();" [(ngModel)]="Quantity" class="form-control" ng-hide="editMode" min="1"
+                (change)="changeQuantity(Quantity)"
+                (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,Quantity,Discount_Rate,Tax_Rate,imei)"
+                style="width:50px" />
+            </div>
+          </div>
+          <div class="col-md-1" style="padding-left:40px">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-address-book-o" style="font-size:medium" aria-hidden="true"></i>
+              <div *ngIf="discountEditing; then discountRateEnable else discountRateDisable"> </div>
+              <ng-template #discountRateEnable>
+                <input type="number" onClick="this.select();" id="Discount" [(ngModel)]="Discount_Rate" class="form-control" min="0" max="100"
+                  (change)="changeDiscountRate(Discount_Rate)"
+                  (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,Quantity,Discount_Rate,Tax_Rate,imei)" />
+              </ng-template>
+
+              <ng-template #discountRateDisable>
+                <input type="number" id="Discount" [(ngModel)]="Discount_Rate" class="form-control" min="0" max="100"
+                  (change)="changeDiscountRate(Discount_Rate)"
+                  (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,Quantity,Discount_Rate,Tax_Rate,imei)"
+                  disabled />
+              </ng-template>
+            </div>
+          </div>
+          <div class="col-md-1" style="padding-left:40px" id="lblTax1">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+
+              <select class="form-control" [(ngModel)]="taxratecode" id="TaxRateDropDown" (change)="changeTaxRate()">
+                <option *ngFor="let i of taxrateList " [value]="i.taxrateid">{{i.taxratename}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-4" style="padding-left:40px">
+            <div class="btn-group">
+              <div class="inner-addon left-addon">
+                <i class="fa fa-sticky-note-o" style="font-size:medium" aria-hidden="true"></i>
+                <!--<input type="text" id="imei" [(ngModel)]="imei" class="form-control" placeholder="Serial# / IMEI#" style="width:300px" (change)="addGrid(item_Code,item_Name,unit_Price,Quantity,Discount_Rate,Tax_Rate,imei)" />-->
+                <input type="text" id="imei" [(ngModel)]="imei" class="form-control"
+                   placeholder="Serial# / IMEI#" style="width:300px"
+                  maxlength="{{imeiLength}}" (keydown.enter)="loadItem(imei)" />
+              </div>
+              <button type="button" class="btn btn-small btn-warning tip"
+                (click)="loadItem(imei);"
+                 data-original-title="Quick save"   id="adds">
+                <span class="fa fa-plus text-white"></span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-8" style="border:ridge;padding-right:0px;padding-left:0px">
+            <div #dvScroll style="min-height: 300px; overflow-y: auto;-ms-overflow-style: -ms-autohiding-scrollbar;">
+              <table class="table table-hover table-striped" style="width:100%">
+                <thead>
+                  <tr class="thclr">
+                    <th style="width:2%">Sr.#</th>
+                    <th style="width:30%">Item</th>
+                    <th style="width:7%">Price</th>
+                    <th style="width:5%">Qty.</th>
+                    <th style="width:9%">Cost</th>
+                    <th style="width:7%">D. %</th>
+                    <th style="width:5%">Disc.</th>
+                    <th style="width:7%">
+                      <div *ngIf="hide; then lbltaxrate "> </div>
+                      <ng-template #lbltaxrate>
+                        <span ng-show="hide">Tax %</span>
+                      </ng-template>
+                    </th>
+                    <th style="width:5%">
+                      <div *ngIf="hide; then lbltax "> </div>
+                      <ng-template #lbltax>
+                        <span ng-show="hide">Tax</span>
+                      </ng-template>
+                    </th>
+                    <th style="width:11%">Net Amt.</th>
+                    <th style="width:8%">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let i of saleOrderDetails let idx = index">
+                    <td>{{idx+1}}</td>
+                    <td>
+                      <span>{{i.item_Name}}</span>
+                    </td>
+                    <td>
+                      <input type="number" onClick="this.select();" id="unit_Price" class="form-control" [(ngModel)]="i.unit_Price" style="
+                      min-width: 5vw;" min="0" />
+
+                    </td>
+                    <td>
+                      <span>{{i.quantity}}</span>
+                    </td>
+                    <td>
+                      <span>{{ (i.quantity) * (i.unit_Price)| number:'1.2-5'}}</span>
+                    </td>
+                    <td>
+                      <span>{{i.discount_Rate }}</span>
+                    </td>
+                    <td>
+                      <span>{{(i.quantity) * (i.unit_Price) * (i.discount_Rate)/100 | number:'1.2-5'}}</span>
+                    </td>
+                    <td>
+                      <div *ngIf="hide; then lbltaxrate "> </div>
+                      <ng-template #lbltaxrate>
+
+                        <span ng-show="hide">
+
+                          <!--{{i.tax_Rate}}-->
+                          <select class="form-control" [(ngModel)]="i.taxrateid" disabled="disabled">
+                            <option *ngFor="let j of taxrateList " [value]="j.taxrateid">{{j.taxratename}}</option>
+                          </select>
+                        </span>
+                      </ng-template>
+                    </td>
+                    <td>
+                      <div *ngIf="hide; then lbltax else lbltax1"> </div>
+                      <ng-template #lbltax>
+                        <span
+                          ng-show="hide">{{((i.quantity * i.unit_Price) -  ((i.quantity * i.unit_Price) * i.discount_Rate/100))/100 * i.tax_Rate | number:'1.2-5'}}</span>
+                      </ng-template>
+
+                    </td>
+                    <td>
+                      <span>{{((i.quantity * i.unit_Price) - ((i.quantity) * (i.unit_Price) * (i.discount_Rate)/100)) + ((i.quantity * i.unit_Price) -  ((i.quantity * i.unit_Price) * i.discount_Rate/100))/100 * i.tax_Rate | number:'1.2-5'}}</span>
+                    </td>
+                    <td>
+                      <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button"
+                        value="Delete" id="remove" (click)="changeMode(idx,i,2)">
+                        <span class="fa fa-remove text-white"></span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <div class="col-md-4" style="border:ridge;padding-right:0px;padding-left:0px">
+            <div #dvScroll style="min-height: 300px; ">
+              <!-- Nested Table -->
+              <table class="table table-hover table-striped" style="width:100%">
+                <thead>
+                  <tr class="thclr">
+                    <th style="width:7%">ID</th>
+                    <th style="width:40%">IMEI#</th>
+                    <th style="width:22%">Color</th>
+                    <th style="width:22%">Warranty</th>
+                    <th style="width:6%"></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let x of itemStockIMEI let idx = index">
+                    <td style="width:7%">{{x.item_Code}}</td>
+                    <td style="width:40%">{{x.imei}}</td>
+                    <td style="width:22%">{{x.colorName}}</td>
+                    <td style="width:22%">{{x.warrantyName}}</td>
+                    <td style="width:6%">
+                      <button class="btn btn-small btn-danger tip" data-original-title="Delete Imei" type="button"
+                        value="Delete" id="remove" (click)="removeData(idx,x,2)">
+                        <span class="fa fa-remove text-white"></span>
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <!-- End Nested Table -->
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer"></div>
+        <div class="row">
+          <div class="col-md-1">
+            <span>Description:</span>
+          </div>
+          <div class="col-md-4" style="padding-left:20px">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-align-justify" style="font-size:medium" aria-hidden="true"></i>
+              <fieldset class="form-group">
+                <textarea [(ngModel)]="remarks" id="de" name="textarea" placeholder="Please text here..."
+                  class="form-control" style="height:auto;" rows="4"></textarea>
+              </fieldset>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <span>Freight :</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-money" aria-hidden="true"></i>
+                  <input type="number" onClick="this.select();" id="freight" class="form-control" [(ngModel)]="freight_Chrgs" min="0"
+                    align="center" style="font-weight: bold;" (change)="changeFreight(freight_Chrgs)" />
+                </div>
+
+              </div>
+            </div>
+            <div class="row" style="margin-top:3px">
+              <div class="col-md-4">
+                <div class="form-group">
+                  <span>Special Discount:</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+
+                <div class="input-group  inner-addon left-addon">
+
+                  <i class="fa fa-money" aria-hidden="true"></i>
+
+
+                  <input type="number" onClick="this.select();" id="specialRate" class="form-control" [(ngModel)]="sd_Rate" min="0"
+                    (change)="changeSpecialRate(sd_Rate)" />
+
+                  <div class="input-group-append">
+                    <span class="input-group-text">%</span>
+                  </div>
+                  <input type="number" onClick="this.select();" id="specialAmount" class="form-control" [(ngModel)]="sd_Amount" min="0"
+                    (change)="changeSpecialAmount(sd_Amount)" />
+
+                </div>
+
+              </div>
+            </div>
+
+            <div *ngIf="hide; then taxcodeD "> </div>
+            <ng-template #taxcodeD>
+              <div class="row">
+                <div class="col-md-4">
+                  <div class="form-group">
+                    <span>Tax Code:</span>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <div class="form-group">
+                    <div class="inner-addon left-addon">
+                      <i class="fa fa-money" style="font-size:medium," aria-hidden="true"></i>
+
+                      <select class="form-control" [(ngModel)]="taxcode" id="taxcode" style="width:50%"
+                        (change)="checkTaxCode()" disabled="disabled">
+                        <option value="1">Exempted</option>
+                        <option value="2">Tax</option>
+                      </select>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+            </ng-template>
+          </div>
+          <div class="col-md-3">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <span>Total Amount:</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+
+                    <input class="form-control" [ngModel]="TotalCost()   | number : '1.2-5'" readonly />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <span> Total Discount:</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+
+                    <input class="form-control" [ngModel]="TotalDiscount()   | number : '1.2-5'" readonly />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <span> Net Amount:</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+
+                    <input class="form-control" [ngModel]="TotalAmount()   | number : '1.2-5'" readonly />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <span> Payable Amount:</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+
+                    <input class="form-control" [ngModel]="NetPayableAmount()   | number : '1.2-5'" readonly />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <span> Cash:</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+
+                    <input type="number" onClick="this.select();" id="cash" class="form-control" [(ngModel)]="cash" min="0" align="center"
+                      style="font-weight: bold; " (change)="changeCash(cash)" />
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <span> Change:</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+
+                    <input type="number" class="form-control" [value]="balance" min="0" readonly />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!--<div class="row" id="lblTotalTax">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <span>Total Tax:</span>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="inner-addon left-addon">
+                    <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+                    <input class="form-control" [ngModel]="TotalTax()   | number : '1.2-5'" readonly />
+                  </div>
+
+                </div>
+              </div>
+            </div>-->
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-1" style="padding-top:5px; ">
+            <span id="DropDownRefSearchLabel">Ref. Customer:</span>
+          </div>
+        </div>
+        <div class="row" style="position:fixed;bottom:0; left:0; width:100vw;z-index:1;">
+          <div class="col-md-8">
+            <!--Cancel Order-->
+            <button [style.display]="permissionUtility.PermissionDelete" type="button" id="cancelBtn"
+              class="btn btn-small btn-warning tip" (click)="cancelOrder()"><i class="fa fa-minus-square-o"
+                aria-hidden="true"></i>Cancel</button>
+
+            <!--RDLC Show-->
+            <button type="button" id="viewRDLC" class="btn btn-small btn-warning tip"
+              style="cursor:pointer; margin-left:5px; padding:6px 7px;" (click)="onNavigate('/si-rpt-rdlc')">
+              <img src="../../../../../../assets/images/icon/report.png" >
+            </button>
+
+            <span [style.display]="templateshow">Template: </span>
+            <select [style.display]="templateshow" [(ngModel)]="templatecode" id="templatecode">
+              <option *ngFor="let u of companytemplate " [value]="u.templatecode">{{u.templatename}}</option>
+            </select>
+          </div>
+          <div class="col-md-2" style="padding-top:5px">
+            <div [style.display]="templateshow">
+              <span>Show Imei</span>
+              <input type="checkbox" id="ShowIMEI" name="ShowIMEI" [(ngModel)]="ShowIMEI" style="margin-right: 10px;" />
+              <span>Show</span>
+              <input type="checkbox" id="isView" name="isView" [(ngModel)]="isView" />
+            </div>
+          </div>
+          <div class="col-md-2">
+            <button [style.display]="permissionUtility.PermissionAdd" id="submitAdd" type="button"
+              class="btn btn-small btn-warning tip"
+              (click)="updateOrder(sale_Order_ID, sO_Date, 1, order_Envoy, customer_ID, contact_ID, delivery_Date, method_Id, payment_ID, frieght_Id, TotalCost(), TotalDiscount(), TotalTax(), freight_Chrgs, TotalAmount(),cash, 1, 1, 1, remarks, 0, 1, 0, sO_Date, 1, false, 1)"><i
+                class="fa fa-floppy-o" aria-hidden="true"></i>Save</button>
+            <button type="button" class="btn btn-small" routerLink="/sale-retail-invoice-list"><i
+                class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="isLoading"
+        style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #customercontent let-h="close" let-f="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        NEW CUSTOMER
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="f('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>alert.message
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-sm-12">
+          <span>Name</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" id="addCustomerName" [(ngModel)]="addCustomerName" class="form-control"
+              (change)="checkDisableStatus()" />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Cell</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addCustomerCell" class="form-control"
+              (change)="checkCustomerCell(addCustomerCell)" />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Phone</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addCustomerPhone" class="form-control"
+              (change)="checkCustomerPhone(addCustomerPhone)" />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Email</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addCustomerEmail" class="form-control"
+              (change)="checkCustomerEmail(addCustomerEmail)" />
+          </div>
+        </div>
+        <div class="col-md-12">
+          <span>Category</span>
+        </div>
+        <div class="col-md-12">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="categorycode">
+              <option *ngFor="let i of category " [value]="i.customerCategoryId">{{i.customerCategoryName}}</option>
+            </select>
+
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Address</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addCustomerAddress" class="form-control" />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>City</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <ng-select2 [data]="city" id="citycode" [value]="citycode" (valueChanged)="getCityChange($event)"
+              [width]="265">
+            </ng-select2>
+          </div>
+        </div>
+
+        <div class="col-md-12" style="display:inline-flex">
+          <span>Status</span>
+
+          <div class="col-md-2">
+            <input type="checkbox" [(ngModel)]="addCustomerStatus" pointer-events="none" style="margin-top: 4px;">
+          </div>
+        </div>
+
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" id="SaveNewCustomer" class="btn btn-small btn-warning tip" (click)="saveCustomer()"><i
+          class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+      <button type="button" class="btn btn-small" id="x" (click)="h('Close click')"><i class="fa fa-window-close-o"
+          aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>
+<!-- End Row -->
+<ng-template #mailcontent let-h="close" let-f="dismiss">
+  <div class="modal-header">
+    <h5 class="modal-title" style="font-weight: bold;">
+      Send
+    </h5>
+    <button type="button" class="close" aria-label="Close" (click)="f('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div id="alertWarning" style="display:none">
+    <p *ngFor="let alert of alerts">
+      <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+    </p>
+  </div>
+
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-sm-5">
+        <div class="row" style="padding-bottom:5px;">
+          <div class="col-sm-12">
+            <span>Customer Name</span>
+          </div>
+
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <input type="text" id="sendCustomerName" [(ngModel)]="sendCustomerName" class="form-control" />
+          </div>
+
+        </div>
+        <div class="row" style="padding-bottom:5px;">
+          <div class="col-sm-12">
+            <span>Customer Email</span>
+          </div>
+
+        </div>
+        <div class="row">
+          <div class="col-sm-12">
+            <input type="text" id="sendCustomerEmail" [(ngModel)]="sendCustomerEmail" class="form-control" />
+          </div>
+
+        </div>
+        <div class="row" style="padding-bottom:5px;padding-top:10px;">
+          <div class="col-md-12">
+            <span>Body:</span>
+          </div>
+
+        </div>
+        <div class="row">
+          <div class="col-md-12">
+            <fieldset class="form-group">
+              <textarea [(ngModel)]="sendCustomerBody" id="de" name="textarea" placeholder="Please text here..."
+                class="form-control" style="height:auto;" rows="30"></textarea>
+            </fieldset>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-1">
+
+      </div>
+      <div class="col-sm-6" style="width:500px;height:600px;padding-right:5px">
+
+        <iframe src="/so-rpt-mail" scrolling='no'
+          style='display: block;width:500px;height:550px; border: none; padding: 0px; margin: 0px; '></iframe>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" id="sendReportMail" class="btn btn-small btn-warning tip" (click)="SendMail()"><i
+        class="fa fa-floppy-o" aria-hidden="true"></i> Send</button>
+    <button type="button" class="btn btn-small" id="x" (click)="h('Close click')"><i class="fa fa-window-close-o"
+        aria-hidden="true"></i>Close</button>
+  </div>
+</ng-template>

@@ -1,0 +1,238 @@
+<div class="card mb-3">
+
+  <div class="card-header doNotPrint" style="vertical-align:middle;">
+    <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:100000 "></spinner>-->
+    <div class="btn-group" ngbDropdown #myDrop="ngbDropdown" style="margin-bottom: 3px;margin-right: 8px;">
+      <button type="button" class="btn btn-outline-secondary" (click)="$event.stopPropagation(); myDrop.open();" style="border: 1px solid grey;">
+        <i class="fa fa-list"></i>  <span style="font-size:14px;font-weight:bold; margin:3px 1px; min-width:200px;">{{reportName}}</span>
+      </button>
+      <div class="dropdown-menu" style="align-content:center;" ngbDropdownMenu>
+        <div><input class="form-control form-rounded" [(ngModel)]="rptname" style="width:100%;" (click)="$event.stopPropagation(); myDrop.open();" /></div>
+        <div style="min-height:0; max-height:70vh;width:25vw; overflow:hidden;overflow-y:auto;">
+          <div *ngFor="let r of reports | filter:rptname ;let x = index;" class="dropdown-item">
+            <a href="javascript:void(0)" (click)="changeReport(r,'1'); myDrop.close();" style="font-size:12px; color:black; padding:2px; margin:2px;">
+              {{r.page_Name}}
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="btn-group" ngbDropdown #myDateRange="ngbDropdown" style="margin-bottom: 3px;margin-right: 8px;">
+      <button class="btn btn-outline-secondary" style="border: 1px solid grey;width:15vw; text-align:right;font-size:12px;" id="dropdownConfig" ngbDropdownToggle>
+        <span style="float:left;">
+          <i class="fas fa-calendar-alt" style="margin-left:10px;"></i>
+          <span style="vertical-align:middle;font-size:14px;font-weight:bold;margin-left:10px;">{{filter}}</span>
+        </span>
+      </button>
+      <div class="dropdown-menu" style="align-content:center;font-size:14px;" ngbDropdownMenu>
+        <button class="dropdown-item" (click)="ApplyFilter('Today');isCollapsed = true;">Today</button>
+        <button class="dropdown-item" (click)="ApplyFilter('This Week')">ThisWeek</button>
+        <button class="dropdown-item" (click)="ApplyFilter('This Month')">ThisMonth</button>
+        <button class="dropdown-item" (click)="ApplyFilter('This Quarter')">This Quarter</button>
+        <button class="dropdown-item" (click)="ApplyFilter('This Year')">This Year</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Yesterday')">Yesterday</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Previous Week')">Previous Week</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Previous Month')">Previous Month</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Previous Quarter')">Previous Quarter</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Previous Year')">Previous Year</button>
+        <button class="dropdown-item" (click)="ApplyFilter('Custom')">Custom </button>
+      </div>
+    </div>
+    <button type="button" class="btn btn-outline-secondary" style="    margin-bottom: 3px;border: 1px solid grey;" (click)="(isCollapsed = !isCollapsed); myDrop.close();"
+            [attr.aria-expanded]="!isCollapsed" aria-controls="custmizeReport">
+      <i class="fa fa-cog"></i> <span>Custmize Report</span>
+    </button>
+    <div class="pull-right">
+      <button class="btn  btn-outline-secondary pull-right" style="margin-left:5vw;margin-right:0.25vw;border: 1px solid grey; " [routerLink]="['/dashboard']">
+        <i class="fa fa-close"></i>
+      </button>
+      <div ngbDropdown class="d-inline-block  pull-right" style="margin-left:1vw;margin-right:0.25vw; ">
+        <button class="btn  btn-outline-secondary" id="dropdownExport" style="border: 1px solid grey;" ngbDropdownToggle>  <i class="fa fa-download"></i></button>
+        <div ngbDropdownMenu aria-labelledby="dropdownExport">
+          <button class="dropdown-item" (click)="export('pdf'); myDrop.close();">
+            <i class="fa fa-file-pdf-o"></i> PDF
+          </button>
+          <button class="dropdown-item" (click)="export('excel');; myDrop.close();">
+            <i class="fa fa-file-excel-o"></i> Excel
+          </button>
+          <button class="dropdown-item" (click)="export('word');; myDrop.close();">
+            <i class="fa fa-file-word-o"></i> Word
+          </button>
+        </div>
+      </div>
+      <!--<button class="btn  btn-outline-secondary pull-right" (click)="onprint('myFrame') ; myDrop.close();">
+        <i class="fa fa-print"></i>
+      </button>-->
+    </div>
+  </div>
+  <div (click)="myDrop.close();" id="custmizeReport" class="doNotPrint" [ngbCollapse]="!isCollapsed" style="z-index:1; position:absolute;margin-top:3.4%;width:99.8%; background:white;padding:0vw 1vw 0vw 1vw ;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);">
+    <div class="row" style="min-height:400px;">
+      <div class="col-md-2" style="padding:0px">
+        <div id="btn1" style="margin:0px;background-color:#ffc103; border-right-width: 10px;" class="row">
+          <a class="col-md-12" style="cursor:pointer;padding:9px 10px;font-size:15px;font-weight:500;line-height: 25px; " (click)="toggleTab('hide')">Custmize Filter Criteria</a>
+        </div>
+      </div>
+
+      <div id="tab1" class="col-md-10" style="border: #ffc107 1px solid;box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176);line-height: 37px;">
+        <div class="row">
+          <div *ngIf="officeShow" class="form-group col-md-4">
+            <div><label>Office</label></div>
+
+            <div style="border: 1px solid #ccc;">
+              <angular2-multiselect [data]="offices" [(ngModel)]="OfficeId" [settings]="settings1" name="ddloffice">
+              </angular2-multiselect>
+            </div>
+          </div>
+          <div *ngIf="dateFromShow" class="form-group col-md-4">
+            <span *ngIf="dateToShow">Date From:</span>
+            <span *ngIf="!dateToShow">Date:</span>
+            <div class="input-group" style="margin-top:8px; ">
+              <input class="form-control" #fromDate name="dp"[(ngModel)]="DateFrom.model" (ngModelChange)="selectOneYear(fromDate.value,todate, 1)" ngbDatepicker #dd="ngbDatepicker" style="height:41px">
+              <button class="btn" (click)="dd.toggle(); ">
+                <i class="fa fa-calendar" aria-hidden="true" ></i>
+              </button>
+            </div>
+          </div>
+          <div *ngIf="dateToShow" class="form-group col-md-4">
+            <span>Date To:</span>
+            <div class="input-group" style="margin-top:8px; ">
+              <input class="form-control" #todate name="dp" [(ngModel)]="DateTo.model" (ngModelChange)="selectOneYear(fromDate,todate.value, 0)" ngbDatepicker #ddd="ngbDatepicker" style="height:41px">
+
+              <button class="btn" (click)="ddd.toggle()">
+                <i class="fa fa-calendar" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div *ngIf="departmentShow" class="form-group col-md-4">
+            <label for="department">Department:</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="departments" [(ngModel)]="DepartmentId" [settings]="settings1" name="ddlDepartment">
+              </angular2-multiselect>
+            </div>
+          </div>
+          <div *ngIf="designationShow" class="form-group col-md-4">
+            <label for="designation">Designation:</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="designations" [(ngModel)]="DesignationId" [settings]="settings" name="ddlDesignation">
+              </angular2-multiselect>
+            </div>
+          </div>
+          <div *ngIf="categoryShow" class="form-group col-md-4">
+            <div class="col-md-12">
+              <label for="category">Category:</label>
+              <div style="border: 1px solid #ccc">
+                <angular2-multiselect [data]="categories" [(ngModel)]="CategoryId" [settings]="settings1" name="ddlCategory">
+                </angular2-multiselect>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="row">
+          <div *ngIf="employeeShow" class="form-group col-md-4">
+            <label for="employee">Employee:</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="employees" [(ngModel)]="EmployeeId" [settings]="settings1" name="ddlEmployee">
+              </angular2-multiselect>
+            </div>
+          </div>
+          <div *ngIf="employeeTypeShow" class="form-group col-md-4">
+            <label for="employeeType">Employement Type:</label>
+            <div style="border: 1px solid #ccc">
+              <angular2-multiselect [data]="employemnts" [(ngModel)]="EmploymentTypeId" [settings]="settings1" name="ddlEmployeeType">
+              </angular2-multiselect>
+            </div>
+          </div>
+          <div *ngIf="genderShow" class="form-group col-md-4">
+            <div *ngIf="cnicShow">
+              <label for="cnic">CNIC:</label>
+              <input type="number" id="cnic" name="Cnic" [(ngModel)]="cnic" class="form-control" />
+            </div>
+            <!--<div class="col-md-12">
+              <label for="gender">Gender:</label>
+
+
+              <select class="form-control" [(ngModel)]="GenderId" id="gendercode" tabindex="12">
+                <option *ngFor="let f of genders " [value]="f.gendercode">{{f.gendername}}</option>
+              </select>
+
+
+
+            </div>-->
+          </div>
+
+        </div>
+
+        <!--<div class="row">
+          <div *ngIf="cnicShow" class="form-group col-md-4">
+            <label for="cnic">CNIC:</label>
+            <input type="number" id="cnic" name="Cnic" [(ngModel)]="cnic" class="form-control" />
+          </div>
+        </div>-->
+
+        <div class="row">
+          <div *ngIf="statusShow==true" class="form-group col-md-1">
+            <label for="status">Status :</label>
+          </div>
+          <div *ngIf="statusShow==true" class="form-group col-md-1" style="padding-top:3px;">
+            <input type="checkbox" class="" id="status" name="Status" [(ngModel)]="status" />
+          </div>
+        </div>
+        <div class="row">
+          <div *ngIf="confirmShow==true" class="form-group col-md-1">
+            <label for="confirm">Confirm :</label>
+          </div>
+          <div *ngIf="confirmShow==true" class="form-group col-md-1" style="padding-top:3px;">
+            <input type="checkbox" class="" id="confirm" name="Confirm" [(ngModel)]="confirm" />
+          </div>
+        </div>
+
+        <div class="card-header form-group col-md-12" style="    border-bottom: 0PX;">
+          <div class="row ">
+            <div style="border: 1px solid #ccc;" *ngIf="companyshow" class="form-group col-md-4">
+              <angular2-multiselect [data]="companies" [(ngModel)]="CompnayId" [settings]="settings1" name="Company">
+              </angular2-multiselect>
+            </div>
+            <div *ngIf="!companyshow" class="form-group col-md-4">
+
+            </div>
+
+            <div class="form-group col-md-8" style="margin-top:15px">
+              <button type="button" class="btn btn-alert pull-right" style="margin-left:10px;" (click)="(isCollapsed = !isCollapsed);">Cancel</button>
+              <button type="button" class="btn btn-warning pull-right" (click)="(isCollapsed = !isCollapsed);changeReport(selectedReport,'0');showPWText();">View Report</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div id="rptBody" name="rptBody" class="rptBody card-body table-responsive" style="    overflow-x: hidden;">
+    <!--style="overflow:hidden;background:url('assets/images/Spinner2.gif') center 200px no-repeat; width:100%;height:100vh ">-->
+    <div class="row">
+      <h1 style="position:absolute;margin-top:400px; margin-left:400px;color:black;font-weight:900" [style.display]="showPS">PLEASE SPECIFY REPORT CRITERIA</h1>
+      <h1 style="position:absolute;margin-top:400px; margin-left:400px;color:black;font-weight:900" [style.display]="showPW">PLEASE WAIT REPORT IS LOADING</h1>
+      <h1 style="position:absolute;margin-top:400px; margin-left:400px;color:rgb(204, 19, 19);font-weight:900" [style.display]="showER">Report Loading Fail! <h3>Please Contact System Administrator</h3></h1>
+      <div class="col-md-12" style="overflow:hidden;margin:0px;padding:0px;">
+        <div id="mydiv">
+        </div>
+
+        <!--<router-outlet></router-outlet>-->
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:80vh;position :absolute;z-index:10000;overflow:hidden;">
+    <spinner [visible]="isLoading" style="position: absolute;left: 50%;top: 17%;z-index:10010"></spinner>
+  </div>
+  <div class="row" *ngIf="isLoadingRpt" style="background-color:transparent; width: 100%;height:80vh;position :absolute;z-index:10000;overflow:hidden;">
+    <spinner [visible]="isLoadingRpt" style="position: absolute;left: 50%;top: 17%;z-index:10010"></spinner>
+  </div>
+</div>
+
+<p>
+  prmreports-viewer works!
+</p>

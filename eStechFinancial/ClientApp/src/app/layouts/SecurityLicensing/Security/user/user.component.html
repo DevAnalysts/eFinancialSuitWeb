@@ -1,0 +1,288 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div id="PageGrid" [class]="card1style">
+      <div class="row  card-header" style="height:auto;">
+        <div class="col-md-10">
+          <div class="page-title-list">
+            <span style="font-size:large;font-weight:bold;">   {{permissionUtility.FUNCTIONALITYNAME}}</span>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" id="search" name="search" placeholder="search..." [(ngModel)]="id" style="float:left; width:100px;margin:1px 0px 1px 1px;">
+            <button class=" btn btn-small btn-warning tip" style="margin: 1px 1px 1px 0px;" (click)="Add()" [style.display]="permissionUtility.PermissionAdd">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div></div>
+        </div>
+        <div class="card-body table-responsive" style="padding:5px;">
+          <table class="table table-hover table-striped" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176)">
+            <thead>
+              <tr class="thclr">
+                <th>User #</th>
+                <th>Login</th>
+                <th>Name</th>
+                <th class="col_1" [style.display]="addbutton">Father Name</th>
+                <th class="col_1" [style.display]="addbutton">Designation</th>
+                <!-- <th class="col_1" [style.display]="addbutton">Department</th> -->
+                <th class="col_1">Role</th>
+                <th class="col_1">Office</th>
+                <th>Status</th>
+                <th>C.Pswrd</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+              <tr *ngFor="let u of users | filter:id | paginate: { itemsPerPage: 20, currentPage: p};">
+                <td>{{u.userNo}}</td>
+                <td>{{u.login}}</td>
+                <td>{{u.name}}</td>
+                <td class="col_1" [style.display]="addbutton">{{u.fatheR_NAME}}</td>
+                <td class="col_1" [style.display]="addbutton">{{u.designatioN_NAME}}</td>
+                <!-- <td class="col_1" [style.display]="addbutton">{{u.department}}</td> -->
+                <td class="col_1">{{u.rolE_NAME}}</td>
+                <td class="col_1">{{u.officE_NAME}}</td>
+                <td>
+                  <div *ngIf="true == u.active; then on else off"></div>
+                  <ng-template #on>
+                    Active
+                  </ng-template>
+                  <ng-template #off>
+                    Disabled
+                  </ng-template>
+                </td>
+                <td  style="cursor:pointer;">
+                  <button class="btn btn-small btn-warning tip" style="margin-left: 30%;" (click)="open(content, u.user_ID, u.login)">
+                    <span class="fa fa-lock"></span>
+                  </button>
+                </td>
+                <td>
+                  <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                    <button [style.display]="permissionUtility.PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.user_ID);View();" id="view">
+                      <span class="fa fa-eye"></span>
+                    </button>
+                  </div>
+                  <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                    <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.user_ID);Edit();" id="edit">
+                      <span class="fa fa-pencil"></span>
+                    </button>
+                  </div>
+                </td>
+
+                <!--<td>
+            <div class="btn-group" style="float:right; ">
+              <a class="btn btn-small btn-warning tip" id="edit">
+                <span class="fa fa-pencil text-white"></span>
+              </a>
+            </div>
+          </td>-->
+              </tr>
+            </tbody>
+          </table>
+          <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+        </div>
+
+      </div>
+      <div id="frm" [class]="card2style" style="padding:0px;margin:0px;border:0px;" [style.display]="card2display">
+        <div class="card-header" style="height:41px;">
+          <div class="page-title-list">
+            <span style="font-size:large;margin-left:10px; font-weight:bold;">      {{permissionUtility.FUNCTIONALITYDETAILNAME}}</span>
+</div>
+          <div class="card-body" style="margin-top:30px;margin-left:50px;width:300px;padding-bottom:30px;">
+            <div class='container-fluid'>
+              <div class='row'>
+                <div class="col-sm-6" [style.display]="ShowEmp1">
+
+                </div>
+                <div class="col-sm-12" [style.display]="ShowEmp1" style="margin-bottom:15px;">
+                  <div class="form-group">
+                    <span>Office</span>
+                    <select class="form-control" [(ngModel)]="officE_CODE" id="officE_CODE" (change)="getEmps(officE_CODE)">
+                      <option *ngFor="let o of offices" [value]="o.officE_CODE">{{o.office}}</option>
+                    </select>
+                  </div>                 
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6" [style.display]="ShowEmp1">
+                  
+                </div>
+                <div class="col-sm-12" [style.display]="ShowEmp1">
+                  <div class="form-group">
+                    <span>Employee</span>
+                    <select class="form-control" [(ngModel)]="empid" id="empid">
+                      <option *ngFor="let e of emps" [value]="e.empid">{{e.empname}}</option>
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6" [style.display]="ShowEmp2">
+                  
+                </div>
+                <div class="col-sm-12" [style.display]="ShowEmp2">
+                  <div class="form-group">
+                    <span>Office</span>
+                    <input type="text" class="form-control" [(ngModel)]="office" id="office" disabled="disabled">
+                  </div>
+                </div>
+              </div>              
+              <div class="row">
+                <div class="col-sm-6" [style.display]="ShowEmp2">
+                  
+                </div>
+                <div class="col-sm-12" [style.display]="ShowEmp2">
+                  <div class="form-group">
+                    <span>Employee</span>
+                    <input type="text" class="form-control" [(ngModel)]="empname" id="empname" disabled="disabled">
+                  </div>
+                </div>
+              </div>               
+              <div class="row">
+                <div class="col-sm-6">
+                  
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <span>Login</span>
+                    <input type="text" class="form-control" [(ngModel)]="login" id="login" required>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <span>Password</span>
+                    <input type="password" class="form-control" [(ngModel)]="password" id="password">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <span>Confirm Password</span>
+                    <input type="password" class="form-control" [(ngModel)]="confirpassword" id="confirpassword" (change)="matchPassword(confirpassword)">
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6" [style.display]="ShowEmp1">
+
+                </div>
+                <div class="col-sm-12" [style.display]="ShowEmp1" style="margin-bottom:15px;">
+                  <div class="form-group">
+                    <span>Role</span>
+                    <select class="form-control" [(ngModel)]="roleid" id="roleid">
+                      <option *ngFor="let r of roles" [value]="r.roleid">{{r.rolename}}</option>
+                    </select>
+                  </div>                 
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6"  [style.display]="ShowEmp2">
+
+                </div>
+                <div class="col-sm-12"  [style.display]="ShowEmp2" style="margin-bottom:15px;">
+                  <div class="form-group">
+                    <span>Role</span>
+                    <!-- <select class="form-control" [(ngModel)]="roleid" id="roleid">
+                      <option *ngFor="let r of roles" [value]="r.roleid">{{r.rolename}}</option>
+                    </select> -->
+                    <input type="text" class="form-control" [(ngModel)]="rolename" id="rolename" disabled="disabled">
+                  </div>                 
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-6">
+                  
+                </div>
+                <div class="col-sm-12">
+                  <div class="form-group">
+                    <span>Status</span>
+                    <input type="checkbox" style="margin-left:5px;" pointer-events="none" [(ngModel)]="active" id="active" (change)="checkValue(active?true:false)">
+                  </div>         </div>
+              </div>               
+            </div>
+            <div class='row'>
+              <div class="col-sm-6"></div>
+              <div class="col-sm-12">
+
+                <button type="button" class=" btn" style="float:right;margin:3px;" (click)="Cancel()"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+                <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp1" (click)="saveUser(login,password,roleid,active,officE_CODE)"> <i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+                <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp2" (click)="updateUser(login,password,roleid,active,officE_CODE)"> <i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+              </div>
+            </div>
+
+          </div>
+    </div>
+    <!--Change Password-->
+<ng-template #content let-c="close"  let-d="dismiss">
+  <div class="modal-header">
+    <h4 class="modal-title">Change Password</h4>
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="row">
+      <div class="col-md-12">
+        
+        <div class="row">
+          <div class="offset-md-1 col-md-12 m-40 ">
+            <span>Login:</span>
+          </div>
+          <div class="col-md-5 m-100">
+            <div class="form-group">
+              
+              <input type="text" class="form-control" [(ngModel)]="login1" id="login" required>
+            </div>
+          </div>
+        </div>
+        <br />
+        
+        <div class="row">
+          <div class="offset-md-1 col-md-12 m-40">
+            <span>Password:</span>
+          </div>
+          <div class="col-md-5 m-100">
+            <div class="form-group">
+              
+              <input type="password" class="form-control" [(ngModel)]="password" id="password">
+            </div>
+          </div>
+        </div>
+      <br/>
+        
+        <div class="row">
+          <div class="offset-md-1 col-md-12 m-40">
+            <span>Confirm Password:</span>
+          </div>
+          <div class="col-md-5 m-100">
+            <div class="form-group">
+              
+              <input type="password" class="form-control" [(ngModel)]="confirpassword" id="confirpassword" (change)="matchPassword(confirpassword)">
+            </div>
+          </div>
+        </div>
+      </div>
+     
+    </div>
+    
+  </div>
+  <div class="modal-footer">
+    <!-- <button type="button" id="submitSave"  class="btn btn-small btn-warning tip" ><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button> -->
+    <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" (click)="changePassword1(login1, password)"> <i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+    <button type="button" id="x" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o" aria-hidden="true"></i> Close</button>
+  </div>
+</ng-template>
+  </div>
+    </div></div>

@@ -1,0 +1,108 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div [class]="card1style">
+      <div class="row card-header" style="height:auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> Currency </span>
+        </div>
+        <div class="col-md-2 ">
+          <div class="input-group">
+            <input class="form-control" type="text" name="search" style="margin-top:1px;" placeholder="search..." [(ngModel)]="ID">
+            <div class="input-group-append order-last">
+              <!--<button class=" btn btn-small btn-warning tip" style="margin:3px;" (click)="Add()" [style.display]="PermissionAdd">
+          <i class="fa fa-plus"></i>
+        </button>-->
+            </div>
+          </div>
+        </div>
+      </div>
+        <div class="card-body table-responsive" style="padding:5px;">
+          <table class="table table-hover table-striped" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176)">
+            <thead>
+              <tr class="thclr">
+                <th>ID</th>
+                <th>Currency</th>
+                <th>Currency Symbol</th>
+                <th>Abbr</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of category  | paginate: { itemsPerPage: 20, currentPage: p};">
+                <td>{{u.currencY_CODE}}</td>
+                <td>{{u.currencY_DESCR}}</td>
+                <td>{{u.currencY_SYMBOL}}</td>
+                <td>{{u.abbR}}</td>
+                <td>
+                  <div *ngIf="true == u.locaL; then on else off"></div>
+                  <ng-template #on>
+                    Active
+                  </ng-template>
+                  <ng-template #off>
+                    Disabled
+                  </ng-template> 
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+        </div>
+
+      </div>
+      <div [class]="card2style" style="padding:0px;margin:0px;border:0px;" [style.display]="card2display">
+        <div class="card-header" style="height:40px;">
+          <div class="page-title-list">
+            <span style="font-size:large;font-weight:bold;">    CURRENCY ITEM</span>
+</div>
+        </div>
+        <div class="card-body" style="margin-top:20px;">
+          <div class='container-fluid'>
+            <div class='row'>
+              <div class="col-md-4">
+                <span>Country Name</span>
+              </div>
+              <div class="col-md-8">
+                <div class="form-group">
+                  <input type="text" class="form-control" [(ngModel)]="currencY_DESCR" id="currencY_DESCR">
+                </div>
+              </div>
+            </div>
+            <div class='row'>
+              <div class="col-md-4">
+                <span>Currency Symbol</span>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input type="text" class="form-control" [(ngModel)]="currencY_SYMBOL" id="currencY_SYMBOL">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <span>Abbr</span>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input type="text" class="form-control" [(ngModel)]="abbR" id="abbR">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <span>Status</span>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input type="checkbox" [(ngModel)]="active" id="active" />
+                </div>
+              </div>
+            </div>  <div class='row'>
+              <div class="col-md-4"></div>
+              <div class="col-md-6">
+                <button type="button" class=" btn" style="float:right;margin:3px;" (click)="Cancel()"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+                <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp1" (click)=" saveSubject(currencY_DESCR, currencY_SYMBOL, abbR, locaL )"> <i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+                <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp2" (click)=" UpdateSubject(currencY_DESCR, currencY_SYMBOL, abbR, locaL)"> <i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+              </div>
+            </div>
+
+          </div>
+    </div>
+  </div></div></div>
+

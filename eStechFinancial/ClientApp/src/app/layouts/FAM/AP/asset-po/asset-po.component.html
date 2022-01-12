@@ -1,0 +1,627 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header" style="height: auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group">
+            <input type="text" #input (keyup)="searchGrid(input.value)" [(ngModel)]="order_ID" id="order_ID" placeholder="search..." class="form-control"  style="margin:1px;">
+            <div class="input-group-append order-last">
+              <button [style.display]="permissionUtility.PermissionAdd" style="margin: 1px 0px 1px 0px;" class="btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button>
+            </div>            
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Order No</th>
+              <th>Supplier Name</th>
+              <th>Order Date</th>
+              <th>Total Cost</th>
+              <th>Total Discount</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of grid | paginate: { itemsPerPage: 14, currentPage: p };">
+              <td>{{dt.purchase_Order_ID}}</td>
+              <td>{{dt.pO_NO}}</td>
+              <td>{{dt.supplier_Name}}</td>
+              <td>{{dt.pO_Date | date:"dd/MM/yy"}} </td>
+              <td>{{dt.total_Cost  | number: '1.2-5'}}</td>
+              <td>{{dt.total_Discount  | number: '1.2-5'}}</td>
+              <td>{{dt.total_Amount  | number: '1.2-5'}}</td>
+              <td>{{dt.cancel}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button  [style.display]="permissionUtility.PermissionView" style="padding: 6px 7px;" class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.purchase_Order_ID,content)"
+                          id="view">
+                    <span><img src="../../../../../../assets/images/icon/report.png" ></span>
+                  </button>
+
+                </div>
+                <div class="btn-group" style="float:right; ">
+                  <button  [style.display]="permissionUtility.PermissionEdit"  class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.purchase_Order_ID,content)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row"> 
+
+  <ng-template #content let-c="close" let-d="dismiss">
+
+    <div class="modal-header">
+      <h4 class="modal-title">{{permissionUtility.FUNCTIONALITYDETAILNAME}}</h4>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-1">
+          
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <span>Date:</span>
+            <div class="input-group" style="width: 300px;">
+              <input class="form-control" name="dp" [(ngModel)]="pO_Date.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="changePODate($event)">
+              <div class="input-group-append" style="margin-top: 5px;">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="">
+          
+        </div>
+        <div class="">
+          <div class="form-group" *ngIf="isDueDate">
+            <span *ngIf="isDueDate">Due Date:</span>
+            <div class="input-group" style="width: 300px;">
+              <input class="form-control" name="dp" [(ngModel)]="delivery_Date.model" ngbDatepicker #ddd="ngbDatepicker" (ngModelChange)="changeDeliveryDate($event)">
+              <div class="input-group-append" style="margin-top: 5px;">
+                <button class="btn btn-small " (click)="ddd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+         
+        <div class="col-md-3 ml-4">
+          <div class="form-group" style="width: 300px;">
+            <span>Purchase Officer:</span>
+            <select class="form-control" [(ngModel)]="order_Envoy" id="order_Envoy">
+              <option *ngFor="let u of users " [value]="u.order_Envoy">{{u.emp_Name}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-1">
+          
+        </div>
+        <div class="col-md-3">
+          <div class="form-group" style="width: 300px;">
+            <span>Supplier:</span>
+            <ng-select2 [data]="suppliers" id="supplier_ID" [value]="supplier_IDM" (valueChanged)="changeSupplier($event)" [width]="300">
+            </ng-select2>
+
+            <!--<button type="button" class="btn btn-small btn-warning tip" (click)="SupplierAddNew(suppliercontent)" data-original-title="Quick save">
+              <span class="fa fa-plus text-white"></span>
+            </button>-->
+          </div>
+        </div>
+ 
+        <div class="col-md-3 ml-4">
+          <div class="form-group" style="width: 300px;">
+            <span>Contact:</span>
+            <select id="ddlcontact" [(ngModel)]="contact_ID" class="form-control">
+              <option *ngFor="let c of contacts" [value]="c.contact_ID" [selected]="c.contact_ID">{{c.contact_Name}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="row table-shadow-padding">
+
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th style="width:2%;margin-left:15px">Sr#.</th>
+              <th style="width:28%">Item</th>
+              <th style="width:7%">U. Price</th>
+              <th style="width:10%">Approved Qty.</th>
+              <th style="width:7%">Qty.</th>
+              <th style="width:10%">Cost</th>
+              <th style="width:7%">D. Rate</th>
+              <th style="width:7%">Discount </th>
+              <!--<th style="width:6%">
+                <div *ngIf="hide; then lbltaxrate else lbltaxrate1"> </div>
+                <ng-template #lbltaxrate>
+                  <span ng-show="hide">T. Rate</span>
+                </ng-template>
+              </th>-->
+              <!--<th style="width:6%">
+                <div *ngIf="hide; then lbltax else lbltax1"> </div>
+                <ng-template #lbltax>
+                  <span ng-show="hide">Tax</span>
+                </ng-template>
+              </th>-->
+              <th style="width:9%">Net Amt.</th>
+              <th style="width:11%">Action</th>
+            </tr>
+          </thead>
+          <tbody style="height: 200px;overflow: hidden scroll;display: block;width:100%;">
+            <tr *ngFor="let i of purchaseOrderDetails let idx = index " class="row">
+              <td style="width:2%;margin-left:15px">{{idx+1}}</td>
+              <td style="width:28%">
+                <div *ngIf="i.edit_Mode; then selectName else viewName"> </div>
+                <ng-template #viewName>
+                  <span ng-show="editMode">{{i.item_Name}}</span>
+                </ng-template>
+                <ng-template #selectName>
+
+                  <ng-select2 [data]="items" id="itemEdit" [value]="item_CodeM" (valueChanged)="updateItem(i,$event)" width="300px">
+                  </ng-select2>
+
+                </ng-template>
+              </td>
+              <td style="width:7%">
+                <div *ngIf="i.edit_Mode; then selectPrice else viewPrice"> </div>
+                <ng-template #viewPrice>
+                  <span ng-show="editMode">{{i.unit_Price | number:'1.2-5'}}</span>
+                </ng-template>
+                <ng-template #selectPrice>
+                  <input type="number" onClick="this.select();" class="form-control" id="UPEdit" [(ngModel)]="i.unit_Price" min="1" (change)="changeUnitPriceEdit(i,i.unit_Price)" (keyup.enter)="changeMode(idx,i,0)" />
+                </ng-template>
+              </td>
+              <td style="width:10%;">
+                <div *ngIf="i.edit_Mode; then selectApprovedQty else viewApprovedQty"> </div>
+                <ng-template #viewApprovedQty>
+                  <span ng-show="editMode">{{i.approvedqty}}</span>
+                </ng-template>
+                <ng-template #selectApprovedQty>
+                  {{ApprovedQty}}
+                </ng-template>
+
+              </td>
+              <td style="width:7%">
+                <div *ngIf="hideUPP; then lblHideUPP else lblHideUPP1"> </div>
+                <ng-template #lblHideUPP>
+                  <div *ngIf="i.edit_Mode; then selectUPP else viewUPP"> </div>
+                  <ng-template #viewUPP>
+                    <span ng-show="editMode">{{i.quantity }}</span>
+                  </ng-template>
+                  <ng-template #selectUPP>
+                    <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="i.quantity" (change)="changeUPPEdit(i,i.quantity)" (keyup.enter)="changeMode(idx,i,0)" />
+                  </ng-template>
+                </ng-template>
+                <ng-template #lblHideUPP1>
+
+                </ng-template>
+              </td>
+              <td style="width:10%">
+                <div *ngIf="i.edit_Mode; then selectCost else viewCost"> </div>
+                <ng-template #viewCost>
+                  <span ng-show="editMode">{{i.purchase_Cost| number:'1.2-5'}}</span>
+                </ng-template>
+                <ng-template #selectCost>
+                  {{ (i.upp) * (i.unit_Price)| number:'1.2-5'}}
+                </ng-template>
+              </td>
+              <td style="width:7%">
+                <div *ngIf="i.edit_Mode; then selectRate else viewRate"> </div>
+                <ng-template #viewRate>
+                  <span ng-show="editMode">{{i.discount_Rate| number:'1.2-5'}}</span>
+                </ng-template>
+                <ng-template #selectRate>
+                  <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="i.discount_Rate" (change)="changeDiscountRateEdit(i,i.discount_Rate)" (keyup.enter)="changeMode(idx,i,0)" />
+                </ng-template>
+              </td>
+              <td style="width:7%">
+                <div *ngIf="i.edit_Mode; then selectDAmount else viewDAmount"> </div>
+                <ng-template #viewDAmount>
+                  <span ng-show="editMode">{{i.discount_Amount| number:'1.2-5'}}</span>
+                </ng-template>
+                <ng-template #selectDAmount>
+                  {{(i.upp) * (i.unit_Price) * (i.discount_Rate)/100 | number:'1.2-5'}}
+                </ng-template>
+              </td>
+              <!--<td style="width:6%">
+                <div *ngIf="hide; then lbltaxrate else lbltaxrate1"> </div>
+                <ng-template #lbltaxrate>
+                  <div *ngIf="i.edit_Mode; then selectTaxRate else viewTaxRate"> </div>
+                  <ng-template #viewTaxRate>
+                    <span ng-show="editMode">{{i.tax_Rate| number:'1.2-5'}}</span>
+                  </ng-template>
+                  <ng-template #selectTaxRate>
+                    {{i.tax_Rate}}
+                  </ng-template>
+                </ng-template>
+                <ng-template #lbltaxrate1>
+                </ng-template>
+              </td>-->
+              <!--<td style="width:6%">
+                <div *ngIf="hide; then lbltaxamount else lbltaxamount1"> </div>
+
+                <ng-template #lbltaxamount>
+                  <div *ngIf="i.edit_Mode; then selectTAmount else viewTAmount"> </div>
+                  <ng-template #viewTAmount>
+                    <span ng-show="editMode">{{i.tax_Amount| number:'1.2-5'}}</span>
+                  </ng-template>
+                  <ng-template #selectTAmount>
+                    {{((i.upp * i.unit_Price) -  ((i.upp * i.unit_Price) * i.discount_Rate/100))/100 * i.tax_Rate | number:'1.2-5'}}
+                  </ng-template>
+                </ng-template>
+                <ng-template #lbltaxamount1>
+                </ng-template>
+              </td>-->
+              <td style="width:9%">
+                <div *ngIf="i.edit_Mode; then selectVAmount else viewNAmount"> </div>
+                <ng-template #viewNAmount>
+                  <span ng-show="editMode">{{i.net_Amount| number:'1.2-5'}}</span>
+                </ng-template>
+                <ng-template #selectVAmount>
+                  {{((i.upp * i.unit_Price) - ((i.upp) * (i.unit_Price) * (i.discount_Rate)/100)) + ((i.upp * i.unit_Price) -  ((i.upp * i.unit_Price) * i.discount_Rate/100))/100 * i.tax_Rate | number:'1.2-5'}}
+                </ng-template>
+              </td>
+              <td style="width:11%">
+                <div class="btn-group" *ngIf="i.edit_Mode; then ok else pencel">
+
+                </div>
+                <ng-template #ok>
+                  <button class="btn btn-small btn-success tip" data-original-title="Quick save" type="button" (click)="changeMode(idx,i,0)" id="update" style="padding-right:11px;margin-right:-1px;">
+                    <span class="fa fa-check"></span>
+                  </button>
+                </ng-template>
+                <ng-template #pencel>
+                  <button class="btn btn-small btn-warning tip" data-original-title="Hide" type="button" (click)="changeMode(idx,i,1)" id="edit" [disabled]="EditItemButton">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+
+                </ng-template>
+                <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button" value="Delete" id="remove" (click)="changeMode(idx,i,2)"
+                        [disabled]="RemoveItemButton">
+                  <span class="fa fa-remove"></span>
+                </button>
+              </td>
+            </tr>
+            <tr id="AddNewItemRow" class="row">
+              <td style="width:2%;margin-left:15px">
+                <input type="text" id="txt" (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,Quantity,Discount_Rate,Tax_Rate)" style="width:3px" />
+              </td>
+              <td style="width:28%">
+                <ng-select2 [data]="items" id="item_ID" [value]="item_CodeM" (valueChanged)="changeItem($event)" width="300px">
+                </ng-select2>
+              </td>
+              <td style="width:7%">
+                <input type="number" onClick="this.select();" id="unit_Price" [(ngModel)]="unit_Price" class="form-control" ng-hide="editMode" min="1" (change)="changeUnitPrice(unit_Price)"
+                       (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,Quantity,Discount_Rate,Tax_Rate)" />
+              </td>
+              <td style="width:10%">
+                {{ApprovedQty}}
+              </td>
+              <td style="width:7%">
+                <div *ngIf="hideUPP; then lblupp else lblupp1"> </div>
+                <ng-template #lblupp>
+                  <span ng-show="hideUPP">
+                    <input type="number" onClick="this.select();" [(ngModel)]="Quantity" class="form-control" ng-hide="editMode" min="1"
+                           (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,upp,Quantity,Discount_Rate,Tax_Rate)" (change)="changeUPP(Quantity)" />
+                  </span>
+                </ng-template>
+              </td>
+              <td style="width:10%">
+                {{ (upp) * (unit_Price)| number:'1.2-5'}}
+              </td>
+              <td style="width:7%">
+                <input type="number" onClick="this.select();" [(ngModel)]="Discount_Rate" class="form-control" ng-hide="editMode" min="0" max="100" (change)="changeDiscountRate(Discount_Rate)"
+                       (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,upp,Quantity,Discount_Rate,Tax_Rate)" />
+              </td>
+              <td style="width:7%">
+                {{(upp) * (unit_Price) * (Discount_Rate)/100 | number:'1.2-5'}}
+              </td>
+              <!--<td style="width:6%">
+                <div *ngIf="hide; then rate else rate1"> </div>
+                <ng-template #rate>
+                  <span ng-show="hide">
+                    {{Tax_Rate}}
+                  </span>
+                </ng-template>
+              </td>-->
+              <!--<td style="width:6%">
+                <div *ngIf="hide; then tax else tax1"> </div>
+                <ng-template #tax>
+                  <span ng-show="hide"> {{((upp * unit_Price) -  ((upp * unit_Price) * Discount_Rate/100))/100 * Tax_Rate | number:'1.2-5'}}</span>
+                </ng-template>
+              </td>-->
+              <td style="width:9%">
+
+                <div *ngIf="hide; then lblNet else lblNet1"> </div>
+                <ng-template #lblNet>
+
+                  {{((upp * unit_Price) - ((upp) * (unit_Price) * (Discount_Rate)/100)) + ((upp * unit_Price) -  ((upp * unit_Price) * Discount_Rate/100))/100 * Tax_Rate | number:'1.2-5'}}
+                </ng-template>
+                <ng-template #lblNet1>
+
+                  {{(upp * unit_Price) - ((upp * unit_Price) * (Discount_Rate)/100) | number:'1.2-5'}}
+                </ng-template>
+
+              </td>
+              <td style="width:11%">
+                <button type="button" class="btn btn-small btn-warning tip"
+                        (click)="addGrid(item_Code,item_Name,unit_Price,upp,Quantity,Discount_Rate,Tax_Rate,Tax_Rate)"
+                        (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,upp,Quantity,Discount_Rate,Tax_Rate,Tax_Rate)"
+                        data-original-title="Quick save" ng-click="addrow()" id="adds">
+                  <span class="fa fa-check"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+
+      <div class="modal-footer"></div>
+      <div class="row">
+        <div class="col-md-1">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-5">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" id="de" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+        <div class="col-md-1">
+          <div class="row">
+            <span>Freight Term:</span>
+          </div>&nbsp;&nbsp;
+          <div class="row" id="freightlbl">
+            <span>Freight:</span>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="row">
+            <div class="form-group">
+              <select id="ddlFrieghtTerm" [(ngModel)]="frieght_Id" class="form-control" (change)="frieghtChange()" style="width:110%">
+                <option *ngFor="let p of FrieghtTermsList" [value]="p.frieght_Id" [selected]="freight_Term">{{p.frieght_Name}}</option>
+              </select>
+            </div>
+          </div>
+          <div class="row" id="freighttxt">
+            <input type='text' style="width:50%" class="form-control" [(ngModel)]="freight_Chrgs" />
+          </div>
+        </div>
+
+
+
+
+
+        <div class="col-md-3">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <span>Total Amount:</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <input class="form-control" [ngModel]="TotalCost()   | number : '1.2-5'" readonly />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <span>Total Discount:</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <input class="form-control" [ngModel]="TotalDiscount()   | number : '1.2-5'" readonly />
+              </div>
+            </div>
+          </div>
+          <div class="row" id="lblTotalTax">
+            <div class="col-md-6">
+              <div class="form-group">
+                <span>Total Tax:</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <input class="form-control" [ngModel]="TotalTax()   | number : '1.2-5'" readonly />
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <span>Net Amount:</span>
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <input class="form-control" [ngModel]="TotalAmount()   | number : '1.2-5'" readonly />
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+
+
+      </div>
+    </div>
+    <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+
+      <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+
+    </div>
+    <div class="modal-footer">
+      <div *ngIf="mode; then submitUpdateC else submitAddC"> </div>
+      <ng-template #submitUpdateC>
+        <div class="row" style="position: absolute;left: 30px;">
+
+          <!--Cancel Order-->
+          <button [style.display]="permissionUtility.PermissionDelete" type="button" id="cancelBtn" class="btn btn-small btn-warning tip" (click)="cancelOrder()"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Cancel</button>
+          <!--RDLC Show-->
+          <!--<button type="button" id="viewRDLC" class="btn btn-small btn-warning tip" style="cursor:pointer; margin-left:5px;" (click)="onNavigate('/po-rpt-rdlc')"><i class="fa fa-eye"></i></button>-->
+          <!--Excel Show-->
+          <!--<button type="button" id="viewExcel" style="cursor:pointer; margin-left:5px;" class="btn btn-small btn-warning tip" (click)="onNavigate('/po-rpt-excel')"><i class="fa fa-file-excel-o"></i></button>-->
+        </div>
+      </ng-template>
+  
+        <!--Allow Exchange-->
+        <!--<div id="allowExchange">
+      <span>Exchange</span>
+      <input type="checkbox" id="exchange" name="exchange" [(ngModel)]="exchange" />
+    </div>-->
+        <!--Show Order View-->
+        <!--<div id="viewBtn">
+      <span>Show</span>
+      <input type="checkbox" id="isView" name="isView" [(ngModel)]="isView" />
+    </div>-->
+        <!--Save-->
+        <div *ngIf="mode; then submitUpdate else submitAdd"> </div>
+        <ng-template #submitAdd>
+          <!--<button id="submitAddMore" type="button" class="btn btn-small btn-warning tip" (click)="saveMoreOrder(purchase_Order_ID,pO_Date,1,0,order_Envoy,0,0,supplier_ID,contact_ID,delivery_Date,Due_Date,method_Id,payment_ID,frieght_Id,TotalCost(),TotalDiscount(),0,TotalTax(),freight_Chrgs,TotalAmount(),remarks,1,'New',paymentDate,0,0,0,'New123',0,0,1,1,0)"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save More</button>-->
+          <!--Save-->
+          <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveOrder(purchase_Order_ID,pO_Date,1,0,order_Envoy,0,0,supplier_ID,contact_ID,delivery_Date,Due_Date,method_Id,payment_ID,frieght_Id,TotalCost(),TotalDiscount(),0,TotalTax(),freight_Chrgs,TotalAmount(),remarks,1,'New',paymentDate,0,0,0,'New123',0,0,1,1,0)"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+          <!--Update-->
+        </ng-template>
+        <ng-template #submitUpdate>
+          <button [style.display]="permissionUtility.PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateOrder(purchase_Order_ID,pO_Date,1,0,order_Envoy,0,0,supplier_ID,contact_ID,delivery_Date,Due_Date,method_Id,payment_ID,frieght_Id,TotalCost(),TotalDiscount(),0,TotalTax(),freight_Chrgs,TotalAmount(),remarks,1,'New',paymentDate,0,0,0,'New123',0,0,1,1,0)"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+        </ng-template>
+
+
+        <!--Cancel-->
+        <button type="button" id="x" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o" aria-hidden="true"></i> Close</button>
+    </div>
+  </ng-template>
+
+  <!--a Hot fix-->
+  <ng-template #suppliercontent let-h="close" let-f="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        NEW SUPPLIER
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="f('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-sm-12">
+          <span>Name</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" id="addSupplierName" [(ngModel)]="addSupplierName" class="form-control" (change)="checkDisableStatus()" />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Cell</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addSupplierCell" class="form-control" (change)="checkSupplierCell(addSupplierCell)" />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Phone</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addSupplierPhone" class="form-control" (change)="checkSupplierPhone(addSupplierPhone)" />
+          </div>
+        </div>
+
+        <div class="col-sm-12">
+          <span>Email</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addSupplierEmail" class="form-control" (change)="checkSupplierEmail(addSupplierEmail)" />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>Address</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <input type="text" [(ngModel)]="addSupplierAddress" class="form-control" />
+          </div>
+        </div>
+        <div class="col-sm-12">
+          <span>City</span>
+        </div>
+        <div class="col-sm-12">
+          <div class="form-group">
+            <ng-select2 [data]="city" id="citycode" [value]="citycode" (valueChanged)="getCityChange($event)" [width]="470">
+            </ng-select2>
+          </div>
+        </div>
+
+        <div class="col-md-12" style="display:inline-flex">
+          <span>Status</span>
+
+          <div class="col-md-2">
+            <input type="checkbox" [(ngModel)]="addSupplierStatus" pointer-events="none" style="margin-top: 4px;">
+          </div>
+        </div>
+
+
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button type="button" id="SaveNewSupplier" class="btn btn-small btn-warning tip" (click)="saveSupplier()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+      <button type="button" class="btn btn-small" id="x" (click)="h('Close click')"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+
+  </div>

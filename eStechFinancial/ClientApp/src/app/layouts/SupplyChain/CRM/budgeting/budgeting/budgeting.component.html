@@ -1,0 +1,826 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{PermissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text"  #input (keydown.enter)='$event.target.blur()' (blur)="searchSaleOrders(input.value)"
+              [(ngModel)]="order_ID" id="order_ID" placeholder="search..." class="form-control" />
+
+            <div class="btn-group">
+              <button [style.display]="PermissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip"
+                id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button>
+              <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown"
+                placement="bottom-right" [style.display]="PermissionUtility.PermissionDropdown">
+                <button class="btn btn-primary dropdown-toggle-split" style="margin-left: 5px;" ngbDropdownToggle></button>
+
+                <div class="dropdown-menu" ngbDropdownMenu>
+                  <button [style.display]="PermissionUtility.PermissionItem1" style="text-align:left"
+                    class="col-sm-12 btn btn-small btn-warning tip" id="myInput" (click)="routeInvoice(1)">
+                    <i class="fa fa-plus"></i> Order Scheme
+                  </button>
+                  <button [style.display]="PermissionUtility.PermissionItem2" style="text-align:left"
+                    class="col-sm-12 btn btn-small btn-warning tip" id="myInput" (click)="routeInvoice(2)">
+                    <i class="fa fa-plus"></i> Sale Order (Import)
+                  </button>
+
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="isLoading"
+        style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Date</th>
+              <th>Contract No</th>
+              <th>Production Type</th>
+              <!-- <th>Total Cost</th> -->
+              <!-- <th>Total Discount</th>
+              <th>Total Amount</th> -->
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let dt of order  | paginate: { itemsPerPage: 14, currentPage: p , id :'1st' }">
+              <td>{{dt.budgeting_ID}}</td>
+              <td>{{dt.date | date:"dd/MM/yy"}}</td>
+              <td> 786/{{dt.contractNo}}</td>
+              <td>{{dt.productionType}} </td>
+              <td *ngIf="dt.status == 1 then ok else notok"></td>
+              <ng-template #ok>
+                <span> Open </span>
+              </ng-template>
+              <ng-template #notok>
+                <span> Close </span>
+              </ng-template>
+              <!-- <td>{{dt.total_Discount | number: '1.2-5'}}</td>
+              <td>{{dt.total_Amount | number: '1.2-5'}}</td>
+              <td>{{dt.cancel}}</td> -->
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionUtility.PermissionEdit" class="btn btn-small btn-warning tip"
+                    (click)="getDetailsByID(dt.budgeting_ID,content, dt.contractNo)" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" id="1st" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+
+        {{PermissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click'); ">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+      <div class="row" style="padding-bottom:5px">
+        <div class=" col-md-2" >
+            <span>Date:</span>
+        </div>
+        <div class="offset-md-1 col-md-2" >
+          <span>Contract #:</span>
+        </div>
+        <div class=" col-md-2" style="display: inline-flex;" >
+          <span>Production Type:</span>
+        </div>
+        <div class=" col-md-2" style="display: inline;">
+          <div class="form-group" style="display: inline;">
+            <input type="radio" [(ngModel)]="productionType" (click)="changeProductionType(0)" value="inHouse"> &nbsp; In House &nbsp; &nbsp; &nbsp;
+            <input type="radio" [(ngModel)]="productionType" (click)="changeProductionType(1)" value="CMT">&nbsp; CMT
+                   
+          </div>
+        </div>
+        <div *ngIf="showParty" class=" col-md-2" style="display: inline-flex;" >
+          <div class="col-md-1">Party:</div>
+          <div class="col-md-2" id="DropDownCustomerSelect2" style="padding-left:00px">
+            
+            <div class="form-group" style="display: inline-flex;">
+              <div class="inner-addon left-addon">
+                <i class="fa fa-group" style="font-size:medium" aria-hidden="true"></i>
+                <ng-select2 [data]="customers" id="customer_ID" [value]="customer_ID" (valueChanged)="changeCustomer($event)"
+                  [width]="250">
+                </ng-select2>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row" >
+        <!-- Date -->
+        <div class=" col-md-2" >
+          <div class="form-group">
+            <div class="input-group">
+              <input   class="form-control" name="dp" [(ngModel)]="date.model" ngbDatepicker #dd2="ngbDatepicker"
+                >
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd2.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Contract #: -->
+        <div class="offset-md-1  col-md-2" style="padding-left: 40px;">
+          <div *ngIf="mode then viewContractNo else selectContractNo"></div>
+          <ng-template #viewContractNo>
+            <div class="form-group">
+              <div class="input-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-money" style="font-size:medium," aria-hidden="true"></i>
+                  <input type="text" readonly [(ngModel)]="contracteNo" class="form-control">
+                </div>
+              </div>
+            </div>
+          </ng-template>
+          <ng-template #selectContractNo>
+            <div class="form-group">
+              <div class="input-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-money" style="font-size:medium," aria-hidden="true"></i>
+                  <select style ="width:180px;"  class="form-control" [(ngModel)]="contractNo" (change)="getContractDetails(contractNo)">
+                    <option *ngFor="let i of contractNos" [value]="i.sale_Order_ID" > {{i.contractNo}}</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+  
+                
+          
+      
+    <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+    <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+    <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+    <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+
+      <div class="row table-shadow-padding ">
+
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th   style="width:6%;margin-left:15px">Sr#.</th>
+              <th   style="width:32%">Item Id:Item Name</th>
+              <th   style="width:12%;">Color</th>
+              <th   style="width:10%;">Size</th>
+              <th   style="width:10%;">Packing</th>
+              <th   style="width:12%;">Qty</th>
+              <th  style="width:14%"></th>
+            </tr>
+           
+          </thead>
+          <tbody style="min-height: 150px;max-height: 300px;overflow: hidden scroll;display: block;width:100%;">
+
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+
+            <tr
+              *ngFor="let i of saleOrderDetails | paginate: { itemsPerPage: 15, currentPage: g, id:'2nd'}; let idx = index"
+              class="row">
+              <td style="width:6%;margin-left:15px">{{(idx+1)+(g-1)*15}}</td>
+              <!-- item -->
+              <td style="width:32%">
+                
+                  <span ng-show="editMode">
+                    {{i.item_Name}}
+                    <div *ngIf="i.scheme=='1'; then packet"> </div>
+                    <ng-template #packet>
+                      - PACKET
+                    </ng-template>
+
+
+                  </span>
+              </td>
+             
+              <!-- color -->
+              <td style="width:12%"> 
+                <span ng-show="editMode">{{i.color}}</span>
+              </td>
+              <!-- Size -->
+              <td style="width:10%"> 
+                
+                  <span ng-show="editMode">{{i.size}}</span>
+                
+              </td>
+              <!-- Packing Qty -->
+              <td style="width:10%"> 
+
+                <span ng-show="editMode">{{i.packingQty }}</span>
+                
+              </td>
+              
+              <!-- Qty -->
+              <td style="width:12%">
+               
+                  <span ng-show="editMode">{{i.quantity | number:'1.2-5'}}</span>
+               
+
+              </td>
+             
+              <!-- Action -->
+              <td style="width:14%">
+                
+
+              </td>
+            </tr>
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+           
+          </tbody>
+        </table>
+
+      </div>
+      <pagination-controls (pageChange)="g = $event" id="2nd" style="float:right;"></pagination-controls>
+      <div class="modal-footer"></div>
+      <div class="row" style="padding-bottom:5px">
+        <div class=" col-md-3" >
+            <span>Item:</span>
+        </div>
+        <div class="offset-md-1 col-md-2" style="padding-left: 80px;">
+            <span>Order Qty.:</span>
+        </div>
+      </div>
+      <div class="row" style="padding-left: 40px;"> 
+        <!-- ITEM -->
+        <div class=" col-md-3" >
+          <div class="inner-addon left-addon">
+            <i class="fa fa-money" style="font-size:medium," aria-hidden="true"></i>
+            <div id="DropDownItemSelect2" class="col-md-12" style="padding: 0px;">
+              <ng-select2 [data]="items" id="item_ID" [value]="item_Code" (valueChanged)="changeItems($event)"
+                width="210px">
+              </ng-select2>
+            </div>
+          </div>
+        </div>
+        <!--Order Qty  -->
+        <div class="offset-md-1 col-md-3"  >
+            <div class="form-group">
+              <div class="input-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-money" style="font-size:medium," aria-hidden="true"></i>
+                  <input type="text"  class="form-control" [(ngModel)]="orderQty" (change)="addItem()"  readonly value="0.00"> 
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="row" style="padding-bottom:5px;padding-left: 15px;">
+        <div class=" col-md-3" >
+            <span>Raw Matrial Waste:</span>
+        </div>
+        <div class="offset-md-1 col-md-2" style="padding-left: 5px;">
+            <span>Cycle Time:</span>
+        </div>
+      </div>
+      <div class="row" style="padding-left: 40px;">
+        <!-- Raw Matrial Waste:-->
+        <div class=" col-md-2" >
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium," aria-hidden="true"></i>
+              <div class="input-group mb-1">
+                <input type="number" step="0.01" (input)="valid.onKeyPressBlockNumbers($event);"  onClick="this.select();" class="form-control" (change)="setProduction(); addItem()" [(ngModel)]="rawMatrialWaste" min="0.01" max="100.00" onkeypress="if(this.value.length == 2) return false" />
+
+                <div class="input-group-append">
+                 <span class="input-group-text">%</span>
+               </div>
+             </div>
+            </div>
+          </div>
+        </div>
+        <!--Cycle Time: -->
+        <div class="offset-md-2 col-md-3"  >
+            <div class="form-group">
+              <div class="input-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-money" style="font-size:medium," aria-hidden="true"></i>
+                  <input type="number" step="0.01" (input)="valid.onKeyPressBlockNumbers($event);"  onClick="this.select();"  class="form-control" (change)=" addItem()" [(ngModel)]="cycleTime"  > 
+                </div>
+              </div>
+            </div>
+          </div>
+      </div>
+      <div class="row" style="padding-bottom:5px;padding-left: 15px;">
+        <div class=" col-md-2" >
+            <span>Qty:</span>
+        </div>
+        <div class="offset-md-2  col-md-2" >
+          <span>Required Production:</span>
+        </div>
+        <div class="offset-md-1  col-md-2" >
+          <span>Pair Weight:</span>
+        </div>  
+      </div>
+      <div class="row" style="padding-left: 40px;">
+        <!-- Qty:-->
+        <div class=" col-md-2" >
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium," aria-hidden="true"></i>
+              <div class="input-group mb-1">
+                <input type="number" step="0.01" (input)="valid.onKeyPressBlockNumbers($event);"  onClick="this.select();" class="form-control" (change)="setProduction(); addItem()" [(ngModel)]="qty" min="1"  />
+
+                <div class="input-group-append">
+                 <span class="input-group-text">%</span>
+               </div>
+             </div>
+            </div>
+          </div>
+        </div>
+        <!-- Required Production:-->
+        <div class="offset-md-2  col-md-2" >
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium," aria-hidden="true"></i>
+              <div class="input-group mb-1">
+                <input type="number" step="0.01" (input)="valid.onKeyPressBlockNumbers($event);" readonly  onClick="this.select();" class="form-control" (change)="addItem()" [(ngModel)]="requiredProduction" min="1"  [value]=""/>
+
+                <div class="input-group-append">
+                 <!-- <span class="input-group-text">%</span> -->
+               </div>
+             </div>
+            </div>
+          </div>
+        </div>
+         <!-- Pair Weight:-->
+         <div class="offset-md-1  col-md-2" >
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium," aria-hidden="true"></i>
+              <div class="input-group mb-1">
+                <input type="number" step="0.01" (input)="valid.onKeyPressBlockNumbers($event);"  onClick="this.select();" class="form-control" (change)="addItem()" [(ngModel)]="pairWeight" min="1"  />
+
+                <div class="input-group-append">
+                 <span class="input-group-text">gm</span>
+               </div>
+             </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+<!-- --------------------------------------------------------------------------------------------- -->
+<!-- --------------------------------------------------------------------------------------------- -->
+<!-- --------------------------------------------------------------------------------------------- -->
+<div class="row table-shadow-padding ">
+
+  <table class="table table-hover table-striped table-shadow">
+    <thead style="display: block;width:98%;">
+      <tr class="thclr row">
+        <th   style="width:6%;margin-left:15px">Sr#.</th>
+        <th   style="width:32%">Item</th>
+        <th   style="width:17%;">UoM</th>
+        <th   style="width:15%;">Weight%</th>
+        <th   style="width:15%;">%</th>
+        <th   style="width:11%;">Action</th>
+      </tr>
+     
+    </thead>
+    <tbody style="min-height: 150px;max-height: 300px;overflow: hidden scroll;display: block;width:100%;">
+
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+
+      <tr
+        *ngFor="let i of budgetingDetails2 | paginate: { itemsPerPage: 15, currentPage: g, id:'2nd'}; let idx = index"
+        class="row">
+        <td style="width:6%;margin-left:15px">{{(idx+1)+(g-1)*15}}</td>
+        <!-- item -->
+        <td style="width:32%">
+          <div *ngIf="i.edit_Mode; then selectName else viewName"> </div>
+          <ng-template #viewName>
+            <span ng-show="editMode">
+              {{i.item_Name}}
+              <div *ngIf="i.scheme=='1'; then packet"> </div>
+              <ng-template #packet>
+                - PACKET
+              </ng-template>
+
+
+            </span>
+          </ng-template>
+          <ng-template #selectName>
+            
+              <div id="DropDownItemSelect2" class="col-md-12" style="padding: 0px;">
+                <!--<ng-select2 [data]="items" id="itemEdit" [value]="item_Code" (valueChanged)="updateItem($event)" width="400px">
+                </ng-select2>-->
+                <ng-select2 [data]="allItems" id="itemEdit" [value]="rawItem_Code" (valueChanged)="updateItem(i,$event)"
+                  width="400px">
+                </ng-select2>
+              </div>
+            
+          </ng-template>
+        </td>
+       
+        <!-- uom -->
+        <td style="width:17%"> 
+          
+          <div *ngIf="i.edit_Mode; then selectcolor else viewcolor"> </div>
+          <ng-template #viewcolor>
+            <span ng-show="editMode">{{i.uom}}</span>
+          </ng-template>
+          <ng-template #selectcolor>
+            <input   type="text" class="form-control" id="ColorEdit" [(ngModel)]="i.uom" min="1"
+               (keyup.enter)="changeMode(idx,i,0)" (change)="addItem()"/>
+          </ng-template>
+        </td>
+        <!-- weight -->
+        <td style="width:15%"> 
+          
+          <div *ngIf="i.edit_Mode; then selectsize else viewsize"> </div>
+          <ng-template #viewsize>
+            <span ng-show="editMode">{{i.weight}}</span>
+          </ng-template>
+          <ng-template #selectsize>
+            <input   type="number" class="form-control" id="SizeEdit" [(ngModel)]="i.weight" 
+               (keyup.enter)="changeMode(idx,i,0)"  (change)="addItem()"/>
+          </ng-template>
+        </td>
+        <!-- Percentage -->
+        <td style="width:15%"> 
+
+          <div *ngIf="i.edit_Mode; then selectpackingQty else viewpackingQty"> </div>
+          <ng-template #viewpackingQty>
+            <span ng-show="editMode">{{i.percentage }}</span>
+          </ng-template>
+          <ng-template #selectpackingQty>
+            <input   type="number" class="form-control" id="SizeEdit" [(ngModel)]="i.percentage" 
+            (keyup.enter)="changeMode(idx,i,0)"  (change)="addItem()"  max="100.00" min="0.01" onkeypress="if(this.value.length == 2) return false"/>
+          </ng-template>
+        </td>
+        <!-- Action -->
+        <td style="width:7%">
+          <div class="btn-group" *ngIf="i.edit_Mode; then ok else pencel">
+            <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button"
+              value="Delete" id="remove">
+              <span class="fa fa-remove"></span>
+            </button>
+          </div>
+          <ng-template #ok>
+            <button class="btn btn-small btn-success tip" data-original-title="Quick save" type="button"
+              (click)="changeMode(idx,i,0)" id="update" style="padding-right:11px;margin-right:-1px;">
+              <span class="fa fa-check"></span>
+            </button>
+          </ng-template>
+          <ng-template #pencel>
+            <button class="btn btn-small btn-warning tip" data-original-title="Hide" type="button"
+              (click)="changeMode(idx,i,1)" [disabled]="EditItemButton" id="edit">
+              <span class="fa fa-pencil"></span>
+            </button>
+
+          </ng-template>
+
+          <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button"
+            value="Delete" id="remove" [disabled]="RemoveItemButton" (click)="changeMode(((idx)+(g-1)*15),i,2)">
+            <span class="fa fa-remove"></span>
+          </button>
+
+        </td>
+      </tr>
+      <tr id="AddNewItemRow" class="row">
+        <td style="width:6%;margin-left:15px">
+          <input type="text" id="txt"
+            (keyup.enter)="addGrid(rawItem_Code,rawItem_Name,uom,weight,percentage)"
+            style="width:3px" />
+        </td>
+        <!-- item -->
+        <td style="width:32%">
+          <div id="DropDownItemSelect2" class="col-md-12" style="padding: 0px;">
+            <ng-select2 [data]="allItems" id="item_ID" [value]="rawItem_Code" (valueChanged)="changeAllItems($event)"
+              width="400px">
+            </ng-select2>
+          </div>
+          
+        </td>
+        
+        <!-- uom -->
+        <td style="width:17%">
+          <input   type="text" onClick="this.select();" [(ngModel)]="uom" class="form-control" ng-hide="editMode" min="0.01"
+            (keyup.enter)="addGrid(rawItem_Code,rawItem_Name,uom,weight,percentage)" />
+        </td>
+        <!-- weight -->
+        <td style="width:15%">
+          <input   type="number" onClick="this.select();" [(ngModel)]="weight" class="form-control" ng-hide="editMode" min="0.01"
+            (keyup.enter)="addGrid(rawItem_Code,rawItem_Name,uom,weight,percentage)" />
+        </td>
+        <!-- percentage -->
+        <td style="width:15%">
+          <input   type="number" onClick="this.select();" [(ngModel)]="percentage" class="form-control" ng-hide="editMode" min="0.01"
+            (keyup.enter)="addGrid(rawItem_Code,rawItem_Name,uom,weight,percentage)" onkeypress="if(this.value.length == 2) return false" max="100.00"/>
+        </td>
+        
+        <!-- action -->
+        <td style="width:11%">
+          <button type="button" class="btn btn-small btn-warning tip"
+            (keyup.enter)="addGrid(rawItem_Code,rawItem_Name,uom,weight,percentage)"
+            (click)="addGrid(rawItem_Code,rawItem_Name,uom,weight,percentage)"
+            data-original-title="Quick save" ng-click="addrow()" id="adds">
+            <span class="fa fa-check"></span>
+          </button>
+        </td>
+      </tr>
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+      
+    </tbody>
+  </table>
+<div class="container">
+  <div class="row">
+    <div class="offset-md-11 col-md-1 text-align-right pull-right">
+      <div class="btn-group mr-3">
+        <button id="AddItem" type="button" (click)="addDetail(item_Code, item_Name, orderQty, rawMatrialWaste, cycleTime, qty, requiredProduction, pairWeight)"  class="btn btn-small btn-warning tip pull-right" [disabled]="showAddButton">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i> {{addItemButton}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+<!-- <pagination-controls (pageChange)="g = $event" id="2nd" style="float:right;"></pagination-controls> -->
+
+
+<!-- ---------------------------------------------------------------------------------------------------- -->
+<!-- ---------------------------------------------------------------------------------------------------- -->
+<div class="row table-shadow-padding ">
+
+  <table class="table table-hover table-striped table-shadow">
+    <thead style="display: block;width:98%;">
+      <tr class="thclr row">
+        <th   style="width:6%;margin-left:15px">Sr#.</th>
+        <th   style="width:15%">Item</th>
+        <th   style="width:15%;">Raw Matrial Waste</th>
+        <th   style="width:15%;">Cycle Time</th>
+        <th   style="width:15%;">Require Production</th>
+        <th   style="width:15%;">Pair Weight</th>
+        <th   style="width:10%;">Action</th>
+      </tr>
+     
+    </thead>
+    <tbody style="min-height: 150px;max-height: 300px;overflow: hidden scroll;display: block;width:100%;">
+
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+
+      <tr
+        *ngFor="let i of budgetingDetails | paginate: { itemsPerPage: 15, currentPage: g, id:'2nd'}; let idx = index"
+        class="row">
+        <td style="width:6%;margin-left:15px">{{(idx+1)+(g-1)*15}}</td>
+        <td style="width:15%"> 
+            <span ng-show="editMode">{{i.item_Name}}</span>
+        </td>
+        <td style="width:15%"> 
+            <span ng-show="editMode">{{i.rawMatrialWaste}}</span>
+        </td>
+        <td style="width:15%"> 
+            <span ng-show="editMode">{{i.cycleTime}}</span>
+        </td>
+        <td style="width:15%"> 
+            <span ng-show="editMode">{{i.requiredProduction}}</span>
+        </td>
+        <td style="width:15%"> 
+            <span ng-show="editMode">{{i.pair_Weight}}</span>
+        </td>
+       
+         <td style="width:10%">
+          <!-- <div class="btn-group" *ngIf="i.edit_Mode; then ok else pencel">
+            <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button"
+              value="Delete" id="remove">
+              <span class="fa fa-remove"></span>
+            </button>
+          </div>
+          <ng-template #ok> -->
+            <button class="btn btn-small btn-success tip" data-original-title="Quick save" type="button"
+              (click)="selectItem(idx,i)" id="update" style="padding-right:11px;margin-right:-1px;">
+              <span class="fa fa-check"></span>
+            </button>
+          <!-- </ng-template>
+          <ng-template #pencel>
+            <button class="btn btn-small btn-warning tip" data-original-title="Hide" type="button"
+              (click)="changeMode(idx,i,1)" [disabled]="EditItemButton" id="edit">
+              <span class="fa fa-pencil"></span>
+            </button>
+
+          </ng-template>
+
+          <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button"
+            value="Delete" id="remove" [disabled]="RemoveItemButton" (click)="changeMode(((idx)+(g-1)*15),i,2)">
+            <span class="fa fa-remove"></span>
+          </button> -->
+
+        </td> 
+      </tr>
+      
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+<!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+      
+    </tbody>
+  </table>
+
+</div>
+<!-- ---------------------------------------------------------------------------------------------------- -->
+<!-- ---------------------------------------------------------------------------------------------------- -->
+</div>    
+
+
+    <div class="modal-footer">
+      <div class="row" style="position: absolute;left: 30px;">
+        <!--Cancel Order-->
+        <div *ngIf="mode; then submitcancel "> </div>
+        <ng-template #submitcancel>
+          <!-- <button [style.display]="PermissionDelete" type="button" id="cancelBtn" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="cancelOrder();"><i class="fa fa-minus-square-o" aria-hidden="true"></i> Cancel</button> -->
+
+
+          <div class="btn-group" [style.display]="PermissionUtility.PermissionDelete">
+            <!-- <button class=" btn btn-small btn-warning tip" id="cancelBtn" (click)="cancelOrder()">
+              <i class="fa fa-minus-square-o" aria-hidden="true"></i> Cancel
+            </button> -->
+            <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown"
+              placement="top" style="display:none" id="cancelBtndrop">
+              <!-- <button class="btn btn-primary dropdown-toggle-split" ngbDropdownToggle></button> -->
+
+              <div class="dropdown-menu" ngbDropdownMenu>
+                <!-- <button id="cancelSchemeBtn" style="text-align:left;" class="col-sm-12 btn btn-small btn-warning tip"
+                  (click)="cancelScheme()">
+                  <i class="fa fa-close" aria-hidden="true"></i>Scheme
+                </button> -->
+
+
+              </div>
+
+            </div>
+            
+          </div>
+        </ng-template>
+
+
+
+
+        <!--Cancel Schme-->
+        <!--<button type="button" id="cancelSchemeBtn" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="cancelScheme();"><i class="fa fa-close" aria-hidden="true"></i>  Scheme</button>-->
+        <!--Duplicate Order-->
+        <!-- <button type="button" id="btnDuplicate" style=" cursor:pointer; margin-right:5px;"
+          class="btn btn-small btn-warning tip" (click)="onNavigate('/duplicate-rpt-rdlc')"><i
+            class="fa fa-clone"></i></button>&nbsp; -->
+            <!--Send Mail-->
+        <!-- <button *ngIf="mode" id="submitAddMail" type="button" class="btn btn-small btn-warning tip"
+        style="    text-align: left;"
+        (click)="saveOrderAndMail(mailcontent,sale_Order_ID, sO_Date, office_Code, order_Envoy, customer_ID, contact_ID, delivery_Date, method_Id, payment_ID, frieght_Id, TotalCost(), TotalDiscount(), TotalTax(), freight_Chrgs, TotalAmount(),paid_Amount, reorder_ID, quotation_ID, order_Type, remarks, cancel, company_ID, manual_Discount, entry_Date, user_ID, false, sOGUID, exportQty,expPODate,shipmentTerm, refNo, productionQty, shipedDate, pOtype, customerCode,clientDate , loadingDate, issuedDate,conversionRate ,currency , contractNo, buyerPO)">
+        <i class="fa fa-envelope-o" aria-hidden="true"></i>
+      </button> -->
+
+        <!--RDLC Show-->
+        <!-- <button type="button" id="viewRDLC" style="cursor:pointer; margin-left:5px;padding:6px 7px"
+          class="btn btn-small btn-warning tip" (click)="onNavigate('/so-rpt-rdlc')"> -->
+          <!-- <i class="fa fa-eye"></i> -->
+         <!-- <img src="../../../../../../assets/images/icon/report.png">
+        </button> -->
+        <!--Excel Show-->
+        <!-- <button type="button" id="viewExcel" style="cursor:pointer; margin-left:5px;"
+          class="btn btn-small btn-warning tip" (click)="onNavigate('/so-rpt-excel')"><i
+            class="fa fa-file-excel-o"></i></button> -->
+
+
+        <!--Attach File-->
+        <!--<button type="button" id="viewAttachment" style="cursor:pointer; margin-left:5px;" class="btn btn-small btn-warning tip" (click)="open(attachmentcontent)"><i class="fa fa-file"></i></button>-->
+
+        <div id="viewStamp">
+          <!-- <span>Certificate</span>
+          <input type="checkbox" id="isStamp" name="isStamp" [(ngModel)]="isStamp" style="margin: 10px 3px 3px 4px"
+            (change)="changeStamp(isStamp)" /> -->
+        </div>
+        <div style="margin-top: 10px;" [style.display]="templateshow">
+          <!-- <span>Template</span> -->
+        </div>
+
+
+        <!-- <div class="col-md-2" style="margin-top: 5px;" [style.display]="templateshow">
+
+          <select [(ngModel)]="templatecode" id="templatecode">
+            <option *ngFor="let u of companytemplate " [value]="u.templatecode">{{u.templatecode+' : '+u.templatename}}</option>
+          </select>
+
+        </div> -->
+      </div>
+      <!--Allow Exchange-->
+      <div id="allowExchange">
+        <!-- <span>Exchange</span> -->
+        <!-- <input type="checkbox" id="exchange" name="exchange" [(ngModel)]="exchange" /> -->
+      </div>
+      <!--Show Order View-->
+      <div id="viewBtn">
+        <!-- <span>Show</span>
+        <input type="checkbox" id="isView" name="isView" [(ngModel)]="isView" /> -->
+      </div>
+      <div *ngIf="mode; then submitUpdate else  submitAdd "> </div>
+      <ng-template #submitAdd>
+
+
+        <!-- <button id="submitAddMore" type="button" class="btn btn-small btn-warning tip"
+          (click)="saveMoreOrder(sale_Order_ID, sO_Date, office_Code, order_Envoy, customer_ID, contact_ID, delivery_Date, method_Id, payment_ID, frieght_Id, TotalCost(), TotalDiscount(), TotalTax(), freight_Chrgs, TotalAmount(),paid_Amount, reorder_ID, quotation_ID, order_Type, remarks, cancel, company_ID, manual_Discount, entry_Date, user_ID, false, sOGUID, exportQty,expPODate,shipmentTerm, refNo, productionQty, shipedDate, pOtype, customerCode,clientDate , loadingDate, issuedDate,conversionRate ,currency , contractNo, buyerPO,paymentTerm1, shipmentDate,term_Condition)"><i
+            class="fa fa-floppy-o" aria-hidden="true"></i> Save & New</button> -->
+
+        <!--Save More-->
+        <div class="btn-group mr-3">
+
+
+          <button id="submitAdd" type="button" class="btn btn-small btn-warning tip"
+            (click)="saveOrder(contractNo, productionType, customer_ID)"><i
+              class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+
+          <!-- <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown"
+            placement="top-right" [style.display]="ShowSendEmail">
+            <button class="btn btn-primary dropdown-toggle-split" ngbDropdownToggle id="submitAdd"></button>
+
+            <div class="dropdown-menu" ngbDropdownMenu>
+              <button id="submitAddMail" type="button" class="col-sm-12 btn btn-small btn-warning tip"
+                style="    text-align: left;"
+                (click)="saveOrderAndMail(mailcontent,sale_Order_ID, sO_Date, office_Code, order_Envoy, customer_ID, contact_ID, delivery_Date, method_Id, payment_ID, frieght_Id, TotalCost(), TotalDiscount(), TotalTax(), freight_Chrgs, TotalAmount(),paid_Amount, reorder_ID, quotation_ID, order_Type, remarks, cancel, company_ID, manual_Discount, entry_Date, user_ID, false, sOGUID, exportQty,expPODate,shipmentTerm, refNo, productionQty, shipedDate, pOtype, customerCode,clientDate , loadingDate, issuedDate,conversionRate ,currency , contractNo, buyerPO,paymentTerm1, shipmentDate,term_Condition)">
+                <i class="fa fa-envelope-o" aria-hidden="true"></i> Save & Mail
+              </button>
+              <button id="submitAddWA" type="button" class="col-sm-12 btn btn-small btn-warning tip"
+                style="    text-align: left;"
+                (click)="saveOrderAndWhatsapp(mailcontent,sale_Order_ID, sO_Date, office_Code, order_Envoy, customer_ID, contact_ID, delivery_Date, method_Id, payment_ID, frieght_Id, TotalCost(), TotalDiscount(), TotalTax(), freight_Chrgs, TotalAmount(),paid_Amount, reorder_ID, quotation_ID, order_Type, remarks, cancel, company_ID, manual_Discount, entry_Date, user_ID, false, sOGUID, exportQty,expPODate,shipmentTerm, refNo, productionQty, shipedDate, pOtype, customerCode,clientDate , loadingDate, issuedDate,conversionRate ,currency , contractNo, buyerPO,paymentTerm1, shipmentDate,term_Condition)">
+                <i class="fa fa-whatsapp" aria-hidden="true"></i> Save & Whatsapp
+              </button>
+
+            </div>
+
+          </div> -->
+        </div>
+
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button id="submitUpdate" type="button" class="btn btn-small btn-warning tip"
+          (click)="updateOrder(contractNo, productionType, customer_ID)"><i
+            class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+        <!--Cancel-->
+      </ng-template>
+      <!--Update-->
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o"
+          aria-hidden="true"></i> Close</button>
+    </div>
+  </ng-template>
+
+  
+
+
+</div>

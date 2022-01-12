@@ -1,0 +1,97 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="card-header">
+        <span style="font-size:large;font-weight:bold;"> Dashboard (Settings)</span>
+        <div class="pull-right">
+          <input type="checkbox" id="chkReportView" (change)="onReportsToggle($event)" />
+          <label style="">Dashboard :</label>
+          <div class="form-group " style="display:inline-block;margin:0px;margin-right: -12px;">
+            <select class="form-control" [value]="selectHomepage" (change)="setDashView($event)">
+              <option [value]="1">Favourites</option>
+              <option [value]="2">Charts</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="col-md-3" style="padding:0px;">
+    <div *ngFor="let head of Headers;let i = index;" id="HEAD-{{i}}">
+      <div (click)="loadDefaultModule(head.header_ID,head.header_Name,head.img_URL,i);" [ngClass]="{'active':(i==0)}" style="height:40px;padding-left:5px;cursor:pointer;">
+        <img style="height:25px;width:25px" src="{{head.img_URL}}">
+        <span style="font-size:15px;font-weight:normal">{{head.header_Name}}</span>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-9 border border-warning">
+    <ul style="display: grid;list-style:none; height: auto; max-height: 85vh; overflow-x: hidden;padding-left:0px">
+      <li *ngFor="let subhead of chunk(SubHeaders,DefaultModule)">
+        <div class="col-md-12" style="border-bottom: 1px solid #e9e9e9">
+          <img src="{{subhead.page_URL}}" style="height:25px;width:25px" />
+          <span style="color:black;font-size:14px;font-weight:normal;">{{subhead.sub_Header_Name}}</span>
+        </div>
+
+        <div class="row" style="padding-left:30px;    line-height: 25px;">
+          <div class="col-md-4" *ngFor="let page of chunkSubHead(userPriviligedFiles,subhead.sub_Header_ID)" style="font-size: 11px;padding-left:0px;">
+
+            <div class="row">
+              <input type="checkbox" [checked]="setFavouritesCheckBox(userFavourites,page.page_Code)" style="margin-top:6px;" (click)="setFavourites(page.page_Code)">
+              <div (click)="getPageDetail(page.page_Code)" style="cursor:pointer;">
+                <img src="{{page.fileName}}" height="25" width="25" />
+                <span style="color:#337ab7;font-size:14px;font-weight:normal;">{{page.page_Name}}</span>
+                
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!--<div style="width:99%;margin-top:-15px;">
+  <ngb-tabset type="pills" orientation="vertical" class="HT2">
+    <ngb-tab *ngFor="let head of Headers">
+      <ng-template ngbTabTitle>
+        <div (click)="loadDefaultModule(head.header_ID,head.header_Name,head.img_URL)" style="height:40px;padding-top: 6px;">
+          <img style="height:25px;width:25px" src="{{head.img_URL}}">
+          <span style="font-size:15px;font-weight:500">{{head.header_Name}}</span>
+        </div>
+      </ng-template>
+
+      <ng-template ngbTabContent>
+        <li class="nav-item" style="list-style:none;">
+          <div class="row" style="width:100%;">
+            <ul style="display: grid;list-style:none;padding-top:10px;">
+              <li *ngFor="let subhead of chunk(SubHeaders,DefaultModule)" style="border-top:0px;padding-bottom:12px;">
+                <div style="border-bottom:1px solid #e9e9e9;padding-bottom:5px;margin-bottom:5px;">
+                  <a>
+                    <img src="{{subhead.page_URL}}" style="height:25px;width:25px" />
+                    <span style="color:black;font-size:14px;font-weight:500;">{{subhead.sub_Header_Name}}</span>
+                  </a>
+                </div>
+                <ul *ngFor="let page of chunkSubHead(userPriviligedFiles,subhead.sub_Header_ID)" style="font-size: 11px;display:inline;padding-left:0px;">
+                  <div style="display:inline-block;width:330px;">
+                    <input type="checkbox" [checked]="setFavouritesCheckBox(userFavourites,page.page_Code)" style="margin-top:6px;" (click)="setFavourites(page.page_Code)">
+                    <a style="cursor:pointer;">
+                      <img src="{{page.fileName}}" height="25" width="25" />
+                      <span class="txt" style="color:#337ab7;font-size:14px;font-weight:500;" (click)="loadDefaultHeadTab(head.header_ID,head.header_Name,head.img_URL);myDrop.close();">{{page.page_Name}}</span>
+                    </a>
+                  </div>
+                </ul>
+              </li>
+            </ul>
+          </div>
+        </li>
+      </ng-template>
+    </ngb-tab>
+  </ngb-tabset>
+</div>-->

@@ -1,0 +1,66 @@
+<!-- Row -->
+ 
+<div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:100000;overflow:hidden;">
+
+  <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+
+</div>
+<div class="row" style="margin-left:5px;width:98%">
+  <div class="col-sm-1">
+  </div>
+  <div class="col-sm-3">
+    <div class="form-group">
+      <span>Customer:</span>
+      <input type="text" readonly class="form-control" style="width:100%; font-size:medium;" value="{{customerid}} : {{customername}}"> 
+     
+    </div>
+  </div>
+  <div class="col-sm-1">
+  </div>
+  <div class="col-sm-3">
+    <div class="form-group">
+      <span>Brand:</span>
+      <select class="form-control" style="width:100%;" [(ngModel)]="brandid" name="brandid" id="brandid" tabindex="2" (change)="emitValue(brandid)" required>
+        <option *ngFor="let c of brandnames" [value]="c.brandid">{{c.brandid + ' : '+ c.brandname}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-sm-4">
+  </div>
+</div>
+<div class="row" style="margin-left:5px;width:98%">
+
+  <div class="card-body table-responsive table-shadow-padding" style="max-height: 400px;overflow: hidden scroll;display: block;width:100%;">
+    <table class="table table-hover table-striped table-shadow">
+      <thead>
+        <tr class="thclr">
+          <th>Model Name</th>
+          <th><!--<input type="checkbox" [(ngModel)]="selectedAll" (change)="selectAll();" />Select All--></th>
+          <th>Discount (%)</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr *ngFor="let i of filtermodels |  paginate: { itemsPerPage: 200, currentPage: p};  let idx = index;">
+          <td style="width: 70%;">{{i.modelid +' : '+ i.modelname}}</td>
+          <td style="width: 10%;">
+            <input type="checkbox" [(ngModel)]="i.status" (change)="updateValues(i)" />
+
+          </td>
+          <td style="width: 20%;"><input type="number" class="form-control" [(ngModel)]="i.discountrate" (blur)="changeRate(i)" [disabled]="!i.status" /></td>
+        </tr>
+      </tbody>
+    </table>
+    <!-- <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>-->
+  </div>
+
+
+  </div>
+   <!--<div class="row">
+    <div class="col-md-12">
+      <div class="pull-right">
+        <button type="button" class="btn btn-small btn-warning tip" style="margin-right:10px;" (click)="saveData()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save </button>
+
+      </div>
+    </div>
+  </div>-->

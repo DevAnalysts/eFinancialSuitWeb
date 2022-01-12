@@ -1,0 +1,105 @@
+
+  <!-- Row -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card card-outline-info">
+        <div class="card-header" style="border-bottom:1px solid #c3c3c3">
+          <span style="font-size:large;font-weight:bold;"> Dashboard (Favourites)</span>
+          <div class="pull-right">
+            <button type="button" class="btn btn-warning fa fa-cog" [routerLink]="['/dashsetting']" style="margin:3px"></button>
+            <button type="button" class="btn btn-warning fa fa-toggle-off" (click)="onToggle()"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+
+  <div class="row">
+
+    <div class="row" style="width:100%;padding-left:55px;margin-top: -10px;">
+      <div class="col-lg-7" style="width:50%">
+        <div class="row" style="padding-right:2px">
+          <div *ngFor="let c of cards;">
+            <p style=" width:150px;border-radius: 5px;padding-right:3px;">
+              <ngb-alert type="custom" (close)="setFavourites(c.pageID)">
+                <div class="position" (click)="changePages(c.pageURL)" style="cursor:pointer;height:65px;width:130px;">                  
+                    <img style="height:30px;width:30px;" src="{{c.pageImg}}">                  
+                    <span style="font-weight: 600; font-size:small;">{{c.pageName}}</span>                                    
+                </div>
+              </ngb-alert>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div style="width:35%">
+        <app-notification></app-notification>
+      </div>
+    </div>
+  </div>
+
+  <div class="row"  style="width:98%">
+    <div class="col-sm-6" *ngIf="showTotalSale">
+      <ngb-alert *ngIf="showTotalSale" [type]="light" (close)="showTotalSale = null">
+        <div class="card" style="padding:30px;">
+
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-2" style="padding: 10px;">
+                <span>YEAR:</span>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <select class="form-control" [(ngModel)]="yearTotalSale" id="yearTotalSale" (change)="getTotalSales()">
+                    <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                    <option value="2018">2018</option>
+                    <option value="2019">2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2020">2021</option>
+
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart [datasets]="TotalSaleData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType" [colors]="TotalSaleColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+    <div class="col-sm-6" *ngIf="showTotalPurchase">
+      <ngb-alert *ngIf="showTotalPurchase" [type]="light" (close)="showTotalPurchase = null">
+        <div class="card" style="padding:30px;">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-sm-2" style="padding: 10px;">
+                <span>YEAR:</span>
+              </div>
+              <div class="col-sm-3">
+                <div class="form-group">
+                  <select class="form-control" [(ngModel)]="yearTotalPurchase" id="yearTotalPurchase" (change)="getTotalPurchases()">
+                    <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                    <option value="2018">2018</option>
+                    <option value="2019">2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2020">2021</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart [datasets]="TotalPurchaseData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType" [colors]="TotalPurchaseColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+
+
+  </div>
+

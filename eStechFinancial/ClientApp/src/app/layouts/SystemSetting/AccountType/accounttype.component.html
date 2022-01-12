@@ -1,0 +1,53 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div [class]="card1style">
+      <div class="row card-header" style="height:auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> Account Type </span>
+        </div>
+        <div class="col-md-2 ">
+          <div class="input-group">
+            <input class="form-control" type="text" name="search" style="margin-top:1px;" placeholder="search..." [(ngModel)]="ID">
+            <div class="input-group-append order-last">
+              <!--<button class=" btn btn-small btn-warning tip" style="margin:3px;" (click)="Add()" [style.display]="PermissionAdd">
+            <i class="fa fa-plus"></i>
+          </button>-->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive" style="padding:5px;">
+        <table class="table table-hover table-striped" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176)">
+          <thead>
+            <tr class="thclr">
+              <th>Account Code</th>
+              <th>Account Name</th>
+              <!--<th>Status</th>-->
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let u of grid | filter:ID  | paginate: { itemsPerPage: 20, currentPage: p};">
+              <td>{{u.accountcode}}</td>
+              <td>{{u.accounttype}}</td>
+              <!--<td>
+            <div *ngIf="true == u.active; then on else off"></div>
+
+            <ng-template #on>
+              ACTIVE
+            </ng-template>
+            <ng-template #off>
+              IN ACTIVE
+            </ng-template>
+          </td>-->
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+
+  </div>
+</div>

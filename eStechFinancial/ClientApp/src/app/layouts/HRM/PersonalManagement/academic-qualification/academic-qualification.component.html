@@ -1,0 +1,264 @@
+<div class="card mb-3">
+  <div class="row card-header" style="height: auto;">
+    <div class="col-md-10">
+      <span class="input-group" style="font-size:large;font-weight:bold;">   {{permissionUtility.FUNCTIONALITYNAME}}</span>
+    </div>
+    <div class="col-md-2">
+      <div class="input-group">
+        <input class="form-control" type="text" name="search" placeholder="search..." #input (keydown.enter)='$event.target.blur()' (blur)="getGrid(input.value)" [(ngModel)]="id" style="margin:1px;">
+       <div class="input-group-append order-last">
+        <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip" style="margin: 1px 0px 1px 0px" id="myInput" (click)="open(content)">
+          <i class="fa fa-plus"></i>
+        </button>
+       </div>        
+      </div>
+    </div>
+  </div>
+  <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+
+    <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+
+  </div>
+  <div class="card-body table-responsive table-shadow-padding">
+    <table class="table table-hover table-striped table-shadow">
+      <thead>
+        <tr class="thclr">
+          <th style="width: 10%">ID</th>
+          <th style="width: 20%">Name</th>
+          <th style="width: 20%">Designation</th>
+          <th style="width: 20%">Department</th>
+          <th style="width: 20%">Office</th>
+          <th style="width: 5%">Diploma/Seminar</th>
+          <th style="width: 5%"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+        <tr *ngFor="let e of gridlist   | paginate: { itemsPerPage: 14, currentPage: p};">
+          <td>{{e.empcode}}</td>
+          <td>{{e.empname}}</td>
+          <td>{{e.designation}}</td>
+          <td>{{e.department}}</td>
+          <td>{{e.office}}</td>
+          <td>{{getDiploma(e.diploma)}}</td>
+          <td>
+            <div class="btn-group" style="float:right; ">
+              <button [style.display]="permissionUtility.PermissionView" class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.empcode,content)"
+                      id="view">
+                <span class="fa fa-eye"></span>
+              </button>
+            </div>
+            <div class="btn-group" style="float:right; ">
+              <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.empcode,content)"
+                      id="edit">
+                <span class="fa fa-pencil"></span>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+<ng-template #content let-c="close" let-d="dismiss">
+  <div class="modal-header">
+    <h5 class="modal-title" style="font-weight: bold;">
+      {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+    </h5>
+
+    <button type="button" class="close" aria-label="Close" (click)="d('Cross click');">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div id="alertWarning" style="display:none">
+    <p *ngFor="let alert of alerts">
+      <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+    </p>
+  </div>
+
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-sm-1">
+        
+      </div>
+      <div class="col-sm-3">
+        <div class="input-group">
+          <span>Employee:</span>
+          <div class="inner-addon left-addon" style="width: 300px; margin-left: 30px;margin-top: 5px;">
+            <i class="fa fa-user" style="font-size:medium" aria-hidden="true"></i>
+            <div *ngIf="btnmode; then EmpAdd else EmpUpdate"> </div>
+            <ng-template #EmpAdd>
+              <ng-select2 [data]="emplist" id="empcode" [value]="empmodel" (valueChanged)="getEmployeesChange($event)" [width]="300">
+              </ng-select2>
+            </ng-template>
+            <ng-template #EmpUpdate>
+              <input type="text" class="form-control" style="margin-top: 0px;" [(ngModel)]="empname" id="empname" readonly="readonly">
+            </ng-template>
+
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-sm-3">
+        <div class="form-group">
+          <span>Designation:</span>
+          <div class="inner-addon left-addon" style="width: 300px; margin-left: 30px;">
+            <i class="fa fa-user-md" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="designationname" id="designationname" readonly="readonly">
+          </div>
+        </div>
+      </div>
+   
+      <div class="col-sm-3">
+        <div class="form-group">
+          <span>Department:</span>
+          <div class="inner-addon left-addon" style="width: 300px; margin-left: 30px;">
+            <i class="fa fa-building-o" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+            <input type="text" class="form-control" [(ngModel)]="departmentname" id="departmentname" readonly="readonly">
+          </div>
+        </div>
+
+
+      </div>
+      <div class="col-sm-2">
+      </div>
+      <div class="col-sm-1">
+
+      </div>
+
+    </div>
+
+    <div class="row table-shadow-padding">
+      <table class="table table-hover table-striped table-shadow">
+        <thead>
+          <tr class="thclr">
+            <th style="width: 3%">Sr#</th>
+            <th style="width: 8%">Education Level</th>
+            <th style="width: 6%">Result</th>
+            <th style="width: 5%">Year</th>
+            <th style="width: 6%">Result Type</th>
+            <th style="width: 7%">Total Marks</th>
+            <th style="width: 7%">Obtained Marks</th>
+            <th style="width: 5%">Division</th>
+            <th style="width: 10%">Board Name</th>
+            <th style="width: 10%">Institution</th>
+            <th style="width: 7%"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td>
+              <select class="form-control" [(ngModel)]="educationlvl" id="educationlvl">
+                <option value="1">Matric</option>
+                <option value="2">Intermediate</option>
+                <option value="3">Diploma</option>
+                <option value="4">Bachelors</option>
+                <option value="5">Masters</option>
+                <option value="6">Phd</option>
+              </select>
+            </td>
+            <td>
+              <select class="form-control" [(ngModel)]="result" id="result">
+                <option value="1">Pass</option>
+                <option value="2">Fail</option>
+              </select>
+            </td>
+            <td><input type="number" onClick="this.select();" min="1950" class="form-control" [(ngModel)]="year" id="year"></td>
+            <td>
+              <select class="form-control" [(ngModel)]="resulttype" id="resulttype">
+                <option value="1">Marks</option>
+                <option value="2">GPA</option>
+              </select>
+            </td>
+            <td><input type="number" onClick="this.select();" min="0" class="form-control" [(ngModel)]="markstotal" id="markstotal"></td>
+            <td><input type="number" onClick="this.select();" min="0" class="form-control" [(ngModel)]="marksobtained" id="marksobtained"></td>
+            <td>
+              <select class="form-control" [(ngModel)]="division" id="division">
+                <option value="1">1st</option>
+                <option value="2">2nd</option>
+                <option value="3">3rd</option>
+              </select>
+            </td>
+            <td><input type="text" class="form-control" maxlength="100" (keypress)="valid.onlyAlphabet($event)" required [(ngModel)]="board" id="board"></td>
+            <td><input type="text" class="form-control" maxlength="100" (keypress)="valid.onlyAlphabet($event)" required [(ngModel)]="institute" id="institute"></td>
+            <td style="width:1px;">
+              <button class=" btn btn-small btn-warning tip" style="margin:3px;" (click)="saveQualification(educationlvl,result,year,resulttype,markstotal,marksobtained,division,board,institute)">
+                <i class="fa fa-check"></i>
+              </button>
+
+              <!--<button class=" btn btn-small " style="margin:3px;" (click)="cancel()">
+                <i class="fa fa-times"></i>
+              </button>-->
+            </td>
+          </tr>
+          <tr *ngFor="let e of qualification;let i = index">
+            <td>{{i + 1}}</td>
+            <td>
+              <select class="form-control" [(ngModel)]="e.educatioN_LEVEL_ID" id="educatioN_LEVEL_ID">
+                <option value="1">Matric</option>
+                <option value="2">Intermediate</option>
+                <option value="3">Diploma</option>
+                <option value="4">Bachelors</option>
+                <option value="5">Masters</option>
+                <option value="6">Phd</option>
+              </select>
+            </td>
+            <td>
+              <select class="form-control" [(ngModel)]="e.resulT_STATUS_ID" id="resulT_STATUS_ID">
+                <option value="1">Pass</option>
+                <option value="2">Fail</option>
+              </select>
+            </td>
+            <td><input type="number" onClick="this.select();" min="1950" class="form-control" [(ngModel)]="e.passinG_YEAR" id="passinG_YEAR"></td>
+            <td>
+              <select class="form-control" [(ngModel)]="e.resulT_TYPE_ID" id="resulT_TYPE_ID">
+                <option value="1">Marks</option>
+                <option value="2">GPA</option>
+              </select>
+            </td>
+            <td><input type="number" onClick="this.select();" min="0" class="form-control" [(ngModel)]="e.totaL_MARKS" id="totaL_MARKS"></td>
+            <td><input type="number" onClick="this.select();" min="0" class="form-control" [(ngModel)]="e.markS_OBTAINED" id="markS_OBTAINED"></td>
+            <td>
+              <select class="form-control" [(ngModel)]="e.divisioN_ID" id="divisioN_ID">
+                <option value="1">1st</option>
+                <option value="2">2nd</option>
+                <option value="3">3rd</option>
+              </select>
+            </td>
+            <td><input type="text" class="form-control" (keypress)="valid.onlyAlphabet($event)" [(ngModel)]="e.boarD_NAME" id="boarD_NAME"></td>
+            <td><input type="text" class="form-control" (keypress)="valid.onlyAlphabet($event)" [(ngModel)]="e.institutioN_NAME" id="institutioN_NAME"></td>
+            <td>
+              <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button" value="Delete" id="remove" (click)="changeMode(i,e,2)" >
+                <span class="fa fa-remove text-white"></span>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+  <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+  <div class="modal-footer">
+    <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+    <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+    <ng-template #submitAdd>
+      <button id="submitAdd" type="button" tabindex="45" class="btn btn-small btn-warning tip"
+              (click)="updateQualification();">
+        <i class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close
+      </button>
+    </ng-template>
+    <ng-template #submitUpdate>
+      <button id="submitUpdate" [style.display]="permissionUtility.PermissionEdit" type="button" tabindex="45" class="btn btn-small btn-warning tip"
+              (click)="updateQualification();">
+        <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+      </button>
+    </ng-template>
+    <button type="button" id="x" class="btn btn-small" tabindex="46" (click)="c('Close click');"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Close</button>
+  </div>
+</ng-template>
+
+

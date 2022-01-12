@@ -1,0 +1,80 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> IMEI Search  {{ShowSearchResult}}</span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input (keydown.enter)="$event.target.blur()" (blur)="getImeiSearch(input.value)" [(ngModel)]="ImeiSearch"
+              id="ImeiSearch" placeholder="search..." class="form-control" />
+      
+            <div class="btn-group">
+ 
+              <button   class=" btn btn-small btn-warning tip" id="myInput" (click)="getImeiSearch(ImeiSearch)">
+                <i class="fa fa-search"></i>
+              </button>
+            
+            </div>
+
+          </div>
+        </div>
+      </div> 
+      <div class="card-body" style="padding-left: 25vw;">
+       
+          <div class="row"    [style.display]="ShowSearchResult" > 
+            <div class="card ">
+              <div class="card-body bg-light"> 
+                <table class="table table-hover table-striped table-shadow">
+                  <thead>
+                    <tr class="thclr">
+                      <th>Sr#</th>
+                      <th>Tag</th>
+                      <th>PartyName</th>
+                      <th>Date</th>
+                      <th>Transaction #</th>
+                      <th>Total Amount</th>
+                      <th>Discount</th> 
+                      <th></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                      <tr *ngFor="let dt of ImeiSearchResult  ">
+                      <td>{{dt.serialNo}}</td>
+                      <td>{{dt.tag}}</td>
+                      <td>{{dt.partyName}}</td>
+                      <td>{{dt.transactionDate | date: 'dd/MM/yyyy'}}</td>
+                      <td>{{dt.transactionNo}}</td>
+                      <td>{{dt.total_Amount}}</td>
+                      <td>{{dt.total_Discount}}</td> 
+                      <td> 
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+               
+              </div>
+            </div> 
+          </div>
+
+          
+          <div class="row"  [style.display]="ShowSearchResult0" >
+            <div class="card ">
+              <div class="card-body bg-light"> 
+                No Data Found
+              </div>
+            </div> 
+          </div>
+       
+         
+        
+        
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+ 

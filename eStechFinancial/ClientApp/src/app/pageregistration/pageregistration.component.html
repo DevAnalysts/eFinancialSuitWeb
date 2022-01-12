@@ -1,0 +1,111 @@
+
+<div class='container-fluid'> 
+      <div class="row  card-header" style="height:40px;">
+        <div class="col-md-10">          
+            <span  class="input-group" style="font-size:large;font-weight:bold;">Page Registration</span>
+        </div> 
+         
+      </div>
+        
+      <div class="card col-md-12" style="padding:0px;margin:0px;border:0PX;border-top:1px solid rgba(0,0,0,.176);">
+             
+          <div class='container-fluid'> 
+            <div class="row" style="margin-left: 30px;margin-top: 10px;"> 
+                <div class="form-group col-md-3">
+                  <span>Module</span>
+                  <select class="form-control" [(ngModel)]="moduleid" id="moduleid" (change)="getSubModule(moduleid)">
+                    <option *ngFor="let m of modules" [value]="m.moduleid">{{m.module}}</option>
+                  </select>                  
+                </div>
+                <div class="form-group col-md-3">
+                    <span>Sub Module</span>
+                    <select class="form-control" [(ngModel)]="submoduleid" id="submoduleid" (change)="getSubModulePages(submoduleid)">
+                      <option *ngFor="let m of submodules" [value]="m.submoduleid">{{m.submodule}}</option>
+                    </select>                  
+                </div>
+                
+                <div class="form-group offset-md-3 col-md-3">
+                  <span>Search</span>
+                  <div>
+                    <input class="form-control" type="text" name="search" placeholder="search..." [(ngModel)]="id2" style="float:left; width:200px;">
+                  </div>          
+                </div>
+            </div> 
+          </div>
+         
+      </div>
+      <div class="card col-sm-12" style="padding:0px;margin:0px;border:0PX;border-top:1px solid rgba(0,0,0,.176);margin-top: 50px;">
+
+        <div class="card-body table-responsive">
+          <div class='container-fluid'>
+            <div style="height:500px;overflow-y:auto;">
+              <table class="table table-hover table-striped table-responsive" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176)">
+                <thead>
+                  <tr class="thclr">
+
+                    <th>Name</th>
+                    <th>TagName</th>
+                      <th>Caption</th>
+                      <th>RLabels</th>
+                      <th>PAGE_URL</th>
+                      <th>TOOLTIP</th>
+                      <th>SORT_ORDER</th>
+                      <th>PAGE_NAME_AddEdit</th>
+                      <th>NameForReport</th>
+                      <th>SPName</th>
+                    <th>
+                      <input type="checkbox"   pointer-events="none" [(ngModel)]="selectallSt" id="selectallSt" (change)="selectAllActiveSt(selectallSt?true:false)">
+                      Status
+                    </th>
+                     <th><input type="checkbox"   pointer-events="none" [(ngModel)]= "selectallSM" id="selectallSM" (change)= "selectAllActiveSM(selectallSM?true:false)">
+                       ShowinMenue</th>
+                     <th>Description</th>
+                     <th>URL</th>
+                     <th>ngPage_Url</th>
+                     <th>TransactiontypeID</th>
+                     <th>ParentId</th>
+                     <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+
+                  <tr *ngFor="let p of submodulePages | filter:id2 ">
+                    <td>{{p.pagename}}</td>
+                    <td><input type="text" [(ngModel)]="p.tagname" name="tagname" id="tagname" class="form-control"></td>
+                    <td><input type="text" [(ngModel)]="p.caption" name="caption" id="caption" class="form-control"></td>
+                    <td><input type="text" [(ngModel)]="p.rlabels" name="rlabels" id="rlabels" class="form-control"></td>
+                    <td><input type="text" [(ngModel)]="p.pagE_URL" name="pagE_URL" id="pagE_URL" class="form-control"></td>
+                    <td><input type="text" [(ngModel)]="p.tooltip" name="tooltip" id="tooltip" class="form-control"></td>
+                    <td><input type="number" [(ngModel)]="p.sorT_ORDER" name="sorT_ORDER" id="sorT_ORDER" class="form-control"></td>
+                    <td><input type="text" [(ngModel)]="p.pagE_NAME_AddEdit" name="pagE_NAME_AddEdit" id="pagE_NAME_AddEdit" class="form-control"></td>
+                    <td><input type="text" [(ngModel)]="p.nameForReport" name="nameForReport" id="nameForReport" class="form-control"></td>
+                    <td><input type="text" [(ngModel)]="p.spName" name="spName" id="spName" class="form-control"></td>
+                    <td><input type="checkbox"  pointer-events="none"  [(ngModel)]="p.status" id="status" /></td>
+                    <td><input type="checkbox" pointer-events="none" [(ngModel)]="p.showinMenue" id="howinMenue"> </td>
+                    <td>{{p.description}}</td>
+                    <td>{{p.url}}</td>
+                    <td>{{p.ngPage_Url}}</td>
+                    <td>{{p.transactiontypeID}}</td>
+                    <td>{{p.parentId}}</td>
+                   </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class='row'>
+              <div class="col-sm-12 align-btn-center"   >
+                <button type="button" class="btn btn-warning tip"  [style.display]="ShowEmp1" (click)="saveSubModulePages(submodulePages);"> <i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+             
+              
+                <button type="button" class=" btn" style="margin-left:10px;"  (click)="Cancel()"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+                
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+     
+   
+</div>
+
+

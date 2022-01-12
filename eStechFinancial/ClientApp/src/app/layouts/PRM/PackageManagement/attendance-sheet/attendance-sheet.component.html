@@ -1,0 +1,148 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" name="search" placeholder="search..." #input (keydown.enter)='$event.target.blur()' (blur)="getGrid()(input.value)" [(ngModel)]="id"
+              style="float:left; width:100px;margin:3px 0px 3px 3px;">
+            <button class=" btn btn-small btn-warning tip" style="margin:3px 3px 3px 0px;" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th style="width: 5%">ID</th>
+              <th style="width: 20%">Name</th>
+              <th style="width: 15%">Designation</th>
+              <th style="width: 10%">Department</th>
+              <th style="width: 10%">Office</th>
+              <th style="width: 13%">Attendance Date</th>
+              <th style="width: 10%">Total Hours</th>
+              <th style="width: 10%">Total Minutes</th>              
+              <th style="width: 5%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let e of gridlist    | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{e.overtimeId}}</td>
+              <td>{{e.name}}</td>
+              <td>{{e.designatioN_DESC}}</td>
+              <td>{{e.departmenT_NAME}}</td>
+              <td>{{e.office}}</td>
+              <td>{{e.overtimeDate | date:"dd/MM/yyyy" }}</td>
+              <td>{{e.totalHours  }}</td>
+              <td>{{e.totalMinutes  }}</td>      
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionView" class="btn btn-small btn-warning tip"
+                    (click)="getDetailsByID(e.overtimeId,e.overtimeDate,content)" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+     
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Overtime Date:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="overtimeDate.model" ngbDatepicker #dd="ngbDatepicker"
+                (ngModelChange)="changeDate()">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12" style="border:ridge;padding-right:0px;padding-left:0px">
+        <div #dvScroll style="min-height: 500px; overflow-y: auto;-ms-overflow-style: -ms-autohiding-scrollbar;">
+          <table class="table table-hover table-striped" style="width:100%">
+            <thead>
+              <tr class="thclr">
+                <th style="width:1%">Sr.#</th>
+                <th>Name</th>
+                <th *ngFor="let a of attendanceTitle" [title]="a.attendanceDate">
+                  {{a.attendanceDate}}
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let i of overtimeDetails let idx = index">
+                <td style="width:1%">{{idx+1}}</td>
+                <td>
+                  <input type="text" id="employee" name="employee" [(ngModel)]="i.employee" style="width: 200px;"
+                    disabled />
+                </td>
+                <td *ngFor="let e of i.attendanceDetail;let y = index;">
+                  <input id="H-{{idx}}-{{1+y}}" type="number" name="H-{{idx}}-{{1+y}}" [(ngModel)]="e.hours"
+                    style="width: 40px;" />
+                  <span><b>:</b></span>
+                  <input id="M-{{idx}}-{{1+y}}" type="number" name="M-{{idx}}-{{1+y}}" [(ngModel)]="e.minutes"
+                    style="width: 50px;" />
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" tabindex="45" class="btn btn-small btn-warning tip" (click)="saveData();">
+          Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button [style.display]="PermissionEdit" id="submitUpdate" type="button" tabindex="45"
+          class="btn btn-small btn-warning tip" (click)="updateData();">
+          Save & Close
+        </button>
+      </ng-template>
+      <button type="button" id="x" class="btn btn-small" tabindex="46" (click)="c('Close click')">Close</button>
+    </div>
+  </ng-template>
+
+</div>
+<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>

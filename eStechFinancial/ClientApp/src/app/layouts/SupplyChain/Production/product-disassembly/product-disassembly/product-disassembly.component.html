@@ -1,0 +1,282 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissomUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" #input (keyup)="getDisassemly(input.value)" [(ngModel)]="ID" id="ID" placeholder="search..." class="form-control" />
+            <button [style.display]="permissomUtility.PermissionAdd"  class=" btn btn-small btn-warning tip" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Disassembly No</th>
+              <th>Diassembly Date</th>
+              <th>Total Qty</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- <spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of disassemblies  | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.disassemly_ID}}</td>
+              <td>{{dt.disassemly_NO  }}</td>
+              <td>{{dt.disassemly_Date | date:"dd/MM/yy"}} </td>
+              <td>{{dt.totalqty}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissomUtility.PermissionEdit"  class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.disassemly_ID,content)"
+                     id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissomUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+      <div class="row">
+        
+        <div class="col-md-3" style="padding-left: 30px;">
+          <div class="form-group" style="width: 330px;">
+            <span>Date:</span>
+            <div *ngIf="btnmode; then dateon else dateoff"></div>
+            <ng-template #dateon>
+              <div class="input-group" style="margin-top: 5px;">                
+                <input class="form-control" name="dp" [(ngModel)]="disassemly_Date.model" ngbDatepicker #dd="ngbDatepicker">
+                <div class="input-group-append">
+                  <button class="btn btn-small " (click)="dd.toggle()">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #dateoff>
+              <div class="input-group" style="margin-top: 5px;">
+                <input class="form-control" name="dp" [(ngModel)]="disassemly_Date.model" ngbDatepicker #dd="ngbDatepicker" disabled>
+                <div class="input-group-append">
+                  <button class="btn btn-small " (click)="dd.toggle()" disabled>
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <div class="col-md-3" style="padding-left: 30px;">
+          <div class="form-group">
+            <span>Disassemble Officer:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-top: 5px;margin-left: 30px;">
+              <i class="fa fa-male" aria-hidden="true"></i>
+              <div *ngIf="btnmode; then Assembleon else Assembleoff"></div>
+              <ng-template #Assembleon>
+                <select class="form-control" [(ngModel)]="order_Envoy" id="order_Envoy">
+                  <option *ngFor="let u of users " [value]="u.order_Envoy">{{u.emp_Name}}</option>
+                </select>
+              </ng-template>
+              <ng-template #Assembleoff>
+                <select class="form-control" [(ngModel)]="order_Envoy" id="order_Envoy" disabled>
+                  <option *ngFor="let u of users " [value]="u.order_Envoy">{{u.emp_Name}}</option>
+                </select>
+              </ng-template>
+            </div>
+            </div>
+          </div>
+      </div>
+      <div class="row table-shadow-padding">
+
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width: 99%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;">Sr#.</th>
+              <th style="width:50%">Item</th>
+              <th style="width:20%">Item Details</th>
+              <!-- <th>Unit Price</th>-->
+              <th style="width:10%">Goods Qty.</th>
+              <!--<th>Total Amount</th>-->
+              <th style="width:13%">Action</th>
+            </tr>
+          </thead>
+          <tbody style="max-height: 300px;overflow: hidden scroll;display: block;width:100%;">
+            <tr class="row" *ngFor="let i of ProductDisassemlyDetails let idx = index">
+              <td style="width:5%;margin-left:25px;">{{idx+1}}</td>
+              <td style="width:50%">
+                <div *ngIf="i.edit_Mode; then selectName else viewName"> </div>
+                <ng-template #viewName>
+                  <span ng-show="editMode">{{i.item_Name}}</span>
+                </ng-template>
+                <ng-template #selectName>
+                  <ng-select2 [data]="items" id="itemEdit" [value]="item_Code" (valueChanged)="updateItem(i,$event)"  width="600px">
+                  </ng-select2>
+                </ng-template>
+              </td>
+              <td style="width:20%">
+                <div *ngIf="i.edit_Mode; then selectDetail else viewDetail"> </div>
+                <ng-template #viewDetail>
+                  <span ng-show="editMode">{{i.item_Detail}}</span>
+                </ng-template>
+                <ng-template #selectDetail>
+                  <input type="text" class="form-control" [(ngModel)]="i.item_Detail" (keyup.enter)="changeMode(idx,i,0)" />
+                </ng-template>
+              </td>
+              <!--<td>
+                <div *ngIf="i.edit_Mode; then selectPrice else viewPrice"> </div>
+                <ng-template #viewPrice>
+                  <span ng-show="editMode">{{i.unit_Price}}</span>
+                </ng-template>
+                <ng-template #selectPrice>
+                  <input type="number" class="form-control" [(ngModel)]="i.unit_Price" min="1" /> (change)="changeQuantityEdit(i,i.quantity)"
+                </ng-template>
+              </td>-->
+
+              <td style="width:10%">
+                <div *ngIf="i.edit_Mode; then selectQty else viewQty"> </div>
+                <ng-template #viewQty>
+                  <span ng-show="editMode">{{i.quantity}}</span>
+                </ng-template>
+                <ng-template #selectQty>
+                  <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="i.quantity" min="1" (change)="changeQuantityEdit(i,i.quantity)" (keyup.enter)="changeMode(idx,i,0)" />
+                </ng-template>
+                <!--</td>
+                <td>
+                  <div *ngIf="i.edit_Mode; then selectCost else viewCost"> </div>
+                  <ng-template #viewCost>
+                    <span ng-show="editMode">{{i.consume_Cost}}</span>
+                  </ng-template>
+                  <ng-template #selectCost>
+                    {{ (i.quantity) * (i.unit_Price)}}
+                  </ng-template>
+                </td>-->
+              <td style="width:13%">
+                <div class="btn-group" *ngIf="i.edit_Mode; then ok else pencel">
+                  <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button" value="Delete" id="remove">
+                    <span class="fa fa-remove text-white"></span>
+                  </button>
+                </div>
+                <ng-template #ok>
+                  <button class="btn btn-small btn-success tip" data-original-title="Quick save" type="button" (click)="changeMode(idx,i,0)" (keyup.enter)="changeMode(idx,i,0)" id="update">
+                    <span class="fa fa-check text-white"></span>
+                  </button>
+                </ng-template>
+                <ng-template #pencel>
+                  <button class="btn btn-small btn-warning tip" data-original-title="Hide" type="button" (click)="changeMode(idx,i,1)" id="edit" [disabled]="EditItemButton">
+                    <span class="fa fa-pencil text-white"></span>
+                  </button>
+                  <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button" value="Delete" id="remove" [disabled]="RemoveItemButton" (click)="changeMode(idx,i,2)">
+                    <span class="fa fa-remove text-white"></span>
+                  </button>
+                </ng-template>
+              </td>
+            </tr>
+            <tr id="AddNewItemRow" class="row">
+              <td style="width:5%;margin-left:25px;">
+                <input type="text" id="txt" (keyup.enter)="addGrid(item_Code,item_Name,item_Detail,quantity)" style="width:3px" />
+              </td>
+              <td style="width:50%">
+                <ng-select2 [data]="items" id="item_Code" [value]="item_Code" (valueChanged)="changeItems($event)"  width="600px">
+                </ng-select2>
+              </td>
+              <td style="width:20%">
+                <input type="text" [(ngModel)]="item_Detail" class="form-control" ng-hide="editMode" min="1"
+                       (keyup.enter)="addGrid(item_Code,item_Name,item_Detail,quantity)" />
+              </td>
+              <!--<td style="width:10%">
+                <input type="number" [(ngModel)]="unit_Price" class="form-control" ng-hide="editMode" min="1"
+                       (keyup.enter)="addGrid(item_Code,item_Name,item_Detail,unit_Price,quantity)" readonly />(change)="changeQuantity(quantity)"
+              </td>-->
+              <td style="width:10%">
+                <input type="number" onClick="this.select();" [(ngModel)]="quantity" class="form-control" ng-hide="editMode" min="1" (change)="changeQuantity(quantity)" (keyup.enter)="addGrid(item_Code,item_Name,item_Detail,quantity)" />
+              </td>
+              <!--<td>
+                {{ (quantity) * (unit_Price)}}
+              </td>-->
+              <td class="btn-group" style="width:13%">
+                <button type="button" class="btn btn-small btn-warning tip" (click)="addGrid(item_Code,item_Name,item_Detail,quantity)"
+                        (keyup.enter)="addGrid(item_Code,item_Name,item_Detail,quantity)"
+                        data-original-title="Quick save" ng-click="addrow()" id="adds">
+                  <span class="fa fa-check text-white"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+      <div class="modal-footer"></div>
+      <div class="row">
+        <div class="col-md-3">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-5">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-align-justify" aria-hidden="true"></i>
+            <fieldset class="form-group">
+              <textarea [(ngModel)]="remarks" id="de" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                        rows="4"></textarea>
+            </fieldset>
+          </div>
+        </div>
+
+        </div>
+    </div>
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+
+      <div *ngIf="mode; then submitUpdate else  submitAdd "> </div>
+
+      <ng-template #submitAdd>
+        <!--Save-->
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveDisassembly()"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <!--Update-->
+        <button [style.display]="permissomUtility.PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateDisassembly()"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      </ng-template>
+        <!--Cancel-->
+        <button type="button" id="x" class="btn btn-small" (click)="c('Close click')"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+  </div>

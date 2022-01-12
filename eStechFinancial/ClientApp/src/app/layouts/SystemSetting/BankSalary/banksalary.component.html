@@ -1,0 +1,135 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div [class]="card1style">
+      <div class="row  card-header" style="height:40px;">
+        <div class="col-md-10" style="padding-top:5px;">
+          <div class="page-title-list">
+            <span style="font-size:large;font-weight:bold;">{{permissionUtility.FUNCTIONALITYNAME}}</span>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" name="search" placeholder="search..." [(ngModel)]="ID" style="float:left; width:100px;margin:3px;">
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive" style="padding:5px; overflow-x:hidden">
+        <div class='row' style="margin-left:20px;padding: 5px;">
+          <div class="col-md-4">
+            <br />
+            <span>BANK Name</span>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <select class="form-control" [(ngModel)]="bankcode" id="bankcode" (change)="getBranchName(bankcode)">
+                <option *ngFor="let m of edit" [value]="m.banK_CODE">{{m.banK_NAME}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="card-body" style="padding:5px; overflow-x:hidden">
+          <div class='row' style="margin-left:20px;">
+            <div class="col-md-4">
+              <span>Branch Name</span>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="branchnum" id="branchnum" (change)="getAccountTITLE(branchnum)">
+                  <option *ngFor="let m of edit1" [value]="m.brancH_CODE">{{m.brancH_NAME}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class='row' style="margin-left:20px;">
+            <div class="col-md-4">
+              <span>Account Title</span>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="a1" id="accounttitlE" (change)="getAccountNO(a1)">
+                  <option *ngFor="let m of AccTitle" [value]="m.accounT_TITLE">{{m.accounT_TITLE}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class='row' style="margin-left:20px;">
+            <div class="col-md-4">
+              <span>Account Number</span>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="a2" id="accountno">
+                  <option *ngFor="let m of AccNo" [value]="m.aCCOUNT_NO">{{m.aCCOUNT_NO}}</option>
+                </select>
+
+              </div>
+            </div>
+          </div>
+          <div class='row' style="margin-left:20px;">
+            <div class="col-md-4">
+              <span>SIGNATORY LEFT 1</span>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="s1" id="signatorycodeL1">
+                  <option *ngFor="let m of sign1" [value]="m.signatorycodeL1">{{m.signatorycodeL1}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class='row' style="margin-left:20px;">
+            <div class="col-md-4">
+              <span>SIGNATORY RIGHT 1</span>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="s2" id="signatorycodeR1">
+                  <option *ngFor="let m of sign2" [value]="m.signatorycodeR1">{{m.signatorY_CODER1}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class='row' style="margin-left:20px;">
+            <div class="col-md-4">
+              <span>SIGNATORY RIGHT 2</span>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="s3" id="signatorycodeL2">
+                  <option *ngFor="let m of sign3" [value]="m.signatorycodeL2">{{m.signatorycodeL2}}</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class='row' style="margin-left:20px;">
+            <div class="col-md-4">
+              <span>SIGNATORY LEFT 2</span>
+            </div>
+            <div class="col-md-4">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="s4" id="signatorycodeR2">
+                  <option *ngFor="let m of sign4" [value]="m.SalarySignatoryiD">{{m.signatorycodeR2}}</option>
+                </select>
+              </div>
+            </div>
+
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <button type="button" class=" btn" style="float:right;margin:3px;margin-left:20px;"
+                      (click)="Cancel()">
+                <i class="fa fa-window-close-o" aria-hidden="true"></i> Cancel
+              </button>
+              <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;margin-left:20px;" [style.display]="PermissionAdd"
+                      (click)="saveSubject(bankcode, branchnum, accounttitlE, Accountno, signatorycodeL1, signatorycodeR1,  signatorycodeR2, signatorycodeL2)">
+                <i class="fa fa-floppy-o" aria-hidden="true"></i>  Save
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

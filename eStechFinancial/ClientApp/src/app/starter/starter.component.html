@@ -1,0 +1,411 @@
+<!-- Row -->
+<div class="row">
+
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;">Customer </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input (keyup)="getCustomers(input.value)" [(ngModel)]="ID" id="ID" placeholder="search..." class="form-control" />
+
+            <button class=" btn btn-small btn-warning tip" id="myInput" (click)="openLg(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body ">
+        <!-- <p *ngIf="!customers"><em>Loading...</em></p>-->
+        <table class="table table-striped fa-border" *ngIf="customers">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Customer #</th>
+              <th>Customer Name</th>
+              <th>Contact Person</th>
+              <th>Phone</th>
+              <th>Cell</th>
+              <th>Net Payable</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dt of customers | paginate: { itemsPerPage: 12, currentPage: p};">
+              <td>{{dt.customer_ID}}</td>
+              <td>{{dt.customerNo}}</td>
+              <td>{{dt.customer_Name}}</td>
+              <td>{{dt.contact_Name}}</td>
+              <td>{{dt.phone}}</td>
+              <td>{{dt.cell}}</td>
+              <td>{{dt.netPayable}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <a class="btn btn-small btn-warning tip" (click)="getDetailsByID(dt.customer_ID,content)"
+                     id="edit">
+                    <span class="fa fa-pencil text-white"></span>
+                  </a>
+                </div>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        Customer Detail
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+
+    <div class="modal-body">
+      <div class="row">
+        <div class="col-md-8">
+
+          <h4>Account Information</h4>
+        </div>
+        <div class="col-md-4">
+
+          <h4>Contact Information</h4>
+        </div>
+      </div>
+
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Name:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="customer_Name" id="customer_Name" (change)="changeCustomerName(customer_Name)" tabindex="1">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>NTN:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="number" class="form-control" [(ngModel)]="nTN" id="nTN" tabindex="2">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Contact Name:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="contact_Name" id="contact_Name" tabindex="16">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Cell:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="cell" id="cell" tabindex="3" (change)="checkCustomerCell(cell)">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Phone:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="phone" id="phone" tabindex="4" (change)="checkCustomerPhone(phone)">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Cell #:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="contact_Cell" id="contact_Cell" tabindex="17" (change)="checkCContactCell(contact_Cell)">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Email:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="email" class="form-control" [(ngModel)]="email" id="email" tabindex="5" (change)="checkCustomerEmail(email)">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Fax:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="fax" id="fax" tabindex="6">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Phone #:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="contact_Phone" id="contact_Phone" tabindex="18" (change)="checkCContactPhone(contact_Phone)">
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Website:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="website" id="website" tabindex="6">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Balance:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="form-group">
+              <input type="number" class="form-control" [(ngModel)]="balance" id="balance" tabindex="7">
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Balance Type:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="balance_Type_ID" id="balance_Type_ID" tabindex="8">
+              <option *ngFor="let b of balanceTypeList " [value]="b.balance_Type_ID">{{b.balance_Type}}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-8">
+          <h4>Account Detail</h4>
+        </div>
+        <div class="col-md-4">
+
+          <h4>Address Information</h4>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Credit Limit:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="number" class="form-control" [(ngModel)]="credit_Limit" id="credit_Limit" tabindex="9">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Credit Hold:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="credit_Hold_ID" id="credit_Hold_ID" tabindex="10">
+              <option *ngFor="let c of creditHoldList " [value]="c.credit_Hold_ID">{{c.credit_Hold}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <span>Line 1:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="line1" id="line1" tabindex="19">
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Payment Term:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="payment_Term_ID" id="payment_Term_ID" tabindex="11">
+              <option *ngFor="let p of paymentTermList " [value]="p.payment_Term_ID">{{p.payment_Term}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Freight Term:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="freight_Term_ID" id="freight_Term_ID" tabindex="12">
+              <option *ngFor="let f of freightTermList " [value]="f.freight_Term_ID">{{f.freight_Term}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <span>Line 2:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="line2" id="line2" tabindex="20">
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Category:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="customerCategoryId" id="customerCategoryId" tabindex="13">
+              <option *ngFor="let i of categories " [value]="i.customerCategoryId">{{i.customerCategoryName}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <span>Industary:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="industary_ID" id="industary_ID" tabindex="13">
+              <option *ngFor="let i of industaryList " [value]="i.industary_ID">{{i.industary}}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <span>Line 3:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="line3" id="line3" tabindex="21">
+          </div>
+        </div>
+
+      </div>
+      <div class="row">
+        <div class="col-md-2">
+          <span>Ownership:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="ownership_ID" id="ownership_ID" tabindex="14">
+              <option *ngFor="let o of ownershipList " [value]="o.ownership_ID">{{o.ownership}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span [style.display]="AreaShow">Area:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="areacode" id="areacode" [style.display]="AreaShow">
+              <option *ngFor="let i of area " [value]="i.areacode">{{i.areaname}}</option>
+            </select>
+          </div>
+        </div>
+
+
+        <!--<p *ngIf="!city"><em>Loading...</em></p>-->
+        <div class="col-md-2">
+          <span>City:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <ng-select2 [data]="city" id="citycode" [value]="citycode" (valueChanged)="getCityChange($event)" [width]="180" tabindex="22">
+            </ng-select2>
+          </div>
+        </div>
+        <!--  <div class="col-md-2">
+          <span>City:</span>
+        </div>
+        <div class="col-md-2" *ngIf="city">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="citycode" id="citycode" (change)="getCityChange(citycode)">
+              <option *ngFor="let i of city " [value]="i.citycode">{{i.cityname}}</option>
+            </select>
+            <select [data]="city" id="citycode" [value]="citycode" (valueChanged)="getCityChange($event)" [width]="180" tabindex="22"></select>
+          </div>
+        </div>
+        -->
+
+
+      </div>
+
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-6">
+          <fieldset class="form-group" tabindex="15">
+            <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+        <div class="col-md-2">
+          <span>Province:</span>
+          <br />
+          <br />
+          <br />
+          <div style="margin-top:-10px">Country:</div>
+
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="provincename" id="provincename" readonly="readonly">
+          </div>
+          <div class="form-group">
+
+            <input type="text" class="form-control" [(ngModel)]="countryname" id="countryname" readonly="readonly">
+          </div>
+        </div>
+
+        <div class="col-md-2" style="margin-top: -10px;">
+          <span>Status:</span>
+        </div>
+        <div class="col-md-2" style="margin-top: -10px;">
+          <div class="form-group">
+            <input type="checkbox" [(ngModel)]="status" id="status" pointer-events="none" style="margin-top: 8px;">
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnMode; then submitAdd else  submitUpdate "> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" tabindex="23" class="btn btn-small btn-warning tip" (click)="saveCustomer(customer_ID, customer_Name, nTN, contact_Name, phone, fax, email, website, contact_Phone, contact_Cell, balance, remarks, credit_Limit, balance_Type_ID, credit_Hold_ID, payment_Term_ID, freight_Term_ID, industary_ID, ownership_ID,line1, line2, line3,status)">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button id="submitUpdate" type="button" tabindex="23" class="btn btn-small btn-warning tip" (click)="updateCustomer( customer_ID, customer_Name, nTN, contact_Name, phone, fax, email, website, contact_Phone, contact_Cell, balance, remarks, credit_Limit, balance_Type_ID, credit_Hold_ID, payment_Term_ID, freight_Term_ID, industary_ID, ownership_ID,line1, line2, line3,status)">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save
+        </button>
+      </ng-template>
+      <button id="x" type="button" class="btn btn-small" (click)="c('Close click')" tabindex="24"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+
+  </ng-template>
+</div>
+<!-- End Row -->

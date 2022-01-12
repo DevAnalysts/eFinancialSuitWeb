@@ -1,0 +1,38 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import '~perfect-scrollbar/css/perfect-scrollbar.css';
+
+.ps .ps__scrollbar-y-rail {
+    left: 3px;
+    right: auto;
+}
+
+@media (min-width: 768px){
+.navbar-expand-md .navbar-nav .dropdown-menu {
+    position: absolute;
+    left: -200px;
+}
+}
+
+
+
+.customSize .modal-dialog .modal-content{
+    width: 500px;
+    height: 500px;
+    left: 42%;
+   top: 30%; 
+   margin-left: -150px;
+   margin-top: -150px;
+  }
+  .modal-dialog,
+.modal-content {
+    /* 80% of window height */
+    height: 100%;
+}
+
+.modal-body {
+    /* 100% = dialog height, 120px = header + footer */
+    max-height: calc(100% - 1px);
+    overflow-y: scroll;
+    overflow-x: hidden;
+}

@@ -1,0 +1,326 @@
+<div [@routerTransition]>
+
+  <!-- Row -->
+  <div class="row">
+    <div class="col-md-12">
+      <div class="card card-outline-info">
+        <div class="card-header">
+          <span style="font-size:large;font-weight:bold;"> Dashboard (Charts)</span>
+          <div class="pull-right">
+            <button type="button" class="btn btn-warning fa fa-cog" [routerLink]="['/dashsetting']" style="margin:3px"></button>
+            <button type="button" class="btn btn-warning fa fa-toggle-on" (click)="onToggle()"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+
+    <div class="col-sm-6" *ngIf="showTotalCustomerPayment">
+      <ngb-alert *ngIf="showTotalCustomerPayment" [type]="light" (close)="showTotalCustomerPayment = null">
+        <div class="card">
+
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-2" style="padding: 10px;">
+                <span>YEAR:</span>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+                  <select class="form-control" [(ngModel)]="yearTotalCustomerPayment" id="yearTotalCustomerPayment" (change)="getTotalCustomerPayment()">
+                    <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                    <option value="2018">2018</option>
+                    <option value="2019">2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2020">2021</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart [datasets]="TotalCustomerPaymentData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType" [colors]="TotalCustomerPaymentColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+    <div class="col-sm-6" *ngIf="showTotalSupplierPayment">
+      <ngb-alert *ngIf="showTotalSupplierPayment" [type]="light" (close)="showTotalSupplierPayment = null">
+        <div class="card">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-sm-2" style="padding: 10px;">
+                <span>YEAR:</span>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+                  <select class="form-control" [(ngModel)]="yearTotalSupplierPayment" id="yearTotalSupplierPayment" (change)="getTotalSupplierPayment()">
+                    <option value="2015">2015</option>
+                    <option value="2016">2016</option>
+                    <option value="2017">2017</option>
+                    <option value="2018">2018</option>
+                    <option value="2019">2019</option>
+                    <option value="2020">2020</option>
+                    <option value="2020">2021</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart [datasets]="TotalSupplierPaymentData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType" [colors]="TotalSupplierPaymentColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+    <div class="col-sm-6" *ngIf="showTotalSalePurchasePerYear">
+      <ngb-alert *ngIf="showTotalSalePurchasePerYear" [type]="light" (close)="showTotalSalePurchasePerYear = null">
+        <div class="card">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-sm-8" style="padding: 10px;">
+                <span>SALE/PURCHASE PER YEAR:</span>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart height="130" [datasets]="TotalSalePurchasePerYear" [labels]="lineChartLabels" [options]="lineChartOptions" [colors]="TotalSalePurchasePerYearColors" [legend]="lineChartLegend" [chartType]="lineChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+    <div class="col-sm-6" *ngIf="showTotalCustomerSupplierPaymentPerYear">
+      <ngb-alert *ngIf="showTotalCustomerSupplierPaymentPerYear" [type]="light" (close)="showTotalCustomerSupplierPaymentPerYear = null">
+        <div class="card">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-sm-8" style="padding: 10px;">
+                <span>CUSTOMER/SUPPLIER RECIEPT/PAYMENT PER YEAR:</span>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart height="130" [datasets]="TotalCustomerSupplierPaymentPerYear" [labels]="lineChartLabels" [options]="lineChartOptions" [colors]="TotalCustomerSupplierPaymentPerYearColors" [legend]="lineChartLegend" [chartType]="lineChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+    <div class="col-sm-6" *ngIf="showTotalSaleInvoices">
+      <ngb-alert *ngIf="showTotalSaleInvoices" [type]="light" (close)="showTotalSaleInvoices = null">
+        <div class="card">
+
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-8" style="padding: 10px;">
+                <span>TOTAL SALE INVOICES:</span>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart height="150px" [data]="TotalSaleInvoicesData" [labels]="pieChartLabels" [chartType]="pieChartType" [options]="pieChartOptions" [colors]="TotalSaleInvoicesColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+    <div class="col-sm-6" *ngIf="showTotalPurchaseInvoices">
+      <ngb-alert *ngIf="showTotalPurchaseInvoices" [type]="light" (close)="showTotalPurchaseInvoices = null">
+        <div class="card">
+
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-8" style="padding: 10px;">
+                <span>TOTAL PURCHASE INVOICES:</span>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart height="150px" [data]="TotalPurchaseInvoicesData" [labels]="pieChartLabels" [chartType]="pieChartType" [options]="pieChartOptions" [colors]="TotalPurchaseInvoicesColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+    <div class="col-sm-6" *ngIf="showFavouriteSaleItemLabels">
+      <ngb-alert *ngIf="showFavouriteSaleItemLabels" [type]="light" (close)="showFavouriteSaleItemLabels = null">
+        <div class="card">
+
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-8" style="padding: 10px;">
+                <span>FAVOURITE ITEM (SALE QTY):</span>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart height="180px" [data]="FavouriteSaleItemData" [labels]="FavouriteSaleItemLabels" [chartType]="doughnutChartType" [options]="pieChartOptions" [colors]="FavouriteSaleItemColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+    <div class="col-sm-6" *ngIf="showFavouritePurchaseItemLabels">
+      <ngb-alert *ngIf="showFavouritePurchaseItemLabels" [type]="light" (close)="showFavouritePurchaseItemLabels = null">
+        <div class="card">
+
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-8" style="padding: 10px;">
+                <span>FAVOURITE ITEM (PURCHASE QTY):</span>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart height="180px" [data]="FavouritePurchaseItemData" [labels]="FavouritePurchaseItemLabels" [chartType]="doughnutChartType" [options]="pieChartOptions" [colors]="FavouritePurchaseItemColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+    <div class="col-sm-6" *ngIf="showFavouriteSaleCustomerLabels">
+      <ngb-alert *ngIf="showFavouriteSaleCustomerLabels" [type]="light" (close)="showFavouriteSaleCustomerLabels = null">
+        <div class="card">
+
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-8" style="padding: 10px;">
+                <span>FAVOURITE CUSTOMER (PAYMENT):</span>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart height="180px" [data]="FavouriteSaleCustomerData" [labels]="FavouriteSaleCustomerLabels" [chartType]="doughnutChartType" [options]="pieChartOptions" [colors]="FavouriteSaleCustomerColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+    <div class="col-sm-6" *ngIf="showFavouritePurchaseSupplierLabels">
+      <ngb-alert *ngIf="showFavouritePurchaseSupplierLabels" [type]="light" (close)="showFavouritePurchaseSupplierLabels = null">
+        <div class="card">
+
+          <div class="card-header ">
+            <div class="row">
+              <div class="col-sm-8" style="padding: 10px;">
+                <span>FAVOURITE SUPPLIERS (PAYMENT):</span>
+              </div>
+              <div class="col-sm-2">
+                <div class="form-group">
+
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <canvas baseChart height="180px" [data]="FavouritePurchaseSupplierData" [labels]="FavouritePurchaseSupplierLabels" [options]="pieChartOptions" [chartType]="doughnutChartType" [colors]="FavouritePurchaseSupplierColors" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+          </div>
+        </div>
+      </ngb-alert>
+    </div>
+
+  </div>
+
+
+  <!--<div class="row">
+    <div class="col col-sm-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          Bar Chart
+        </div>
+        <div class="card-body">
+          <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions" [legend]="barChartLegend" [chartType]="barChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+        </div>
+        <div class="card-footer">
+          <button class="btn btn-info btn-sm" (click)="randomize()">Update</button>
+        </div>
+      </div>
+    </div>
+    <div class="col col-sm-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          Doughnut Chart
+        </div>
+        <div class="card-body">
+          <canvas baseChart height="180px" [data]="doughnutChartData" [labels]="doughnutChartLabels" [chartType]="doughnutChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-sm-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          Radar Chart
+        </div>
+        <div class="card-body">
+          <canvas baseChart height="150px" [datasets]="radarChartData" [labels]="radarChartLabels" [chartType]="radarChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col col-sm-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          Pie Chart
+        </div>
+        <div class="card-body">
+          <canvas baseChart height="150px" [data]="pieChartData" [labels]="pieChartLabels" [chartType]="pieChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col col-sm-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          Polar Area Chart
+        </div>
+        <div class="card-body">
+          <canvas baseChart height="130px" [data]="polarAreaChartData" [labels]="polarAreaChartLabels" [legend]="polarAreaLegend" [chartType]="polarAreaChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+        </div>
+      </div>
+    </div>
+    <div class="col col-sm-6">
+      <div class="card mb-3">
+        <div class="card-header">
+          Line Chart
+        </div>
+        <div class="card-body">
+          <canvas baseChart height="130" [datasets]="lineChartData" [labels]="lineChartLabels" [options]="lineChartOptions" [colors]="lineChartColors" [legend]="lineChartLegend" [chartType]="lineChartType" (chartHover)="chartHovered($event)" (chartClick)="chartClicked($event)"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>-->
+</div>

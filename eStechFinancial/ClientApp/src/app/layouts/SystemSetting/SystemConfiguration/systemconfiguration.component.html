@@ -1,0 +1,155 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div id="PageGrid" [class]="card1style">
+      <div class="row card-header" style="height:auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2 ">
+          <div class="input-group">
+            <input class="form-control" type="text" name="search" style="margin-top:1px;" placeholder="search..." [(ngModel)]="ID">
+            <div class="input-group-append order-last">
+              <!--<button class=" btn btn-small btn-warning tip" style="margin:3px;" (click)="Add()" [style.display]="PermissionAdd">
+                <i class="fa fa-plus"></i>
+              </button>-->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive" style="padding:5px;">
+        <table class="table table-hover table-striped" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176)">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Name</th>
+              <th>Type</th>
+              <th class="col_1">Value</th>
+              <th class="col_1">Remarks</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of grid | filter:ID | paginate: { itemsPerPage: 20, currentPage: p};">
+              <td>{{u.settingcode}}</td>
+              <td>{{u.settingname}}</td>
+              <td>{{u.settingtype}}</td>
+              <td class="col_1">{{u.settingvalue}}</td>
+              <td class="col_1">{{u.remarks}}</td>
+              <td>
+                <div *ngIf="true == u.active; then on else off"></div>
+
+                <ng-template #on>
+                  Active
+                </ng-template>
+                <ng-template #off>
+                  Disabled
+                </ng-template>
+              </td>
+              <td>
+                <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                  <button [style.display]="permissionUtility.PermissionView" style="padding: 6px 7px;" class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.settingcode);View();" id="view">
+                    <span><img src="../../../../../../assets/images/icon/report.png" ></span>
+                  </button>
+                </div>
+                <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                  <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.settingcode);Edit();" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+    <div id="frm" [class]="card2style" style="padding:0px;margin:0px;border:0px;" [style.display]="card2display">
+      <div class="card-header" style="height:40px;">
+        <div class="page-title-list">
+          <span style="font-size:large; margin-left:10px; font-weight:bold;">{{permissionUtility.FUNCTIONALITYDETAILNAME}}</span>
+        </div>
+      </div>
+      <div class="card-body" style="margin-top:20px; margin-left:50px; width:300px;">
+        <div class='container-fluid'>
+          <div class='row'>
+            <div class="col-sm-6">
+
+            </div>
+            <div class="col-sm-12">
+              <div class="form-group">
+                <span>Name</span>
+                <input type="text" class="form-control" [(ngModel)]="settingname" id="settingname" disabled>
+              </div>
+            </div>
+          </div>
+          <div class='row'>
+            <div class="col-sm-6">
+
+            </div>
+            <div class="col-sm-12">
+              <div class="form-group">
+                <span>Type</span>
+                <input type="text" class="form-control" [(ngModel)]="settingtype" id="settingtype" disabled>
+              </div>
+            </div>
+          </div>
+
+          <div class='row'>
+            <div class="col-sm-6">
+
+            </div>
+            <div class="col-sm-12">
+              <div class="form-group">
+                <span>Value</span>
+                <input type="text" class="form-control" [(ngModel)]="settingvalue" id="settingvalue" required>
+              </div>
+            </div>
+          </div>         
+          <div class="row">
+            <div class="col-sm-6">
+
+            </div>
+            <div class="col-sm-12">
+              <fieldset class="form-group">
+                <span>Remarks:</span>
+                <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please type here..." class="form-control" style="height:auto; margin-top:4px;"
+                          rows="4"></textarea>
+              </fieldset>
+            </div>
+          </div>
+          <div class='row'>
+            <div class="col-sm-6">
+
+            </div>
+            <div class="col-sm-12">
+              <div class="form-group">
+                <span>Status</span>
+                <input type="checkbox" style="margin-left:5px;" [(ngModel)]="active" id="active" (change)="checkValue(active?true:false)" />
+              </div>
+            </div>
+          </div>
+          <div class='row'>
+            <div class="col-sm-6"></div>
+            <div class="col-sm-12">
+              <button type="button" class=" btn" style="float:right;margin:3px;" (click)="Cancel()">Cancel</button>
+              <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp1"
+                      (click)="updateData()">
+                Save
+              </button>
+              <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp2"
+                      (click)="updateData()">
+                Save
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+

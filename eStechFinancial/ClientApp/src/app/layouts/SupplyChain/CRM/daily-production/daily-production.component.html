@@ -1,0 +1,696 @@
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{PermissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" #input (keydown.enter)='$event.target.blur()' (blur)="GetDailyProductionDetails(input.value)"
+              [(ngModel)]="production_ID" id="production_ID" style="margin: 3px;" placeholder="search..." class="form-control" />
+
+            <div class="btn-group">
+              <button [style.display]="PermissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip"
+                id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button> 
+            </div>
+          </div>
+        </div>
+        <div class="row" *ngIf="isLoading"
+        style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Prod Date</th>
+              <th>Knitting No</th>
+              <th>Contract No</th>
+              <th>Shift Incharge</th>
+              <th>Fourman</th>              
+              <th>Department From</th> 
+              <th>Department To</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let prod of AllProductions">
+              <td>{{prod.production_ID}}</td>
+              <td>{{prod.prod_Date | date:"dd/MM/yy"}} </td>
+              <td>{{prod.production_No }}</td>
+              <td>{{prod.contract_NO}}</td>
+              <td>{{prod.shift_Incharge}}</td>
+              <td>{{prod.fourman}}</td>
+              <td>{{prod.deparment_From}}</td> 
+              <td>{{prod.department_To}}</td>
+              <td>
+                <div *ngIf="prod.status == 0 then inProgress  else cancel"></div>
+                <ng-template #inProgress>
+                  <span>Open</span>
+                </ng-template>
+                <ng-template #complete>
+
+                </ng-template>
+                <ng-template #cancel>
+                  <div *ngIf="prod.status == 1 then complete else cancel1"></div>
+                  <ng-template #complete>
+                    <span>Completed</span>
+                  </ng-template>
+                  <ng-template #cancel1>
+                    <span>Canceled</span>
+                  </ng-template>
+                </ng-template>
+              </td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionUtility.PermissionEdit" class="btn btn-small btn-warning tip"
+                  (click)="getDetailsByID(prod.production_ID,content)"  id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" id="1st" style="float:right;"></pagination-controls>
+      </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+
+        {{PermissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click'); ">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+      <div class="row"> 
+        <div class="col-sm-3" style="margin-left: 4.5vh;">
+          <div class="form-group">
+            <span>Date:</span>
+            <div class="input-group" style="width: 330px;">
+              <input class="form-control" name="dp" [(ngModel)]="date.model" ngbDatepicker #a="ngbDatepicker" tabindex="6">
+              <div class="input-group-append" style="margin-top: 5px;">
+                <button class="btn btn-small " (click)="a.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div> 
+        <div class="col-sm-3" style="margin-left: 12.5vh;">
+          <div class="input-group">
+            <span>Knitting No:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-user-md" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="production_No" id="prodNo">
+            </div>
+          </div>
+        </div> 
+        <div class="col-sm-3" style="margin-left: 13vh;">
+          <div class="form-group">
+            <span>Contract No:</span>
+            <div *ngIf="btnmode then viewContractNo else SelectContract"> </div>
+            <ng-template #viewContractNo>
+              <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+                <i class="fa fa-user-md" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                <select class="form-control" [(ngModel)]="contractNo" id="contractNo" (change)="getContractDetail(contractNo)" disabled
+                    >
+                    <option *ngFor="let c of contractNos " [value]="c.contract_No">{{c.contract_No}}</option>
+                </select>
+              </div>
+            </ng-template>
+            <ng-template #SelectContract>
+              <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+                <i class="fa fa-user-md" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+                <select class="form-control" [(ngModel)]="contractNo" id="contractNo" (change)="getContractDetail(contractNo)"
+                    >
+                    <option *ngFor="let c of contractNos " [value]="c.contract_No">{{c.contract_No}}</option>
+                </select>
+              </div>
+            </ng-template>
+            
+          </div>
+        </div>
+      </div>
+      <div class="row"> 
+        <div class="col-sm-3" style="margin-left: 4.5vh;">
+          <div class="form-group">
+            <span>Shift:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-building-o" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="shift_Id" id="shift"
+                   >
+                  <option *ngFor="let s of shift " [value]="s.shift_Id">{{s.shift_Name}}</option>
+                </select>
+            </div>
+          </div>
+        </div>   
+        <div class="col-sm-3" style="margin-left: 12.5vh;">
+          <div class="form-group">
+            <span>Hall No:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-building" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+              <input type="number" class="form-control" [(ngModel)]="hall_No" id="hallNo">
+            </div>
+          </div>
+        </div> 
+      </div>
+      <div class="row">
+        <div class="col-sm-3" style="margin-left: 4.5vh;">
+          <div class="form-group">
+            <span>Shift Incharge:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-legal" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="shiftIncharge" id="shiftIncharge"
+                   >
+                  <option *ngFor="let si of shiftIncharges " [value]="si.shift_inch_Id">{{si.shift_Inch_Name}}</option>
+                </select>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-3" style="margin-left: 12.5vh;">
+          <div class="form-group">
+            <span>Fourman:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-legal" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="fourman" id="fourman"
+                   >
+                  <option *ngFor="let f of fourmans " [value]="f.fourman_Id">{{f.fourman_Name}}</option>
+                </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-3" style="margin-left: 4.5vh;">
+          <div class="form-group">
+            <span>Department From:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-legal" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="deparment_From" id="deptFrom"
+                   >
+                  <option *ngFor="let d of departments " [value]="d.dept_Id">{{d.dept_Name}}</option>
+                </select>
+            </div>
+          </div>
+        </div> 
+        <div class="col-sm-3" style="margin-left: 12.5vh;">
+          <div class="form-group">
+            <span>Department To:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-legal" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="department_To" id="deptTo"
+                   >
+                  <option *ngFor="let d of departments " [value]="d.dept_Id">{{d.dept_Name}}</option>
+                </select>
+            </div>
+          </div>
+        </div> 
+        <div *ngIf="btnmode" class="col-sm-3" style="margin-left: 12.5vh;">
+          <div class="form-group">
+            <span>Is Closed:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <input type="checkbox" [(ngModel)]="isCloseCheckbox" id="statuscheckbox" pointer-events="none" style="margin-top: 8px;">
+            </div>
+          </div>
+        </div> 
+      </div>
+      <div class="row">
+         
+        <div class="col-md-6">
+          <div class="form-grpup" style="margin-left: 30px;">
+            <span>Remarks:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-align-justify" style="font-size:medium" aria-hidden="true"></i>
+              <fieldset class="form-group">              
+                <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please type here..." class="form-control" style="height:auto;"
+                          rows="4"></textarea>
+              </fieldset>
+            </div>
+          </div>          
+        </div>
+      </div>
+       <!--Table Grid-->
+      
+      <div class="row table-shadow-padding "> 
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th style="width:5%; margin-left:15px">Sr#.</th>
+              <th style="width:8%">Machine No</th>
+              <th style="width:10%">Operator</th>
+              <th style="width:5%">Batch No</th>
+              <th style="width:10%">Article</th>
+              <th style="width:10%">Item</th>
+              <th style="width:5%">Color</th>
+              <th style="width:3%">Size</th>
+              <th style="width:4%">Qty (Dzn)</th>
+              <th style="width:6%">A-Pair (Dzn) </th>
+              <th style="width:5%">Weight (Kg) </th>
+              <th style="width:5%">B-Pair (Dzn) </th>
+              <th style="width:5%">Weight (Kg)</th>
+              <th style="width:6%">Wastage (Kg) </th>
+              <th style="width:5%">Rework</th>
+              <th style="width:7%">Action</th>
+            </tr>
+          </thead>
+          <tbody style="min-height: 150px;max-height: 300px;overflow: hidden scroll;display: block;width:100%;">
+
+            <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+            <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+            <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+            <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+            <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+            
+                  <tr
+                    *ngFor="let i of dailyProductionDetails | paginate: { itemsPerPage: 15, currentPage: g, id:'2nd'}; let idx = index"
+                    class="row">
+                    <td style="width:5%; margin-left:15px" >{{(idx+1)+(g-1)*15}}</td>
+                    <td style="width:8%">
+                      <div *ngIf="i.edit_Mode then selectmachine else viewmachine"></div>
+                      <ng-template #viewmachine>
+                          <span>{{i.machine_No}}</span>
+                      </ng-template>
+                      <ng-template #selectmachine>
+                        <input type="text" id="machine_No" class="form-control" [(ngModel)]="i.machine_No" />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:10%">
+                      <div *ngIf="i.edit_Mode then selectoperator else viewoperator"></div>
+                      <ng-template #viewoperator>
+                          <span>{{i.operator_Name}}</span>
+                      </ng-template>
+                      <ng-template #selectoperator>
+                        <div id="DropDownItemSelect2" class="col-md-12" style="padding: 0px;">
+                          <ng-select2 [data]="operator" id="operator" [value]="i.operator_ID" (valueChanged)="updateOperator(i,$event)"
+                            width="100px">
+                          </ng-select2>
+                        </div> 
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:5%"> 
+                      <div *ngIf="i.edit_Mode then selectbatchNo else viewbatchNo"></div>
+                      <ng-template #viewbatchNo>
+                          <span>{{i.batch_No}}</span>
+                      </ng-template>
+                      <ng-template #selectbatchNo>
+                        <input type="text" [(ngModel)]="i.batch_No" class="form-control" />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:10%"> 
+                      <div *ngIf="i.edit_Mode then selectarticle else viewarticle"></div>
+                      <ng-template #viewarticle>
+                          <span>{{i.article}}</span>
+                      </ng-template>
+                      <ng-template #selectarticle>
+                        <select class="form-control" [(ngModel)]="i.article">
+                          <option value="Crew(Complate)" >Crew(Complate)</option>
+                          <option value="Quarter(Ankle)" >Quarter(Ankle)</option>
+                          <option value="Low Cut(Footy)" >Low Cut(Footy)</option>
+                        </select>
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:10%">
+                      <div *ngIf="i.edit_Mode then selectitem else viewitem"></div>
+                      <ng-template #viewitem>
+                          <span>{{i.item_Name}}</span>
+                      </ng-template>
+                      <ng-template #selectitem>
+                        <div id="DropDownItemSelect2" class="col-md-12" style="padding: 0px;">
+                          <ng-select2 [data]="items" id="item_Code" [value]="i.item_Code" (valueChanged)="updateItem(i,$event)"
+                            width="140px">
+                          </ng-select2>
+                        </div> 
+                      </ng-template>
+                    
+                    </td>
+                    <td style="width:5%">
+                      <div *ngIf="i.edit_Mode then selectcolor else viewcolor"></div>
+                      <ng-template #viewcolor>
+                          <span>{{i.color}}</span>
+                      </ng-template>
+                      <ng-template #selectcolor>
+                        <input type="text" [(ngModel)]="i.color" class="form-control" />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:3%">
+                      <div *ngIf="i.edit_Mode then selectsize else viewsize"></div>
+                      <ng-template #viewsize>
+                          <span>{{i.size}}</span>
+                      </ng-template>
+                      <ng-template #selectsize>
+                        <input type="text" [(ngModel)]="i.size" class="form-control" />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:4%">
+                      <div *ngIf="i.edit_Mode then selectquantity else viewquantity"></div>
+                      <ng-template #viewquantity>
+                          <span>{{i.quantity}}</span>
+                      </ng-template>
+                      <ng-template #selectquantity>
+                        <input type="number" [(ngModel)]="i.quantity" class="form-control" />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:6%">
+                      <div *ngIf="i.edit_Mode then selectapair else viewapair"></div>
+                      <ng-template #viewapair>
+                          <span>{{i.a_Pair}}</span>
+                      </ng-template>
+                      <ng-template #selectapair>
+                        <input type="number" [(ngModel)]="i.a_Pair" class="form-control" />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:5%">
+                      <div *ngIf="i.edit_Mode then selectweight1 else viewweight1"></div>
+                      <ng-template #viewweight1>
+                          <span>{{i.weight_1}}</span>
+                      </ng-template>
+                      <ng-template #selectweight1>
+                        <input type="number" [(ngModel)]="i.weight_1" class="form-control" />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:5%">
+                      <div *ngIf="i.edit_Mode then selectbpair else viewbpair"></div>
+                      <ng-template #viewbpair>
+                          <span>{{i.b_Pair}}</span>
+                      </ng-template>
+                      <ng-template #selectbpair>
+                        <input type="number" [(ngModel)]="i.b_Pair" class="form-control" />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:5%">
+                      <div *ngIf="i.edit_Mode then selectweight2 else viewweight2"></div>
+                      <ng-template #viewweight2>
+                          <span>{{i.weight_2}}</span>
+                      </ng-template>
+                      <ng-template #selectweight2>
+                        <input type="number" [(ngModel)]="i.weight_2" class="form-control" />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:6%">
+                      <div *ngIf="i.edit_Mode then selectwastage else viewwastage"></div>
+                      <ng-template #viewwastage>
+                          <span>{{i.wastage}}</span>
+                      </ng-template>
+                      <ng-template #selectwastage>
+                        <input type="number"  [(ngModel)]="i.wastage" class="form-control" />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:5%">
+                      <div *ngIf="i.edit_Mode then selectrework else viewrework"></div>
+                      <ng-template #viewrework>
+                        <div *ngIf="i.rework == true then yes else no"></div>
+                        <ng-template #yes>
+                          <span>Yes</span>
+                        </ng-template>
+                        <ng-template #no>
+                          <span>No</span>
+                        </ng-template>
+                      </ng-template>
+                      <ng-template #selectrework>
+                        <input type="checkbox"  [(ngModel)]="i.rework"  />
+                      </ng-template>
+                      
+                    </td>
+                    <td style="width:7%">
+                      <div class="btn-group" *ngIf="i.edit_Mode; then ok else pencel">
+                        <button *ngIf="status1 == 0" class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button"
+                          value="Delete" id="remove">
+                          <span class="fa fa-remove"></span>
+                        </button>
+                      </div>
+                      <ng-template #ok>
+                        <button *ngIf="status1 == 0" class="btn btn-small btn-success tip" data-original-title="Quick save" type="button"
+                          (click)="changeMode(idx,i,0)" id="update" style="padding-right:11px;margin-right:-1px;">
+                          <span class="fa fa-check"></span>
+                        </button>
+                      </ng-template>
+                      <ng-template   #pencel>
+                        <button *ngIf="status1 == 0" class="btn btn-small btn-warning tip" data-original-title="Hide" type="button"
+                          (click)="changeMode(idx,i,1)" [disabled]="EditItemButton" id="edit">
+                          <span class="fa fa-pencil"></span>
+                        </button>
+
+                      </ng-template>
+
+                      <button *ngIf="status1 == 0" class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button"
+                        value="Delete" id="remove" [disabled]="RemoveItemButton" (click)="changeMode(((idx)+(g-1)*15),i,2)">
+                        <span class="fa fa-remove"></span>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr id="AddNewItemRow" class="row">
+                    <td style="width:5%; margin-left:15px">
+                      <input type="text" id="txt" style="width:10px" />
+                    </td>
+                    <td style="width:8%">
+                      <input type="text" id="machine_No" class="form-control" [(ngModel)]="machine_No" />
+                    </td>
+                    <td style="width:10%">
+                      <div id="DropDownItemSelect2" class="col-md-12" style="padding: 0px;">
+                        <ng-select2 [data]="operator" id="operator_ID" [value]="operator_ID" (valueChanged)="changeOperator($event)"
+                          width="100px">
+                        </ng-select2>
+                      </div> 
+                    </td>
+                    <td style="width:5%;"> 
+                      <input type="number" [(ngModel)]="batch_No" class="form-control" />
+                    </td>
+                    <td style="width:10%;"> 
+                      <select class="form-control" [(ngModel)]="article">
+                        <option value="Crew(Complate)" >Crew(Complate)</option>
+                        <option value="Quarter(Ankle)" >Quarter(Ankle)</option>
+                        <option value="Low Cut(Footy)" >Low Cut(Footy)</option>
+                      </select>
+                    </td>
+                    <td style="width:10%">
+                      <div id="DropDownOperatorSelect2" class="col-md-12" style="padding: 0px;">
+                        <ng-select2 [data]="items" id="item_Code" [value]="item_Code" (valueChanged)="changeItems($event)"
+                          width="140px">
+                        </ng-select2>
+                      </div> 
+                    </td>
+                    <td style="width:5%;">
+                      <input type="text" [(ngModel)]="color" class="form-control" />
+                    </td>
+                    <td style="width:3%">
+                      <input type="text" [(ngModel)]="size" class="form-control" />
+                    </td>
+                    <td style="width:4%">
+                      <input type="number" [(ngModel)]="quantity" class="form-control" />
+                    </td>
+                    <td style="width:6%">
+                      <input type="number" [(ngModel)]="A_Pair" class="form-control" />
+                    </td>
+                    <td style="width:5%;">
+                      <input type="number" [(ngModel)]="weight_1" class="form-control" />
+                    </td>
+                    <td style="width:5%;">
+                      <input type="number" [(ngModel)]="B_Pair" class="form-control" />
+                    </td>
+                    <td style="width:5%;">
+                      <input type="number" [(ngModel)]="weight_2" class="form-control" />
+                    </td>
+                    <td style="width:6%;">
+                      <input type="number"  [(ngModel)]="wastage" class="form-control" />
+                    </td>
+                    <td style="width:5%;">
+                      <input type="checkbox"  [(ngModel)]="rework"  class="p-3"/>
+                    </td>
+                    <td  style="width:7%;">
+                      <button type="button" class="btn btn-small btn-warning tip" 
+                        data-original-title="Quick save" ng-click="addrow()" (click)="addGrid(item_Code, item_Name, machine_No, quantity, batch_No, operator_ID,A_Pair,weight_1,weight_2,B_Pair)" id="adds">
+                        <span class="fa fa-check"></span>
+                      </button>
+                    </td>
+
+
+                  </tr>
+            <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+            <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+            <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+            <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+            <!-- ------------------------------------------------------------------------------------------------------------------------------------- -->
+                  
+                </tbody>
+        </table> 
+      </div> 
+      
+      <pagination-controls (pageChange)="g = $event" id="2nd" style="float:right;"></pagination-controls>
+      <div class="modal-footer"></div> 
+    </div>
+
+    <div class="modal-footer">
+      <!-- <div class="row" style="position: absolute;margin-right: 20px;"> 
+        
+          <div *ngIf="btnmode; then submitUpdate else  submitAdd "> </div>
+          <ng-template #submitAdd>  -->
+            <!--Save More-->
+            <!-- <div class="btn-group mr-3"> 
+              <button id="submitAdd" [style.display]="PermissionUtility.PermissionAdd" style="margin: 5px;"  type="button" class="btn btn-small btn-warning tip pull-right"
+               (click)="saveOrder(production_ID)" ><i
+                  class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+      
+              </div> 
+          </ng-template>
+          <ng-template #submitUpdate>
+            <button [style.display]="PermissionUtility.PermissionEdit" id="submitUpdate" style="margin: 5px;" type="button" class="btn btn-small btn-warning tip pull-right"
+            (click)="updateOrder(production_ID)"><i
+                class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button> -->
+            <!--Cancel-->
+          <!-- </ng-template> -->
+        <!--Update-->
+        <!-- <button type="button" id="x" class="btn btn-small pull-right" style="margin: 5px;"  (click)="c('Close click');"><i class="fa fa-window-close-o"
+            aria-hidden="true"></i> Close</button>
+      </div> -->
+      <!-- <div class="modal-footer"> -->
+        <div class="row" style="position: absolute;left: 30px;">
+  
+          <!--Cancel Order-->
+          <div *ngIf="btnmode; then submitcancel "> </div>
+          <ng-template #submitcancel>
+            <button  type="button" id="cancelBtn" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="cancelOrder();"><i class="fa fa-minus-square-o" aria-hidden="true"></i> Cancel</button>
+  
+  
+            <div class="btn-group" [style.display]="PermissionUtility.PermissionDelete">
+              <!-- <button class=" btn btn-small btn-warning tip" id="cancelBtn" (click)="cancelOrder()">
+                <i class="fa fa-minus-square-o" aria-hidden="true"></i> Cancel
+              </button> -->
+              <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown"
+                placement="top" style="display:none" id="cancelBtndrop">
+                <!-- <button class="btn btn-primary dropdown-toggle-split" ngbDropdownToggle></button> -->
+  
+                <div class="dropdown-menu" ngbDropdownMenu>
+                  <!-- <button id="cancelSchemeBtn" style="text-align:left;" class="col-sm-12 btn btn-small btn-warning tip"
+                    (click)="cancelScheme()">
+                    <i class="fa fa-close" aria-hidden="true"></i>Scheme
+                  </button> -->
+  
+  
+                </div>
+  
+              </div>
+              
+            </div>
+          </ng-template>
+  
+  
+  
+  
+          <!--Cancel Schme-->
+          <!--<button type="button" id="cancelSchemeBtn" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="cancelScheme();"><i class="fa fa-close" aria-hidden="true"></i>  Scheme</button>-->
+          <!--Duplicate Order-->
+          <!-- <button type="button" id="btnDuplicate" style=" cursor:pointer; margin-right:5px;"
+            class="btn btn-small btn-warning tip" (click)="onNavigate('/duplicate-rpt-rdlc')"><i
+              class="fa fa-clone"></i></button>&nbsp; -->
+              <!--Send Mail-->
+          <!-- <button *ngIf="mode" id="submitAddMail" type="button" class="btn btn-small btn-warning tip"
+          style="    text-align: left;"
+          (click)="saveOrderAndMail(mailcontent,sale_Order_ID, sO_Date, office_Code, order_Envoy, customer_ID, contact_ID, delivery_Date, method_Id, payment_ID, frieght_Id, TotalCost(), TotalDiscount(), TotalTax(), freight_Chrgs, TotalAmount(),paid_Amount, reorder_ID, quotation_ID, order_Type, remarks, cancel, company_ID, manual_Discount, entry_Date, user_ID, false, sOGUID, exportQty,expPODate,shipmentTerm, refNo, productionQty, shipedDate, pOtype, customerCode,clientDate , loadingDate, issuedDate,conversionRate ,currency , contractNo, buyerPO)">
+          <i class="fa fa-envelope-o" aria-hidden="true"></i>
+        </button> -->
+  
+          <!--RDLC Show-->
+          <!-- <button type="button" id="viewRDLC" style="cursor:pointer; margin-left:5px;padding:6px 7px"
+            class="btn btn-small btn-warning tip" (click)="onNavigate('/so-rpt-rdlc')"> -->
+            <!-- <i class="fa fa-eye"></i> -->
+           <!-- <img src="../../../../../../assets/images/icon/report.png">
+          </button> -->
+          <!--Excel Show-->
+          <!-- <button type="button" id="viewExcel" style="cursor:pointer; margin-left:5px;"
+            class="btn btn-small btn-warning tip" (click)="onNavigate('/so-rpt-excel')"><i
+              class="fa fa-file-excel-o"></i></button> -->
+  
+  
+          <!--Attach File-->
+          <!--<button type="button" id="viewAttachment" style="cursor:pointer; margin-left:5px;" class="btn btn-small btn-warning tip" (click)="open(attachmentcontent)"><i class="fa fa-file"></i></button>-->
+  
+          <!-- <div id="viewStamp"> -->
+            <!-- <span>Certificate</span>
+            <input type="checkbox" id="isStamp" name="isStamp" [(ngModel)]="isStamp" style="margin: 10px 3px 3px 4px"
+              (change)="changeStamp(isStamp)" /> -->
+          <!-- </div> -->
+          <!-- <div style="margin-top: 10px;" [style.display]="templateshow"> -->
+            <!-- <span>Template</span> -->
+          <!-- </div> -->
+  
+  
+          <!-- <div class="col-md-2" style="margin-top: 5px;" [style.display]="templateshow">
+  
+            <select [(ngModel)]="templatecode" id="templatecode">
+              <option *ngFor="let u of companytemplate " [value]="u.templatecode">{{u.templatecode+' : '+u.templatename}}</option>
+            </select>
+  
+          </div> -->
+        </div>
+        <!--Allow Exchange-->
+        <!-- <div id="allowExchange"> -->
+          <!-- <span>Exchange</span> -->
+          <!-- <input type="checkbox" id="exchange" name="exchange" [(ngModel)]="exchange" /> -->
+        <!-- </div> -->
+        <!--Show Order View-->
+        <!-- <div id="viewBtn">
+          <span>Show</span>
+          <input type="checkbox" id="isView" name="isView" [(ngModel)]="isView" />
+        </div> -->
+        <div *ngIf="btnmode; then submitUpdate else  submitAdd "> </div>
+          <ng-template #submitAdd> 
+            <!--Save More-->
+            <div class="btn-group mr-3"> 
+              <button id="submitAdd" [style.display]="PermissionUtility.PermissionAdd" style="margin: 5px;"  type="button" class="btn btn-small btn-warning tip pull-right"
+               (click)="saveOrder(production_ID)" ><i
+                  class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+      
+              </div> 
+          </ng-template>
+          <ng-template #submitUpdate>
+            <button [style.display]="PermissionUtility.PermissionEdit" id="submitUpdate" style="margin: 5px;" type="button" class="btn btn-small btn-warning tip pull-right"
+            (click)="updateOrder(production_ID)"><i
+                class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+            <!--Cancel-->
+          </ng-template>
+        <!--Update-->
+        <button type="button" id="x" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o"
+            aria-hidden="true"></i> Close</button>
+      </div>
+    <!-- </div> -->
+  </ng-template>
+
+</div>
+
+
+

@@ -1,0 +1,403 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text"  #input (keydown.enter)='$event.target.blur()' (blur)="searchStockTransfer(input.value)"
+              [(ngModel)]="order_ID" id="order_ID" placeholder="search..." class="form-control" />
+
+            <div class="btn-group">
+              <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip"
+                id="myInput" (click)="open(content)">
+                <i class="fa fa-plus"></i>
+              </button>
+               
+            </div>
+          </div>
+        </div>
+      </div> 
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Date</th>
+              <th>From Office</th>
+              <th>To Office</th>
+              <th>From Warehouse</th>
+              <th>To Warehouse</th> 
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let dt of order  | paginate: { itemsPerPage: 14, currentPage: p , id :'1st' }">
+              <td>{{dt.stock_Trans_ID}}</td>  
+              <td>{{dt.sT_Date | date:"dd/MM/yy"}} </td>
+              <td>{{dt.from_Office}}</td>
+              <td>{{dt.to_Office}}</td>
+              <td>{{dt.from_WarehouseID}}</td>
+              <td>{{dt.to_WarehouseID}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip"
+                    (click)="getDetailsByID(dt.stock_Trans_ID,content)" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" id="1st" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+
+        {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click'); ">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type" [dismissible]="false">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+      <div class="row" style="padding-bottom:5px">
+        <div class="col-sm-1"></div>
+        <div class="col-md-3">
+          <span>Date:</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="sT_Date.model" ngbDatepicker #dd="ngbDatepicker"
+                (ngModelChange)="changeSTDate($event)">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+        <div class="row">
+          <div class="col-sm-1"></div>
+          <div class="col-md-3">
+            <div *ngIf="allowOW1; then lblO1"> </div>
+            <ng-template #lblO1>
+              <span>From Office:</span>
+            </ng-template>
+          </div>
+  
+          <div class="col-md-3">
+            <div *ngIf="allowOW1; then lblW1"> </div>
+            <ng-template #lblW1>
+              <span>From Warehouse:</span>
+            </ng-template>
+          </div>  
+        </div>  
+
+        <div class="row">
+          <div class="col-sm-1"></div>
+          <div class="col-md-3" style="padding-left: 40px;">
+            <div *ngIf="allowOW1; then selO1"> </div>
+            <ng-template #selO1>
+              <div class="form-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-building" style="font-size:medium" aria-hidden="true"></i>
+                  <select class="form-control" (change)="getItems()" [(ngModel)]="from_Office" [disabled]="disabledFromOffice"
+                     >
+                    <option *ngFor="let u of fromOffices " [value]="u.officE_CODE">{{u.officE_NAME}}</option>
+                  </select>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+          <div class="col-md-3" style="padding-left: 40px;">
+            <div *ngIf="allowOW1; then selW1"> </div>
+            <ng-template #selW1>
+              <div class="form-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-building" style="font-size:medium" aria-hidden="true"></i>
+                  <select class="form-control" (change)="getItems()" [(ngModel)]="from_Warehouse" [disabled]="disabledFromWarehouse"
+                     >
+                    <option *ngFor="let w of fromWarehouses " [value]="w.warehouseID">{{w.warehouseName}}</option>
+                  </select>
+                </div>
+              </div>
+            </ng-template>
+          </div> 
+        </div>
+
+        <div class="row">
+          <div class="col-sm-1"></div>
+          <div class="col-md-3">
+            <div *ngIf="allowOW2; then lblO3"> </div>
+            <ng-template #lblO3>
+              <span>To Office:</span>
+            </ng-template>
+          </div>
+  
+          <div class="col-md-3">
+            <div *ngIf="allowOW2; then lblW3"> </div>
+            <ng-template #lblW3>
+              <span>To Warehouse:</span>
+            </ng-template>
+          </div>  
+        </div>  
+
+        <div class="row">
+          <div class="col-sm-1"></div>
+          <div class="col-md-3" style="padding-left: 40px;">
+            <div *ngIf="allowOW2; then selO3"> </div>
+            <ng-template #selO3>
+              <div class="form-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-building" style="font-size:medium" aria-hidden="true"></i>
+                  <select class="form-control" [(ngModel)]="to_Office" [disabled]="disabledToOffice"
+                   >
+                    <option *ngFor="let u of toOffices " [value]="u.officE_CODE">{{u.officE_NAME}}</option>
+                  </select>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+          <div class="col-md-3" style="padding-left: 40px;">
+            <div *ngIf="allowOW2; then selW3"> </div>
+            <ng-template #selW3>
+              <div class="form-group">
+                <div class="inner-addon left-addon">
+                  <i class="fa fa-building" style="font-size:medium" aria-hidden="true"></i>
+                  <select class="form-control" [(ngModel)]="to_Warehouse" [disabled]="disabledToWarehouse"
+                     >
+                    <option *ngFor="let w of toWarehouses " [value]="w.warehouseID">{{w.warehouseName}}</option>
+                  </select>
+                </div>
+              </div>
+            </ng-template>
+          </div> 
+        </div> 
+       
+
+      <div class="row table-shadow-padding ">
+
+        <table class="table table-hover table-striped table-shadow">
+          <thead style="display: block;width:98%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px">Sr#.</th>
+              <th style="width:25%">Item</th>
+              <th style="width:20%">
+                <div *ngIf="hideStock; then lblstock else lblstock1"> </div>
+                <ng-template #lblstock>
+                  <span ng-show="hideStock">Stock</span>
+                </ng-template>
+              </th> 
+              <th style="width:20%">Transfer Quantity</th>  
+              <th style="width:20%">Action</th>
+            </tr>
+          </thead>
+          <tbody style="min-height: 300px;max-height: 300px;overflow: hidden scroll;display: block;width:100%;">
+            <tr
+              *ngFor="let i of stockTransferDetails | paginate: { itemsPerPage: 15, currentPage: g, id:'2nd'}; let idx = index"
+              class="row">
+              <td style="width:5%;margin-left:15px">{{(idx+1)+(g-1)*15}}</td>
+              <td style="width:25%">
+                <div *ngIf="i.edit_Mode; then selectName else viewName"> </div>
+                <ng-template #viewName>
+                  <span ng-show="editMode">
+                    {{i.item_Name}} 
+                  </span>
+                </ng-template>
+                <ng-template #selectName>
+                  <div *ngIf="sessionEnableTextboxItem==0; then select2EditItem "> </div>
+                  <ng-template #select2EditItem>
+                    <div id="DropDownItemSelect2" class="col-md-12" style="padding: 0px;">
+                      <ng-select2 [data]="items" id="itemEdit" [value]="item_Code" (valueChanged)="updateItem(i,$event)"
+                        width="250px">
+                      </ng-select2>
+                    </div>
+                  </ng-template> 
+                </ng-template>
+              </td>
+              <td style="width:20%">
+                <div *ngIf="hideStock; then lblstock else lblstock1"> </div>
+                <ng-template #lblstock>
+                  <div *ngIf="i.edit_Mode; then selectStock else viewStock"> </div>
+                  <ng-template #viewStock>
+                    <span ng-show="editMode">{{i.stock_Qty}}</span>
+                  </ng-template>
+                  <ng-template #selectStock>
+                    {{i.stock_Qty}}
+                  </ng-template>
+                </ng-template>
+                <ng-template #lblstock1>
+                </ng-template>
+              </td> 
+               
+              <td style="width:20%">
+                <div *ngIf="i.edit_Mode; then selectQty else viewQty"> </div>
+                <ng-template #viewQty>
+                  <span ng-show="editMode">{{i.trans_Qty}} {{getUnitName(i.unit)}}</span>
+                </ng-template>
+                <ng-template #selectQty>
+                  <input type="number" onClick="this.select();" class="form-control" [(ngModel)]="i.trans_Qty" min="1"
+                    (change)="changeQuantityEdit(i,i.Trans_Quantity)" (keyup.enter)="changeMode(idx,i,0)" />
+                </ng-template>
+              </td>  
+               
+              <td style="width:20%">
+                <div class="btn-group" *ngIf="i.edit_Mode; then ok else pencel">
+                  <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button"
+                    value="Delete" id="remove">
+                    <span class="fa fa-remove"></span>
+                  </button>
+                </div>
+                <ng-template #ok>
+                  <button class="btn btn-small btn-success tip" data-original-title="Quick save" type="button"
+                    (click)="changeMode(idx,i,0)" id="update" style="padding-right:11px;margin-right:-1px;">
+                    <span class="fa fa-check"></span>
+                  </button>
+                </ng-template>
+                <ng-template #pencel>
+                  <button class="btn btn-small btn-warning tip" data-original-title="Hide" type="button"
+                    (click)="changeMode(idx,i,1)" [disabled]="EditItemButton" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+
+                </ng-template>
+
+                <button class="btn btn-small btn-danger tip" data-original-title="Delete user" type="button"
+                  value="Delete" id="remove" [disabled]="RemoveItemButton" (click)="changeMode(((idx)+(g-1)*15),i,2)">
+                  <span class="fa fa-remove"></span>
+                </button>
+
+              </td>
+            </tr>
+            <tr id="AddNewItemRow" class="row">
+              <td style="width:5%;margin-left:15px">
+                <input type="text" id="txt"
+                  (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,Quantity,Discount_Rate,Tax_Rate, unit)"
+                  style="width:3px" />
+              </td>
+              <td style="width:25%">
+                <div id="DropDownItemSelect2" class="col-md-12" style="padding: 0px;">
+                  <ng-select2 [data]="items" id="item_ID" [value]="item_Code" (valueChanged)="changeItems($event)"
+                    width="250px">
+                  </ng-select2>
+                </div> 
+              </td>
+              <td style="width:20%">
+                <div *ngIf="hideStock; then stock "> </div>
+                <ng-template #stock>
+                  <span ng-show="hideStock"> {{stock_Qty}}</span>
+                </ng-template>
+              </td> 
+              <td style="width:20%">
+                <input style="width:70%" type="number" onClick="this.select();" [(ngModel)]="trans_Quantity" class="form-control" ng-hide="editMode" min="1"
+                  (change)="changeQuantity(trans_Quantity)"
+                  (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,Quantity,Discount_Rate,Tax_Rate, unit)" />
+              
+                <select class="form-control pt-1" [(ngModel)]="unit" id="unit" style="display: inline-flex; width: 30%; background-color: lightgray;" (change)="changeUnitID()">
+                  <option *ngFor="let i of unitList " [value]="i.unitID">{{i.unit}}</option>
+              </select>
+              </td> 
+              <td style="width:20%">
+                <button type="button" class="btn btn-small btn-warning tip"
+                  (keyup.enter)="addGrid(item_Code,item_Name,unit_Price,Quantity,Discount_Rate,Tax_Rate, unit)"
+                  (click)="addGrid(item_Code,item_Name,unit_Price,Quantity,Discount_Rate,Tax_Rate, unit)"
+                  data-original-title="Quick save" ng-click="addrow()" id="adds">
+                  <span class="fa fa-check"></span>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+      </div>
+      <pagination-controls (pageChange)="g = $event" id="2nd" style="float:right;"></pagination-controls>
+      <div class="modal-footer"></div> 
+    </div>
+
+    <div class="modal-footer">
+      <div class="row" style="position: absolute;left: 30px;">
+       <!--Duplicate Order-->
+        <button type="button" id="btnDuplicate" style=" cursor:pointer; margin-right:5px;"
+          class="btn btn-small btn-warning tip" (click)="onNavigate('/duplicate-rpt-rdlc')"><i
+            class="fa fa-clone"></i></button>&nbsp; 
+        <!--RDLC Show-->
+        <button type="button" id="viewRDLC" style="cursor:pointer; margin-left:5px;padding:6px 7px"
+          class="btn btn-small btn-warning tip" (click)="onNavigate('/so-rpt-rdlc')">
+         <!--  <i class="fa fa-eye"></i> -->
+         <img src="../../../../../../assets/images/icon/report.png">
+        </button>
+        <!--Excel Show-->
+        <button type="button" id="viewExcel" style="cursor:pointer; margin-left:5px;"
+          class="btn btn-small btn-warning tip" (click)="onNavigate('/so-rpt-excel')"><i
+            class="fa fa-file-excel-o"></i></button> 
+         
+        <div style="margin-top: 10px;" [style.display]="templateshow">
+          <span>Template</span>
+        </div> 
+        <div class="col-md-2" style="margin-top: 5px;" [style.display]="templateshow">
+
+          <select [(ngModel)]="templatecode" id="templatecode">
+            <option *ngFor="let u of companytemplate " [value]="u.templatecode">{{u.templatecode+' : '+u.templatename}}</option>
+          </select>
+
+        </div>
+      </div> 
+      <!--Show Order View-->
+      <div id="viewBtn">
+        <span>Show</span>
+        <input type="checkbox" id="isView" name="isView" [(ngModel)]="isView" />
+      </div>
+      <div *ngIf="mode; then submitUpdate else  submitAdd "> </div>
+      <ng-template #submitAdd>  
+        <!--Save More-->
+        <div class="btn-group mr-3"> 
+          <button id="submitAdd" type="button" class="btn btn-small btn-warning tip"
+          (click)="saveStock(stock_Trans_ID, sT_Date, office_Code, from_Office, to_Office, from_Warehouse, to_Warehouse)"><i
+              class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+        </div>
+
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button [style.display]="permissionUtility.PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip"
+          (click)="updateStock(stock_Trans_ID, sT_Date, office_Code, from_Office, to_Office, from_Warehouse, to_Warehouse)"><i
+            class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+        <!--Cancel-->
+      </ng-template>
+      <!--Update-->
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o"
+          aria-hidden="true"></i> Close</button>
+    </div>
+  </ng-template>
+
+  
+</div>

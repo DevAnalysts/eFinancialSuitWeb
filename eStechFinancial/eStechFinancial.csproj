@@ -1,0 +1,246 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <TypeScriptCompileBlocked>true</TypeScriptCompileBlocked>
+    <TypeScriptToolsVersion>Latest</TypeScriptToolsVersion>
+    <IsPackable>false</IsPackable>
+    <SpaRoot>ClientApp\</SpaRoot>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(SpaRoot)node_modules\**</DefaultItemExcludes>
+
+    <!-- Set this to true if you enable server-side prerendering -->
+    <BuildServerSideRenderer>false</BuildServerSideRenderer>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DevExpress.AspNetCore.Reporting" Version="19.1.6" />
+    <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaServices.Extensions" Version="2.1.1" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.3" />
+    <PackageReference Include="Nodejs.Redist.x64" Version="10.7.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Don't publish the SPA source files, but do show them in the project files list -->
+    <Compile Remove="ClientApp\dist\**" />
+    <Compile Remove="ClientApp\Reports\**" />
+    <Compile Remove="ClientApp\src\app\access-denied\**" />
+    <Compile Remove="ClientApp\src\app\dashboardOri\**" />
+    <Compile Remove="ClientApp\src\app\dashboard\**" />
+    <Compile Remove="ClientApp\src\app\dashsetting\**" />
+    <Compile Remove="ClientApp\src\app\layouts\Admin\**" />
+    <Compile Remove="ClientApp\src\app\layouts\blank-page\**" />
+    <Compile Remove="ClientApp\src\app\layouts\bs-component\**" />
+    <Compile Remove="ClientApp\src\app\layouts\bs-element\**" />
+    <Compile Remove="ClientApp\src\app\layouts\change-password\**" />
+    <Compile Remove="ClientApp\src\app\layouts\components\**" />
+    <Compile Remove="ClientApp\src\app\layouts\DashboardLayouts\DashboardFavourites\**" />
+    <Compile Remove="ClientApp\src\app\layouts\form\**" />
+    <Compile Remove="ClientApp\src\app\layouts\generalsetting\**" />
+    <Compile Remove="ClientApp\src\app\layouts\grid\**" />
+    <Compile Remove="ClientApp\src\app\layouts\report-tab\**" />
+    <Compile Remove="ClientApp\src\app\layouts\reports\**" />
+    <Compile Remove="ClientApp\src\app\layouts\tables\**" />
+    <Compile Remove="ClientApp\src\app\not-found\**" />
+    <Compile Remove="ClientApp\src\app\server-error\**" />
+    <Compile Remove="ClientApp\src\app\signup\**" />
+    <Compile Remove="Common\**" />
+    <Compile Remove="DataModal\**" />
+    <Compile Remove="DataModel\**" />
+    <Compile Remove="Pages\**" />
+    <Compile Remove="publishweb\**" />
+    <Content Remove="$(SpaRoot)**" />
+    <Content Remove="ClientApp\dist\**" />
+    <Content Remove="ClientApp\Reports\**" />
+    <Content Remove="ClientApp\src\app\access-denied\**" />
+    <Content Remove="ClientApp\src\app\dashboardOri\**" />
+    <Content Remove="ClientApp\src\app\dashboard\**" />
+    <Content Remove="ClientApp\src\app\dashsetting\**" />
+    <Content Remove="ClientApp\src\app\layouts\Admin\**" />
+    <Content Remove="ClientApp\src\app\layouts\blank-page\**" />
+    <Content Remove="ClientApp\src\app\layouts\bs-component\**" />
+    <Content Remove="ClientApp\src\app\layouts\bs-element\**" />
+    <Content Remove="ClientApp\src\app\layouts\change-password\**" />
+    <Content Remove="ClientApp\src\app\layouts\components\**" />
+    <Content Remove="ClientApp\src\app\layouts\DashboardLayouts\DashboardFavourites\**" />
+    <Content Remove="ClientApp\src\app\layouts\form\**" />
+    <Content Remove="ClientApp\src\app\layouts\generalsetting\**" />
+    <Content Remove="ClientApp\src\app\layouts\grid\**" />
+    <Content Remove="ClientApp\src\app\layouts\report-tab\**" />
+    <Content Remove="ClientApp\src\app\layouts\reports\**" />
+    <Content Remove="ClientApp\src\app\layouts\tables\**" />
+    <Content Remove="ClientApp\src\app\not-found\**" />
+    <Content Remove="ClientApp\src\app\server-error\**" />
+    <Content Remove="ClientApp\src\app\signup\**" />
+    <Content Remove="Common\**" />
+    <Content Remove="DataModal\**" />
+    <Content Remove="DataModel\**" />
+    <Content Remove="Pages\**" />
+    <Content Remove="publishweb\**" />
+    <None Include="$(SpaRoot)**" Exclude="$(SpaRoot)node_modules\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Remove="ClientApp\dist\**" />
+    <EmbeddedResource Remove="ClientApp\Reports\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\access-denied\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\dashboardOri\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\dashboard\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\dashsetting\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\Admin\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\blank-page\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\bs-component\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\bs-element\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\change-password\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\components\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\DashboardLayouts\DashboardFavourites\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\form\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\generalsetting\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\grid\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\report-tab\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\reports\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\layouts\tables\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\not-found\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\server-error\**" />
+    <EmbeddedResource Remove="ClientApp\src\app\signup\**" />
+    <EmbeddedResource Remove="Common\**" />
+    <EmbeddedResource Remove="DataModal\**" />
+    <EmbeddedResource Remove="DataModel\**" />
+    <EmbeddedResource Remove="Pages\**" />
+    <EmbeddedResource Remove="publishweb\**" />
+    <None Remove="ClientApp\dist\**" />
+    <None Remove="ClientApp\Reports\**" />
+    <None Remove="ClientApp\src\app\access-denied\**" />
+    <None Remove="ClientApp\src\app\dashboardOri\**" />
+    <None Remove="ClientApp\src\app\dashboard\**" />
+    <None Remove="ClientApp\src\app\dashsetting\**" />
+    <None Remove="ClientApp\src\app\layouts\Admin\**" />
+    <None Remove="ClientApp\src\app\layouts\blank-page\**" />
+    <None Remove="ClientApp\src\app\layouts\bs-component\**" />
+    <None Remove="ClientApp\src\app\layouts\bs-element\**" />
+    <None Remove="ClientApp\src\app\layouts\change-password\**" />
+    <None Remove="ClientApp\src\app\layouts\components\**" />
+    <None Remove="ClientApp\src\app\layouts\DashboardLayouts\DashboardFavourites\**" />
+    <None Remove="ClientApp\src\app\layouts\form\**" />
+    <None Remove="ClientApp\src\app\layouts\generalsetting\**" />
+    <None Remove="ClientApp\src\app\layouts\grid\**" />
+    <None Remove="ClientApp\src\app\layouts\report-tab\**" />
+    <None Remove="ClientApp\src\app\layouts\reports\**" />
+    <None Remove="ClientApp\src\app\layouts\tables\**" />
+    <None Remove="ClientApp\src\app\not-found\**" />
+    <None Remove="ClientApp\src\app\server-error\**" />
+    <None Remove="ClientApp\src\app\signup\**" />
+    <None Remove="Common\**" />
+    <None Remove="DataModal\**" />
+    <None Remove="DataModel\**" />
+    <None Remove="Pages\**" />
+    <None Remove="publishweb\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="package-lock.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="ClientApp\src\app\layouts\layout.component.html" />
+    <None Remove="ClientApp\src\app\layouts\layout.component.html" />
+    <None Remove="ClientApp\src\app\layouts\layout.component.scss" />
+    <None Remove="ClientApp\src\app\layouts\layout.component.scss" />
+    <None Remove="ClientApp\src\app\layouts\layout.component.spec.ts" />
+    <None Remove="ClientApp\src\app\layouts\layout.component.spec.ts" />
+    <None Remove="ClientApp\src\app\layouts\layout.component.ts" />
+    <None Remove="ClientApp\src\app\layouts\layout.component.ts" />
+    <None Remove="ClientApp\src\app\layouts\layout.module.spec.ts" />
+    <None Remove="ClientApp\src\app\layouts\layout.module.spec.ts" />
+    <None Remove="ClientApp\src\app\layouts\layout.module.ts" />
+    <None Remove="ClientApp\src\app\layouts\layout.module.ts" />
+    <None Remove="ClientApp\src\app\layouts\SupplyChain\CRM\customer-discount\customer-discount-routing.module.ts" />
+    <None Remove="ClientApp\src\app\layouts\SupplyChain\CRM\customer-discount\customer-discount-routing.module.ts" />
+    <None Remove="ClientApp\src\app\shared\directives\new-tab.directive.ts" />
+    <None Remove="ClientApp\src\app\shared\directives\new-tab.directive.ts" />
+    <None Remove="ClientApp\src\app\shared\pipes\SafePipe.ts" />
+    <None Remove="ClientApp\src\app\shared\pipes\SafePipe.ts" />
+    <None Remove="ClientApp\src\app\shared\services\SearchFilter\search-filter1.service.ts" />
+    <None Remove="ClientApp\src\app\shared\services\SearchFilter\search-filter1.service.ts" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="ClientApp\src\app\layouts\PRM\Reports\" />
+    <Folder Include="ClientApp\src\app\shared\models\FAM\TM\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="ClientApp\src\assets\img\ReportLogo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ClientApp\src\assets\img\ReportLogo1.jpeg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ClientApp\src\assets\img\ReportLogo1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ClientApp\src\assets\img\ReportLogo2.jpeg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ClientApp\src\assets\img\ReportLogo2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ClientApp\src\assets\img\ReportLogo3.jpeg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ClientApp\src\assets\img\ReportLogo3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ClientApp\src\assets\img\ReportLogoWithAddress.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ClientApp\src\assets\img\ReportLogoWithAddress1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ClientApp\src\assets\img\ReportLogoWithAddress2.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="ClientApp\src\assets\img\ReportLogoWithAddress3.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="DebugEnsureNodeEnv" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('$(SpaRoot)node_modules') ">
+    <!-- Ensure Node.js is installed -->
+    <Exec Command="node --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
+    <Message Importance="high" Text="Restoring dependencies using 'npm'. This may take several minutes..." />
+
+    <!--<Exec WorkingDirectory="$(SpaRoot)" Command="npm install  no-optional" />-->
+
+  </Target>
+
+  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
+    <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
+    <!--<Exec WorkingDirectory="$(SpaRoot)" Command="npm install no-optional" />-->
+    <Exec WorkingDirectory="$(SpaRoot)" Command="npm run build" />
+
+
+
+
+    <!-- Include the newly-built files in the publish output -->
+    <ItemGroup>
+      <DistFiles Include="$(SpaRoot)dist\**; $(SpaRoot)dist-server\**" />
+      <DistFiles Include="$(SpaRoot)node_modules\**" Condition="'$(BuildServerSideRenderer)' == 'true'" />
+      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
+        <RelativePath>%(DistFiles.Identity)</RelativePath>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </ResolvedFileToPublish>
+    </ItemGroup>
+  </Target>
+
+  <ProjectExtensions><VisualStudio><UserProperties clientapp_4angular_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+
+</Project>

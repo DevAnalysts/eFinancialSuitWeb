@@ -1,0 +1,161 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input  placeholder="search..." class="form-control" />
+            <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip" id="myInput" (click)="open(contentMultiple)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+  <ng-template #contentMultiple let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click');routeInvoice();">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+      <div class="row" style="padding-bottom:5px;">
+        <div class="col-md-2">
+          <span>Date:</span>
+        </div>
+
+      </div>
+      <div class="row">
+
+        <div class="col-md-2">
+          <div class="form-group">
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="invoice_Date.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="getPendingSalePayment(areacode)">
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="row" style="padding-bottom:5px;">
+        <div class="col-md-2" [style.display]="areashow">
+          <span>Area:</span>
+        </div>
+        <div class="col-md-2">
+          <span>Order Paging:</span>
+        </div>
+        <div class="col-md-2"></div>
+        <div class="col-md-2"></div>
+        <div class="col-md-2"></div>
+        <div class="col-md-2">
+          <span>Office:</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-2" [style.display]="areashow">
+          <div class="form-group">
+            <select class="form-control" [(ngModel)]="areacode" id="areacode" (change)="getPendingSalePayment(areacode)">
+              <option *ngFor="let i of area " [value]="i.areacode">{{i.areaname}}</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-2" style="padding-left:40px">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-pagelines" aria-hidden="true"></i>
+              <select class="form-control" [(ngModel)]="PagingListIndex" id="PagingListIndex" disabled>
+                <option *ngFor="let i of PagingList " [value]="i.index">{{i.desc}}</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-2"></div>
+        <div class="col-md-2"></div>
+        <div class="col-md-2"></div>
+        <div class="col-md-2" style="padding-left:40px">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-building" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="userCurrentOfficeName" id="userCurrentOfficeName" readonly="readonly">
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <div class="row" style="padding-bottom:5px;">
+      </div>
+      <div class="row table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow-padding">
+          <thead style="display: block;width:99%;">
+            <tr class="thclr  row">
+              <th style="width:4%;margin-left:15px;">Sr#.</th>
+              <th style="width:36%">Customer</th>
+              <th style="width:20%">Payment Date</th>              
+              <th style="width:10%">Piad</th>
+              <th style="width:10%">Net Amount</th>
+              <th style="width:10%"><input type="checkbox" [(ngModel)]="selectedAll" (change)="selectAll();" />Mark</th>
+              <th style="width:8%"></th>
+            </tr>
+          </thead>
+          <tbody style="min-height: 300px;max-height: 500px;overflow: hidden scroll;display: block;width:99%;">
+            <tr *ngFor="let i of PendingOrders let idx = index" class="row">
+              <td style="width:4%;margin-left:25px">{{idx+1}}</td>
+              <td style="width:36%"><span>{{i.customer_Name}}</span></td>
+              <td style="width:20%"><span>{{i.payment_Date| date:"dd/MM/yyyy"}}</span></td>
+              <td style="width:10%"><span>{{i.paid_Amount}}</span></td>
+              <td style="width:10%"><span>{{i.netPayable}}</span></td>
+              <td style="width:10%"><span><input type="checkbox" id="action" name="action" [(ngModel)]="i.action" (change)="selectByOne(i.action);" /></span></td>
+              <td style="width:8%"></td>
+            </tr>
+          </tbody>
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:4%;"></th>
+              <th style="width:36%"></th>
+              <th style="width:20%"></th>
+              <th style="width:10%"> </th>
+              <th style="width:10%"></th>
+              <th style="width:10%"></th>
+              <td style="width:8%"></td>
+            </tr>
+          </thead>
+        </table>
+      </div>
+      <div class="modal-footer"></div>
+    </div>
+    <div class="modal-footer">
+      <div *ngIf="mode; then submitUpdate else  submitAdd "> </div>
+      <ng-template #submitAdd>     
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="savePendingPayments(sale_Invoice_ID, invoice_Date,1,customer_ID, sale_Order_ID, 0, 0, 0,freight_Chrgs, total_Amount,  remarks)" disabled><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button [style.display]="permissionUtility.PermissionEdit" id="submitUpdate" type="button" class="btn btn-small btn-warning tip" (click)="updateInvoice(sale_Invoice_ID, invoice_Date,1,customer_ID, sale_Order_ID, 0, 0, 0,freight_Chrgs, total_Amount,  remarks)"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save</button>
+      </ng-template>
+      <button type="button" id="x" class="btn btn-small" (click)="c('Close click');routeCustomerReceipt(); "><i class="fa fa-window-close-o" aria-hidden="true"></i> Close</button>
+    </div>
+  </ng-template>
+</div>

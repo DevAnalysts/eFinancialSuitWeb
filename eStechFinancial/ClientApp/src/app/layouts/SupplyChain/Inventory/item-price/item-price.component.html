@@ -1,0 +1,86 @@
+<!-- Row -->
+<div class="row card-header" style="border-bottom:1px solid #808080">
+  <div class="col-md-10" style="padding-top:5px;">
+    <span style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}}</span>
+  </div>
+  <div class="col-md-2">
+    <div class="input-group pull-right">
+      <button type="button" class="btn btn-small btn-warning tip" (click)="saveData()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+      <button type="button" id="x" class="btn btn-small" (click)="routePage(); "><i class="fa fa-window-close-o" aria-hidden="true"></i> Close</button>
+    </div>
+  </div>
+</div>
+<div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:100000;overflow:hidden;">
+
+  <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+
+</div>
+<div class="row" style="margin-left:5px;width:98%">
+  <div class="col-sm-2" style="padding-top:5px">
+    <span>Category:</span>
+  </div>
+  <div class="col-sm-2">
+    <div class="form-group">
+      <select class="form-control" [(ngModel)]="categorycode" id="categorycode" (change)="changeCategories(categorycode)" tabindex="1">
+        <option *ngFor="let c of category " [value]="c.categorycode">{{c.categoryname}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-sm-2" style="padding-top:5px">
+    <span>Sub Category:</span>
+  </div>
+  <div class="col-sm-2">
+    <div class="form-group">
+      <select class="form-control" [(ngModel)]="subcategorycode" id="subcategorycode" tabindex="2" (change)="changeSubCategories(subcategorycode,pricelistcode)">
+        <option *ngFor="let s of subcategory" [value]="s.subcategorycode">{{s.subcategoryname}}</option>
+      </select>
+    </div>
+  </div>
+  <div class="col-sm-2" style="padding-top:5px">
+    <span>Price List:</span>
+  </div>
+  <div class="col-sm-2">
+    <div class="form-group">
+      <select class="form-control" [(ngModel)]="pricelistcode" id="pricelistcode" (change)="changeSubCategories(subcategorycode,pricelistcode)" tabindex="3">
+        <option *ngFor="let c of pricelist " [value]="c.pricelistcode">{{c.pricelistname}}</option>
+      </select>
+    </div>
+  </div>
+</div>
+<div class="row " style="margin-left:5px;width:98%">
+
+  <div class="card-body table-responsive table-shadow-padding">
+    <table class="table table-hover table-striped table-shadow">
+      <thead>
+        <tr class="thclr">
+          <th>Item Name</th>
+          <th>Cost</th>
+          <th>Unit Price</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+
+        <tr *ngFor="let i of item  | paginate: { itemsPerPage: 14, currentPage: p};">
+          <td style="width: 70%;">{{i.itemname}}</td>
+          <div *ngIf="i.status==1; then priceOn else priceOff"> </div>
+          <ng-template #priceOn>
+            <td style="width: 10%;"><input type="number" class="form-control" [(ngModel)]="i.costprice" /></td>
+            <td style="width: 10%;"><input type="number" class="form-control" [(ngModel)]="i.unitprice" /></td>
+          </ng-template>
+          <ng-template #priceOff>
+            <td style="width: 10%;"><input type="number" class="form-control" [(ngModel)]="i.costprice" disabled /></td>
+            <td style="width: 10%;"><input type="number" class="form-control" [(ngModel)]="i.unitprice" disabled /></td>
+          </ng-template>
+
+          <td style="width: 10%;">
+            <input type="checkbox" [(ngModel)]="i.status" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+  </div>
+
+
+</div>

@@ -1,0 +1,128 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div [class]="card1style">
+      <div class="row  card-header" style="height:40px;">
+        <div class="col-md-10" style="padding-top:5px;">
+          <div class="page-title-list">
+
+            <span style="font-size:large;font-weight:bold;">   TRAINING TYPE </span>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" name="search" placeholder="search..." #input (keydown.enter)='$event.target.blur()' (blur)="getTrainingType(input.value)" [(ngModel)]="ID" style="float:left; width:100px;margin:3px 0px 3px 3px;">
+            <button class=" btn btn-small btn-warning tip" style="margin:3px 3px 3px 0px;" (click)="Add()" [style.display]="addbutton">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div></div>
+        </div>
+        <div class="card-body table-responsive" style="padding:5px;">
+          <table class="table table-hover table-striped" style="box-shadow: -2px 5px 10px 1px rgba(0,0,0,.176)">
+            <thead>
+              <tr class="thclr">
+                <th>ID</th>
+                <th>Training Category</th>
+                <th>Training Name</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let u of category  | paginate: { itemsPerPage: 20, currentPage: p};">
+                <td>{{u.traininG_Type_ID}}</td>
+                <td>{{u.traininG_Catagory}}</td>
+                <td>{{u.traininG_Name}}</td>
+                <td>{{u.duratioN}}</td>
+                <td>
+                  <div *ngIf="true == u.activE; then on else off"></div>
+
+                  <ng-template #on>
+                    <input type="checkbox" [checked]="checked" pointer-events="none" disabled="disabled" style="margin-top: 8px;">
+                  </ng-template>
+                  <ng-template #off>
+                    <input type="checkbox" [checked]="unchecked" pointer-events="none" disabled="disabled" style="margin-top: 8px;">
+                  </ng-template>
+                </td>
+                <td>
+                  <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                    <button class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.traininG_Type_ID);Edit();" id="edit">
+                      <span class="fa fa-pencil"></span>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+        </div>
+      </div>
+      <div [class]="card2style" style="padding:0px;margin:0px;border:0px;" [style.display]="card2display">
+        <div class="card-header" style="height:40px;">
+          <div class="page-title-list">
+
+            <span style="font-size:large;font-weight:bold;"> Training Type Detail</span>
+          </div>
+        </div>
+        <div class="card-body" style="margin-top:20px;">
+          <div class='container-fluid'>
+            <div class='row'>
+              <div class="col-md-4">
+                <span>Training Name</span>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input type="text" class="form-control" [(ngModel)]="traininG_Name" id="traininG_Name">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <span>Training Category</span>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input type="text" class="form-control" [(ngModel)]="traininG_Catagory" id="traininG_Catagory">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <span>Training Duration</span>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input type="text" class="form-control" [(ngModel)]="duratioN" id="duratioN">
+                </div>
+              </div>
+              <div class="col-md-4">
+                <span>Status</span>
+              </div>
+              <div class="col-md-6">
+                <div class="form-group">
+                  <input type="checkbox" [(ngModel)]="activE" id="activE">
+
+                </div>
+              </div>
+            </div>
+            <div class='row'>
+              <div class="col-md-4"></div>
+              <div class="col-md-6">
+                <button type="button" class=" btn" style="float:right;margin:3px;" (click)="Cancel()"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+                <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp1"
+                        (click)="Savetrain(traininG_Catagory, traininG_Name, duratioN,activE)">
+                  <i class="fa fa-floppy-o" aria-hidden="true"></i>   Save
+                </button>
+                <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp2"
+                        (click)="UpdateDepartment(traininG_Catagory, traininG_Name, duratioN,activE)">
+                  <i class="fa fa-floppy-o" aria-hidden="true"></i>   Save
+                </button>
+
+              </div>
+            </div>
+
+          </div>
+    </div>
+  </div></div></div>
+
+
+
+
+

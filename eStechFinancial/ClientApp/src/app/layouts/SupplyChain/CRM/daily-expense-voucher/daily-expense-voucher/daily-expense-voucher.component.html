@@ -1,0 +1,56 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissomUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input (keydown.enter)="$event.target.blur()" (blur)="expenseVoucherDetails(input.value)" [(ngModel)]="id" id="id" placeholder="search..." class="form-control" />
+            
+          </div>
+        </div>
+      </div>
+
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Expense No</th>
+              <th>Expense Date</th>
+              <th>Total Amount</th>
+              <th>Active</th>
+              <th>Remarks</th>
+              <th style="width:15%"><input type="checkbox" [(ngModel)]="selectedAll" (change)="selectAll();" />Mark</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let dt of expense  | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{dt.dailyID}}</td>
+              <td>{{dt.expenseNo}}</td>
+              <td>{{dt.calenderDate | date:"dd/MM/yyyy"}} </td>
+              <td>{{dt.totalAmount}}</td>
+              <td>{{dt.active}}</td>
+              <td>{{dt.remarks}}</td>
+              <td style="width:15%"><input type="checkbox" [(ngModel)]="dt.voucherId" (change)="checkIfAllSelected();" /></td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+
+  <br />
+  <div class="modal-footer">
+    <!--Save-->
+    <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="voucherApprove()"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save</button>
+  </div>

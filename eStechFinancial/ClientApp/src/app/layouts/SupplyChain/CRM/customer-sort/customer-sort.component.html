@@ -1,0 +1,65 @@
+
+
+<div class="card mb-3">
+  <div class="card-header">
+    <div class="page-title-list">
+      {{FUNCTIONALITYNAME}} CUSTOMER AREA/ROUTE
+    </div>
+    <div style="float:right;">
+      <button type="button" class="btn btn-small btn-warning tip" (click)="createArray()"><i class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close</button>
+      <button type="button" id="x" class="btn btn-small" (click)="routePage(); "><i class="fa fa-window-close-o" aria-hidden="true"></i> Close</button>
+    </div>
+  </div>
+</div>
+<spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10000 "></spinner>
+<div style="width:99%;margin-top:-15px;">
+  <ngb-tabset type="pills" orientation="vertical" class="HT2">
+    <ngb-tab *ngFor="let a of area">
+      <ng-template ngbTabTitle>
+        <div style="height:40px;padding-top: 6px;" (click)="changeArea(a.areacode)">
+          <img style="height:25px;width:25px" src="../assets/img/ModuleIconsNew/AssetManagement.png">
+          <span style="font-size:15px;font-weight:500">{{a.areaname}}</span>
+        </div>
+      </ng-template>
+      <ng-template ngbTabContent>
+
+        <div class="row" style="width:103%">
+          <div class="col-sm-12">
+            <div class="panel panel-success">
+              <div class="panel-heading">
+              </div>
+              <div class="panel-body">
+                <ul class="list-group" dnd-sortable-container [sortableData]="listOne">
+                  <li *ngFor="let customer of listOne; let i = index" class="list-group-item" dnd-sortable [sortableIndex]="i" style="padding: 2px;">
+                    <div style="display:inline-flex;width:95%">
+                      <button id="" type="button" class="btn btn-small btn-warning tip" style="width:30px;padding:2px;">{{i + 1}}</button>
+                      <span style="padding-left:50px;font-size: large;">{{customer}}</span>
+                    </div>
+                    <button class="btn btn-small btn-danger tip" type="button" style="float: right;" id="remove" (click)="changeCustomerStatus(customer) ">
+                      <span class="fa fa-remove text-white"></span>
+                    </button>
+                  </li>
+
+                </ul>
+              </div>
+            </div>
+          </div>
+          <!--<div class="col-sm-6">
+            <div class="panel panel-default">
+              <div class="panel-body">
+                My prefences:<br />
+                <span *ngFor="let item of listOne; let i = index">{{i + 1}}) {{item}}<br /></span>
+              </div>
+            </div>
+          </div>-->
+        </div>
+
+      </ng-template>
+    </ngb-tab>
+
+
+
+  </ngb-tabset>
+</div>
+
+

@@ -1,0 +1,83 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{PermissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input (keyup)="searchSaleOrders(input.value)"
+              [(ngModel)]="order_ID" id="order_ID" placeholder="search..." class="form-control" />
+
+            <div class="btn-group">
+              <button [style.display]="PermissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip"
+                id="myInput" (click)="routeInvoice(0,3)">
+                <i class="fa fa-plus"></i>
+              </button>
+              <div class="btn-group" ngbDropdown role="group" aria-label="Button group with nested dropdown"
+                placement="bottom-right" [style.display]="PermissionUtility.PermissionDropdown">
+                <button class="btn btn-primary dropdown-toggle-split" ngbDropdownToggle></button>
+                <div class="dropdown-menu" ngbDropdownMenu>
+                  <button [style.display]="PermissionUtility.PermissionItem1" style="text-align:left"
+                    class="col-sm-12 btn btn-small btn-warning tip" id="myInput" (click)="routeInvoice(0,1)">
+                    <i class="fa fa-plus"></i> Order Scheme
+                  </button>
+                  <button [style.display]="PermissionUtility.PermissionItem2" style="text-align:left"
+                    class="col-sm-12 btn btn-small btn-warning tip" id="myInput" (click)="routeInvoice(0,2)">
+                    <i class="fa fa-plus"></i> Sale Order (Import)
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="isLoading"
+        style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Invoice No</th>
+              <th>Customer Name</th>
+              <th>Date</th>
+              <th>Total Cost</th>
+              <th>Total Discount</th>
+              <th>Total Amount</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let dt of order  | paginate: { itemsPerPage: 14, currentPage: p , id :'1st' }">
+              <td>{{dt.sale_Invoice_ID}}</td>
+              <td>{{dt.invoice_NO}}</td>
+              <td>{{dt.customer_Name}}</td>
+              <td>{{dt.invoice_Date | date:"dd/MM/yy"}} </td>
+              <td>{{dt.total_Cost | number: '1.2-5'}}</td>
+              <td>{{dt.total_Discount | number: '1.2-5'}}</td>
+              <td>{{dt.total_Amount | number: '1.2-5'}}</td>
+              <td>{{dt.cancel}}</td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="PermissionUtility.PermissionEdit" class="btn btn-small btn-warning tip"
+                    (click)="routeInvoice(dt.sale_Invoice_ID,0)" id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" id="1st" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div> 
+<!-- Row -->
+

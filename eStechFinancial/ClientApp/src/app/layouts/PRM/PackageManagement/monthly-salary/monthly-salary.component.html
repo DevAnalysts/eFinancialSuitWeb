@@ -1,0 +1,644 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header" style="height: auto;">
+        <div class="col-md-10">
+          <span class="input-group" style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group">
+            <input class="form-control" type="text" name="search" placeholder="search..." #input (keydown.enter)='$event.target.blur()' (blur)="getGrid(input.value)" [(ngModel)]="id" style="margin:1px;">
+           <div class="input-group-append order-last">
+            <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip" style="margin: 1px 0px 1px 0px" id="myInput" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+           </div>            
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="row" *ngIf="isLoading" style="background-color:transparent; width: 100%;height:100vh;position :absolute;z-index:10000;overflow:hidden;">
+
+        <spinner [visible]="isLoading" style="position: absolute;left: 50%;z-index:10010"></spinner>
+
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+
+            <tr class="thclr">
+              <th style="width: 15%">Month</th>
+              <th style="width: 15%">Office</th>
+              <th style="width: 15%">Employee Name</th>
+              <th style="width: 15%">Package</th>
+              <th style="width: 15%">Salary Days</th>
+              <!--  <th style="width: 15%">Month Days</th>-->
+              <th style="width: 15%">Payment</th>
+              <!--<th style="width: 10%">Deduction</th>
+              <th style="width: 10%">Contribution</th>-->
+              <th style="width: 10%"></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let e of gridlist     | paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{e.salarymonth}}</td>
+              <td>{{e.office}}</td>
+              <td>{{e.empname}}</td>
+              <td>{{e.package | number: '1.2-5'}}</td>
+              <td>{{e.salarydays}}</td>
+              <!--<td>{{e.monthdays}}</td>-->
+              <td>{{e.payment | number: '1.2-5'}}</td>
+              <!--<td>{{e.paid}}</td>
+              <td>{{e.unpaid}}</td>-->
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissionUtility.PermissionView" style="padding: 6px 7px;" class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.salarycode,contentdetail)"
+                          id="view">
+                    <span><img src="../../../../../../assets/images/icon/report.png" ></span>
+                  </button>
+                </div>
+                <div class="btn-group" style="float:right; ">
+                  <button [style.display]="permissionUtility.PermissionEdit" class="btn btn-small btn-warning tip" (click)="getDetailsByID(e.salarycode,contentdetail)"
+                          id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+
+
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click');">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-sm-1">
+          
+        </div>
+        <div class="col-sm-3 pl-0">
+          <div class="form-group">
+            <span>Current Month:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-calendar-o" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="monthname" id="monthname" readonly="readonly">
+            </div>
+          </div>
+          </div>
+      
+        
+
+      </div>
+      <div class="row">
+        <div class="col-sm-1">
+          
+        </div>
+        <div class="col-sm-3 pl-0">
+          <div class="form-group" style="width: 330px;">
+            <span>Salary Date:</span>
+            <div *ngIf="btnmode; then DateToOn else DateTooff"> </div>
+            <ng-template #DateToOn>
+              <div class="input-group">
+                <input class="form-control" name="a" [(ngModel)]="salarydate.model"
+                       displayMonths="2" navigation="none" ngbDatepicker #a="ngbDatepicker">
+                <div class="input-group-append" style="margin-top: 5px;">
+                  <button class="btn btn-small" (click)="a.toggle()">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+            <ng-template #DateTooff>
+              <div class="input-group" style="width: 330px;margin-left: 30px;">
+                <input class="form-control" name="a" [(ngModel)]="salarydate.model"
+                       displayMonths="2" navigation="none" ngbDatepicker #a="ngbDatepicker" disabled="disabled">
+                <div class="input-group-append" style="margin-top: 5px;">
+                  <button class="btn btn-small" (click)="a.toggle()">
+                    <i class="fa fa-calendar" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+        <div class="col-sm-3" style="margin-left: 5vh;">
+          <div class="form-group">
+            <span>Office:</span>
+            <div class="inner-addon left-addon" style="width: 300px;margin-left: 30px;">
+              <i class="fa fa-building" style="font-size:medium;margin-top: 5px;" aria-hidden="true"></i>
+              <div *ngIf="btnmode; then OfficeOn else OfficeOff"> </div>
+              <ng-template #OfficeOn>
+                <select class="form-control" [(ngModel)]="officecode" id="officecode" tabindex="35" (change)="getEmployees(officecode)">
+                  <!-- <option value="0">Select...</option>-->
+                  <option *ngFor="let o of office" [value]="o.officecode">{{o.officename}}</option>
+                </select>
+              </ng-template>
+              <ng-template #OfficeOff>
+                <select class="form-control" [(ngModel)]="officecode" id="officecode" tabindex="35" disabled>
+                  <!-- <option value="0">Select...</option>-->
+                  <option *ngFor="let o of office" [value]="o.officecode">{{o.officename}}</option>
+                </select>
+              </ng-template>
+            </div>
+            </div>
+          </div>
+        
+        <div class="col-sm-3" style="margin-left: 8vh;">
+          <div class="input-group">
+            <span>Employee:</span>
+            <div class="inner-addon left-addon" style="margin-left: 30px;margin-top: 5px;">
+              <i class="fa fa-user" style="font-size:medium" aria-hidden="true"></i>
+              <div *ngIf="btnmode; then On else Off"> </div>
+              <ng-template #On>
+                <ng-select2 [data]="emplist" id="empcode" [value]="empmodel" (valueChanged)="getEmployeesChange($event)" [width]="300" placeholder="Select...">
+                </ng-select2>
+              </ng-template>
+              <ng-template #Off>
+                <ng-select2 [data]="emplist" id="empcode" [value]="empmodel" (valueChanged)="getEmployeesChange($event)" [width]="300" disabled="true">
+                </ng-select2>
+              </ng-template>
+            </div>
+            </div>
+          </div>
+
+      </div>
+      <div class="row">
+        <!--<div class="col-sm-2">
+          <span>Leave</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="leavefromto" readonly="readonly" />
+          </div>
+        </div>-->
+        <div class="col-sm-1">
+
+        </div>
+        <div class="col-sm-9" style="margin-bottom: 5px;">
+          <div *ngIf="btnmode; then checkOn else checkoff"> </div>
+          <ng-template #checkOn>
+
+            <button type="button" class="btn btn-small btn-warning tip pull-right" id="calculate" (click)="calculateSalary()">Calculate</button>
+          </ng-template>
+          <ng-template #checkoff>
+
+            <button type="button" class="btn btn-small btn-warning tip pull-right" id="calculate" (click)="calculateSalary()" hidden="hidden">Calculate</button>
+          </ng-template>
+        </div>
+      </div>
+      <div class="row" style="margin-left:5px;margin-right:5px;">
+        <div class="card-body table-responsive table-shadow-padding">
+          <table class="table table-hover table-striped table-shadow">
+            <thead>
+              <tr class="thclr">
+                <th style="width: 5%">SR #</th>
+                <th style="width: 15%">Employee Name</th>
+                <th style="width: 10%">Package</th>
+                <th style="width: 10%">Salary Days</th>
+                <th style="width: 10%">Month Days</th>
+                <th style="width: 10%">Payment</th>
+                <th style="width: 10%">Deduction</th>
+                <th style="width: 10%">Contribution</th>
+                <th style="width: 5%"></th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <tr *ngFor="let e of salary;let i = index">
+                <td>{{i + 1}}</td>
+                <td>{{e.emP_NAME}}</td>
+                <td>{{e.package | number: '1.2-5'}}</td>
+                <td>{{e.dayS_WORKED}}</td>
+                <td>{{e.daysinmonth}}</td>
+                <td>{{e.payment | number: '1.2-5'}}</td>
+                <td>{{e.deduction | number: '1.2-5'}}</td>
+                <td>{{e.contribution | number: '1.2-5'}}</td>
+
+
+                <div *ngIf="btnmode; then checkOn else checkoff"> </div>
+                <ng-template #checkOn>
+                  <td><input type="checkbox" [(ngModel)]="e.status"></td>
+                </ng-template>
+                <ng-template #checkoff>
+                  <td><input type="checkbox" [(ngModel)]="e.status" disabled="disabled"></td>
+                </ng-template>
+              </tr>
+
+
+
+            </tbody>
+          </table>
+
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <!--<button type="button" class="btn btn-small btn-warning tip" style="left:5px;position:absolute;" (click)="updateData();">Cancel</button>-->
+        <button id="submitAdd" type="button" class="btn btn-small btn-warning tip" (click)="saveData();">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i> Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <!--<button type="button" class="btn btn-small btn-warning tip" style="left:5px;position:absolute;" (click)="cancelData();">Cancel</button>
+        <button id="submitUpdate" type="button"  class="btn btn-small btn-warning tip"
+                (click)="updateData();">
+          Save..
+        </button>-->
+      </ng-template>
+      <button type="button" class="btn btn-small" (click)="c('Close click');">Close</button>
+    </div>
+  </ng-template>
+
+  <!----Salary Package---->
+  <ng-template #contentdetail let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Employee:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-user" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="uempname" id="uempname" readonly="readonly">
+            </div>
+          </div>
+
+          </div>
+        <div class="col-sm-2">
+          <span>Designation:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-user-md" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="udesignation" id="udesignation" readonly="readonly">
+            </div>
+          </div>
+          </div>
+        <div class="col-sm-2">
+          <span>Department:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-building-o" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="udepartment" id="udepartment" readonly="readonly">
+            </div>
+          </div>
+
+          </div>
+
+
+      </div>
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Office:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-building" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="uofficename" id="uofficename" readonly="readonly">
+            </div>
+          </div>
+          </div>
+        <div class="col-sm-2">
+          <span>Employement Type:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-legal" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="uemploymenttype" id="uemploymenttype" readonly="readonly">
+            </div>
+          </div>
+          </div>
+        <div class="col-sm-2">
+          <span>Joining Date:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-calendar-o" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="ujoiningdate" id="ujoiningdate" readonly="readonly">
+            </div>
+          </div>
+          </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-2">
+          <span>Package:</span>
+        </div>
+        <div class="col-sm-2">
+          <div class="form-group">
+            <div class="inner-addon left-addon">
+              <i class="fa fa-money" style="font-size:medium" aria-hidden="true"></i>
+              <input type="text" class="form-control" [(ngModel)]="upackage" id="upackage" readonly="readonly">
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+
+      <div class="row" style="margin-left:5px;margin-right:5px;margin-bottom:5px;">
+        <div style="width:32%;margin-left:10px;">
+          <button class=" btn btn-small btn-warning tip" style="margin:3px;" (click)="getArears('A',arear)">
+            <i class="fa fa-plus"></i>
+          </button>
+          <span>Allowances:</span>
+        </div>
+        <div style="width:32%;margin-left:10px;">
+          <button class=" btn btn-small btn-warning tip" style="margin:3px;" (click)="getArears('C',arear)">
+            <i class="fa fa-plus"></i>
+          </button>
+          <span>Contributions:</span>
+        </div>
+        <div style="width:32%;margin-left:10px;">
+          <button class=" btn btn-small btn-warning tip" style="margin:3px;" (click)="getArears('D',arear)">
+            <i class="fa fa-plus"></i>
+          </button>
+          <span>Deductions:</span>
+        </div>
+      </div>
+      <div class="row" style="margin-left:5px;margin-right:5px;">
+
+        <div style="width:32%;height:300px;margin-left:10px;overflow-y:auto;border:1px solid lightgray;">
+          <div class="form-group">
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr class="thclr">
+                  <th style="width: 5%"></th>
+                  <th style="width: 10%">Code</th>
+                  <th style="width: 45%">Description</th>
+                  <th style="width: 40%">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of uallowance;let i = index">
+
+                  <div *ngIf="e.isReadonly==1; then readonlyOn else readonlyOff"> </div>
+                  <ng-template #readonlyOn>
+                    <td></td>
+                    <td>{{e.allowancE_CODE}}</td>
+                    <td>{{e.allowancE_NAME}}</td>
+                    <td><input class="form-control" [ngModel]="e.amount  | number : '1.2-5'" (ngModelChange)="e.amount = $event" id="amount" disabled="disabled"></td>
+                  </ng-template>
+                  <ng-template #readonlyOff>
+                    <td></td>
+                    <td>{{e.allowancE_CODE}}</td>
+                    <td>{{e.allowancE_NAME}}</td>
+                    <td><input class="form-control" [ngModel]="e.amount  | number : '1.2-5'" (ngModelChange)="e.amount = $event" id="amount" disabled="disabled"></td>
+                    <!--  <td><input type="number" min="0" class="form-control" [(ngModel)]="e.amount" id="e.amount" (change)="calculateDeductionsTotal()"></td>-->
+                  </ng-template>
+
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div style="width:32%;height:300px;margin-left:10px;overflow-y:auto;border:1px solid lightgray;">
+          <div class="form-group">
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr class="thclr">
+                  <th style="width: 5%"></th>
+                  <th style="width: 10%">Code</th>
+                  <th style="width: 45%">Description</th>
+                  <th style="width: 40%">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let e of ucontribution;let i = index">
+
+                  <div *ngIf="e.isReadonly==1; then readonlyOn else readonlyOff"> </div>
+                  <ng-template #readonlyOn>
+                    <td></td>
+                    <td>{{e.allowancE_CODE}}</td>
+                    <td>{{e.allowancE_NAME}}</td>
+                    <td><input class="form-control" [ngModel]="e.amount  | number : '1.2-5'" (ngModelChange)="e.amount = $event" id="amount" disabled="disabled"></td>
+                  </ng-template>
+                  <ng-template #readonlyOff>
+                    <td></td>
+                    <td>{{e.allowancE_CODE}}</td>
+                    <td>{{e.allowancE_NAME}}</td>
+                    <td><input type="number" class="form-control" [ngModel]="e.amount  | number : '1.2-5'" (ngModelChange)="e.amount = $event" id="amount" disabled="disabled"></td>
+                    <!--<td><input type="number" min="0" class="form-control" [(ngModel)]="e.amount" id="e.amount" (change)="calculateDeductionsTotal()"></td>-->
+                  </ng-template>
+
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div style="width:32%;max-height:300px;margin-left:10px;overflow-y:auto;border:1px solid lightgray;">
+          <div class="form-group">
+            <table class="table table-hover table-striped">
+              <thead>
+                <tr class="thclr">
+                  <th style="width: 5%"></th>
+                  <th style="width: 10%">Code</th>
+                  <th style="width: 45%">Description</th>
+                  <th style="width: 40%">Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <tr *ngFor="let e of udeduction;let i = index">
+
+                  <div *ngIf="e.isReadonly==1; then readonlyOn else readonlyOff"> </div>
+                  <ng-template #readonlyOn>
+                    <td></td>
+                    <td>{{e.allowancE_CODE}}</td>
+                    <td>{{e.allowancE_NAME}}</td>
+                    <td><input class="form-control" [ngModel]="e.amount  | number : '1.2-5'" (ngModelChange)="e.amount = $event" id="amount" disabled="disabled"></td>
+                  </ng-template>
+                  <ng-template #readonlyOff>
+                    <td></td>
+                    <td>{{e.allowancE_CODE}}</td>
+                    <td>{{e.allowancE_NAME}}</td>
+                    <td><input class="form-control" [ngModel]="e.amount  | number : '1.2-5'" (ngModelChange)="e.amount = $event" id="amount" disabled="disabled"></td>
+                    <!--<td><input type="number" min="0" class="form-control" [(ngModel)]="e.amount" id="e.amount" (change)="calculateDeductionsTotal()"></td>-->
+                  </ng-template>
+
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+      <div class="row" style="margin-left:5px;margin-right:5px;margin-bottom:20px;">
+        <div style="width:22%;margin-left:10px;">
+          <div class="form-group" style="background-color:lightgray">
+            <span>Total Allowances:</span>
+          </div>
+        </div>
+        <div style="width:10%;">
+          <div class="form-group" style="background-color:lightgray">
+            <span>{{uallowancetotal | number: '1.2-5'}}</span>
+          </div>
+        </div>
+
+        <div style="width:22%;margin-left:10px;">
+          <div class="form-group" style="background-color:lightgray">
+            <span>Total Contributions:</span>
+          </div>
+        </div>
+        <div style="width:10%;">
+          <div class="form-group" style="background-color:lightgray">
+            <span>{{ucontributiontotal | number: '1.2-5'}}</span>
+          </div>
+        </div>
+
+        <div style="width:22%;margin-left:10px;">
+          <div class="form-group" style="background-color:lightgray">
+            <span>Total Deductions:</span>
+          </div>
+        </div>
+        <div style="width:10%;">
+          <div class="form-group" style="background-color:lightgray">
+            <span>{{udeductiontotal | number: '1.2-5'}}</span>
+          </div>
+        </div>
+
+      </div>
+
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Remarks:</span>
+        </div>
+        <div class="col-md-10">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-align-justify" style="font-size:medium" aria-hidden="true"></i>
+            <fieldset class="form-group">
+              <textarea [(ngModel)]="remarks" id="remarks" name="textarea" placeholder="Please type here..." class="form-control" style="height:auto;"
+                        rows="4" readonly="readonly"></textarea>
+            </fieldset>
+          </div>
+        </div>
+        </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <!-- <a class="btn btn-secondary" routerLink="/report-tab" newtab>Viewer</a>-->
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <button type="button" class="btn btn-small btn-warning tip" style="left:5px;position:absolute;" (click)="cancelSalary();"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Cancel</button>
+        <button id="submitUpdate" type="button" tabindex="45" class="btn btn-small btn-warning tip"
+                (click)="updateData();">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+
+      </ng-template>
+      <button type="button" class="btn btn-small" tabindex="46" (click)="c('Close click')"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+
+  <!--/////////////////AREAR////////////////-->
+  <ng-template #arear let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{arearlabel}}
+      </h5>
+
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-sm-4">
+          <span>Allowance Code:</span>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+
+            <select class="form-control" [(ngModel)]="uarearcode" id="uarear" (ngModelChange)="checkArear()">
+              <option *ngFor="let o of uarear" [value]="o.allowancE_CODE">{{o.allowancE_CODE}} : {{o.allowancE_NAME}}</option>
+            </select>
+
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-4">
+          <span>Amount:</span>
+        </div>
+        <div class="col-sm-6">
+          <div class="form-group">
+
+            <input type="number" onClick="this.select();" [(ngModel)]="uarearamount" class="form-control" min="1" />
+
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button [style.display]="permissionUtility.PermissionEdit" id="submitUpdate" type="button" tabindex="45" class="btn btn-small btn-warning tip" (click)="addArear();" [style.display]="uarearsave"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close</button>
+      <button type="button" class="btn btn-small" tabindex="46" id="x" (click)="c('Close click')"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+
+</div>

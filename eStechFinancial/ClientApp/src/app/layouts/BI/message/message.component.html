@@ -1,0 +1,153 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> Message Notification
+            <!-- {{FUNCTIONALITYNAME}} -->
+          </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" name="search" [(ngModel)]="stitle" placeholder="search..."
+              style="float:left; width:100px;margin:3px;">
+            <button class=" btn btn-small btn-warning tip" style="margin:3px;"
+              id="myInput" [style.display]="permissionUtility.PermissionAdd" (click)="open(content)">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+     
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow" >
+          <thead>
+            <tr class="thclr">
+              <th style="width: 10%">Title</th>
+              <th style="width: 10%">Type</th>
+              <th style="width: 50%">Message</th>
+              
+              <th style="width: 10%">Is Default</th>
+              <th style="width: 10%"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <!--<spinner [visible]="isLoading" style="position: absolute;left: 50%; "></spinner>-->
+            <tr *ngFor="let p of gridlist  | filter:stitle|  paginate: { itemsPerPage: 14, currentPage: p};">
+              <td>{{p.title}}</td>
+              <td>{{p.type}}</td>
+              <td>{{p.message}}</td>
+              
+              <td>
+                {{(p.isDefault==true?'Yes':'No')}}
+              </td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <button  [style.display]="permissionUtility.PermissionEdit"  class="btn btn-small btn-warning tip" (click)="getDetailByID(p.templateID,content)"
+                     id="edit">
+                    <span class="fa fa-pencil"></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+
+<div class="row" >
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header" style="padding-bottom: 30px;">
+      <h5 class="modal-title" style="font-weight: bold;">
+        New Message
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click');">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class='row' style="margin-left: 15%;">
+
+        <div class="col-md-8 " style="height: 30px;margin-top: 40px;">
+          <span>Title:</span>
+        </div>
+        <div class="col-md-8">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-align-justify" style="height: 30px; padding-top: 8px;" aria-hidden="true"></i>
+            <div class="form-group">
+              <input [(ngModel)]="title" tabindex="27" id="remarks"  name="textarea" placeholder="Enter your title..."
+                class="form-control" style="height:auto;width:500px;">
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class='row' style="    margin-left: 15%;">
+        <div class="col-md-8" style="height: 30px;">
+          <span>Type:</span>
+        </div>
+        <div class="col-sm-8">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-align-justify" style="height: 30px; padding-top: 8px;" aria-hidden="true"></i>
+            <div class="form-group">
+              <ng-select2 [data]="data" id="code" [value]="type" (valueChanged)="changeType($event)" [width]="430"></ng-select2>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class='row' style="    margin-left: 15%;">
+
+        <div class="col-md-8" style="height: 30px;margin-top:10px;">
+          <span>Message:</span>
+        </div>
+        <div class="col-md-8">
+          <div class="inner-addon left-addon">
+            <i class="fa fa-align-justify" style="height: 63.59px; padding-top: 26px;" aria-hidden="true"></i>
+            <fieldset class="form-group">
+              <textarea [(ngModel)]="message" tabindex="27" id="remarks" name="textarea"
+                placeholder="Enter your message..." class="form-control" style="height:auto;width:500px;" rows="4"></textarea>
+            </fieldset>
+          </div>
+        </div>
+
+      </div>
+      <div class='row' style="margin-left: 15%;">
+        <div class="col-sm-8">
+
+        </div>
+        <div class="col-sm-8 mt-4">
+          <div class="form-group">
+            <span>Default</span>
+            <input type="checkbox" id="checkbox" style="margin-left:5px;" [(ngModel)]="isDefault" id="isDefault"
+              name="active" />
+          </div>
+        </div>
+      </div> 
+    </div>
+    <div class="modal-footer" style="margin-bottom: 10px;padding-top: 15px;">
+
+
+      <div *ngIf="btnmode; then submitAdd else submitUpdate"> </div>
+      <ng-template #submitAdd>
+        <button id="submitAdd" type="button" tabindex="3" class="btn btn-small btn-warning tip" (click)="saveMessage();">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+      <ng-template #submitUpdate>
+        <button  id="submitUpdate" type="button" tabindex="3"
+          class="btn btn-small btn-warning tip" (click)="updateMessage();">
+          <i class="fa fa-floppy-o" aria-hidden="true"></i>Save & Close
+        </button>
+      </ng-template>
+      <button type="button" class="btn btn-small" (click)="c('Close click');"><i class="fa fa-window-close-o" aria-hidden="true"></i>Close</button>
+    </div>
+  </ng-template>
+</div>

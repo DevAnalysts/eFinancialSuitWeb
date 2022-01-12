@@ -1,0 +1,624 @@
+<!-- Row -->
+<div class="row">
+  <div class="col-md-12">
+    <div class="card card-outline-info">
+
+      <div class="row card-header">
+        <div class="col-md-10" style="padding-top:5px;">
+          <span style="font-size:large;font-weight:bold;"> {{permissionUtility.FUNCTIONALITYNAME}} </span>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input type="text" style="margin-right:5px;" #input (keydown.enter)='$event.target.blur()' (blur)="getVoucherPosting(input.value)" [(ngModel)]="ID" id="ID" placeholder="search..." class="form-control" />
+          </div>
+        </div>
+      </div>
+
+
+      <spinner [visible]="isLoading" style="position: absolute;left: 50%; z-index:100000"></spinner>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>Voucher ID</th>
+              <th>Voucher#</th>
+              <th>Voucher Date</th>
+              <th>Office</th>
+              <th>Amount</th>
+              <th><input type="checkbox" [(ngModel)]="selectedAll" (change)="selectAll(); checkIfAllSelected();" />Post All</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+
+            <tr *ngFor="let dt of vouchers | paginate: { itemsPerPage: 19, currentPage: p};">
+              <td>{{dt.voucher_ID}}</td>
+              <td>{{dt.journalNo }}</td>
+              <td>{{dt.voucheR_DATE| date:"dd/MM/yy" }}</td>
+              <td>{{dt.officE_NAME }}</td>
+              <td>{{dt.net_Paied}}</td>
+              <td><input type="checkbox" [(ngModel)]="dt.posteD_BY" (change)="checkIfAllSelected();" /></td>
+              <td>
+                <div class="btn-group" style="float:right; ">
+                  <div *ngIf="dt.voucher_ID != null">
+                    <button class="btn btn-small btn-warning tip" style="padding: 6px 7px;" id="edit" style="margin-right: 5px;" (click)="changeVoucherStatus(dt.voucher_ID,4)">
+                      <span class="fa fa-check"></span>
+                    </button>
+                  </div>
+                  
+                  <div *ngIf="dt.type==2; then BPV else A "> </div>
+                  <ng-template #BPV>
+                    <button class="btn btn-small btn-warning tip" style="padding: 6px 7px;" id="edit" (click)="getDetailsByID(dt.voucher_ID,2,content)">
+                      <span ><img src="../../../../../../assets/images/icon/report.png" ></span>
+                    </button>
+                  </ng-template>
+                  <ng-template #A>
+                    <div *ngIf="dt.type==4; then BPR else AA "> </div>
+                    <ng-template #BPR>
+                      <a class="btn btn-small btn-warning tip" style="padding: 6px 7px;" id="edit" (click)="getDetailsByID(dt.voucher_ID,4,content)">
+                        <span ><img src="../../../../../../assets/images/icon/report.png" ></span>
+                      </a>
+                    </ng-template>
+                    <ng-template #AA>
+                      <div *ngIf="dt.type==1; then CPV else AAA "> </div>
+                      <ng-template #CPV>
+                        <a class="btn btn-small btn-warning tip" style="padding: 6px 7px;" id="edit" (click)="getDetailsByID(dt.voucher_ID,1,contentcash)">
+                          <span ><img src="../../../../../../assets/images/icon/report.png" ></span>
+                        </a>
+                      </ng-template>
+                      <ng-template #AAA>
+                        <div *ngIf="dt.type==3; then CRV else JV "> </div>
+                        <ng-template #CRV>
+                          <a class="btn btn-small btn-warning tip" style="padding: 6px 7px;" id="edit" (click)="getDetailsByID(dt.voucher_ID,3,contentcash)">
+                            <span ><img src="../../../../../../assets/images/icon/report.png" ></span>
+                          </a>
+                        </ng-template>
+                        <ng-template #JV>
+                          <a class="btn btn-small btn-warning tip" style="padding: 6px 7px;" id="edit" (click)="getDetailsByID(dt.voucher_ID,0,contentJV)">
+                            <span ><img src="../../../../../../assets/images/icon/report.png" ></span>
+                          </a>
+                        </ng-template>
+                      </ng-template>
+                    </ng-template>
+                  </ng-template>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+      <div class="modal-footer">
+        <button id="." type="button" class="btn btn-small btn-warning tip" (click)="voucherPosting()">
+          Save
+        </button>
+        <!-- <button type="button" class="btn btn-small" >Close</button> -->
+      </div>
+    </div>
+  </div>
+</div>
+<!-- End Row -->
+<!-- Row -->
+<div class="row">
+  
+  <!-- BPV <===========> BRV -->
+  <ng-template #content let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        {{permissionUtility.FUNCTIONALITYDETAILNAME}}
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Payment Date	:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="voucheR_DATE.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="changeVDate($event)" disabled>
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()" disabled>
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <span>Office:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <select class="form-control" [(ngModel)]="officE_CODE" id="officE_CODE" disabled>
+              <option *ngFor="let u of offices " [value]="u.officE_CODE">{{u.officE_NAME}}</option>
+            </select>
+
+          </div>
+        </div>
+        <!--<div class="col-md-2">
+          <span>Method:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <select id="pay_Method" [(ngModel)]="pay_Method" class="form-control" disabled>
+              <option *ngFor="let p of paymentMethod" [value]="p.pay_Method">{{p.payment_Method}}</option>
+            </select>
+
+
+          </div>
+        </div>-->
+
+      </div>
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Bank Accounts:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <select class="form-control" [(ngModel)]="bank_Acct_No" id="bank_Acct_No" disabled>
+              <option *ngFor="let u of bankAccounts " [value]="u.bank_Acct_No">{{u.bank_Acct_TITLE}}</option>
+            </select>
+
+
+          </div>
+        </div>
+        <div class="col-md-2">
+          <span>Cheque No	:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="chequE_NO" readonly>
+          </div>
+        </div>
+
+
+        <div class="col-md-2">
+          <span>Cheque Date:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="chequE_DATE.model" ngbDatepicker #ddd="ngbDatepicker" disabled>
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="ddd.toggle()" disabled>
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>Amount	:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <input type="number" min="0" class="form-control" [(ngModel)]="amount" disabled>
+
+          </div>
+
+        </div>
+
+        <div class="col-md-2" [style.display]="showpayto">
+          <span>Pay To	:</span>
+        </div>
+        <div class="col-md-2" [style.display]="showpayto">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="payto" disabled>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div class="row" style="width:102%">
+        <table class="table table-hover table-striped" style="width:100%">
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:8%;margin-left:15px;">Sr#.</th>
+              <th style="width:50%">Account Information</th>
+              <th style="width:20%">Memo</th>
+              <th style="width:20%">Amount</th>
+
+            </tr>
+          </thead>
+          <tbody style="max-height: 300px;overflow: hidden scroll;display: block;width:100.5%;">
+            <tr class="row" *ngFor="let i of voucherDetails let idx = index">
+              <td style="width:8%;margin-left:15px;">{{idx+1}}</td>
+              <td style="width:50%">
+
+                <span>{{i.accounT_TITLE}}</span>
+
+              </td>
+              <td style="width:20%">
+
+                <span>{{i.particulars}}</span>
+
+              </td>
+              <td style="width:20%">
+                <div *ngIf="voucheR_TYPE_CODE==2; then BPVDebit else BRVCredit"> </div>
+                <ng-template #BPVDebit>
+                  <span>{{i.debit}}</span>
+                </ng-template>
+                <ng-template #BRVCredit>
+                  <span>{{i.credit}}</span>
+                </ng-template>
+              </td>
+
+            </tr>
+
+          </tbody>
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:8%;margin-left:15px;"></th>
+              <th style="width:50%">Total:</th>
+              <th style="width:20%"></th>
+
+              <div *ngIf="voucheR_TYPE_CODE==2; then BPVTDebit else BRVTCredit"> </div>
+              <ng-template #BPVTDebit>
+                <th style="width:20%">{{TotalDebit()}}</th>
+              </ng-template>
+              <ng-template #BRVTCredit>
+                <th style="width:20%">{{TotalCredit()}}</th>
+              </ng-template>
+            </tr>
+          </thead>
+
+        </table>
+
+      </div>
+      <div class="row">
+        <div class="col-md-1">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-5">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="row" style="position: absolute;left: 30px;">
+
+        <!--Post Voucher-->
+        <button type="button" id="PostBtn" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="changeVoucherStatus(voucheR_ID , '4' );"><i class="fa fa-check" aria-hidden="true"></i> Post</button>
+      </div>
+
+      <button type="button" class="btn btn-small" (click)="c('Close click')"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Close</button>
+
+    </div>
+  </ng-template>
+
+  <!-- CPV <===========> CRV-->
+  <ng-template #contentcash let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        <div *ngIf="voucheR_TYPE_CODE==1; then CPVTITLE else CRVTITLE"> </div>
+
+        <ng-template #CPVTITLE>
+          Cash Payment Voucher Post Detail
+        </ng-template>
+        <ng-template #CRVTITLE>
+          Cash Reciept Voucher Post Detail
+        </ng-template>
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Payment Date	:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="voucheR_DATE.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="changeVDate($event)" disabled>
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()" disabled>
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <span>Office:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <select class="form-control" [(ngModel)]="officE_CODE" id="officE_CODE" disabled>
+              <option *ngFor="let u of offices " [value]="u.officE_CODE">{{u.officE_NAME}}</option>
+            </select>
+
+
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <span>Cash Accounts:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <select class="form-control" [(ngModel)]="bank_Acct_No" id="bank_Acct_No" disabled>
+              <option *ngFor="let u of bankAccounts " [value]="u.bank_Acct_No">{{u.bank_Acct_TITLE}}</option>
+            </select>
+
+
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+
+        <div class="col-md-2">
+          <span>Amount	:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <input type="number" min="0" class="form-control" [(ngModel)]="amount" disabled>
+
+          </div>
+
+        </div>
+
+        <div class="col-md-2" [style.display]="showpayto">
+          <span>Pay To	:</span>
+        </div>
+        <div class="col-md-2" [style.display]="showpayto">
+          <div class="form-group">
+            <input type="text" class="form-control" [(ngModel)]="payto" disabled>
+          </div>
+        </div>
+
+
+      </div>
+
+      <div class="row" style="width:102%">
+
+        <table class="table table-hover table-striped" style="width:100%">
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:8%;margin-left:15px;">Sr#.</th>
+              <th style="width:50%">Account Information</th>
+              <th style="width:20%">Memo</th>
+              <th style="width:20%">Amount</th>
+            </tr>
+          </thead>
+          <tbody style="max-height: 300px;overflow: hidden scroll;display: block;width:100.5%;">
+            <tr class="row" *ngFor="let i of voucherDetails let idx = index">
+              <td style="width:8%;margin-left:15px;">{{idx+1}}</td>
+              <td style="width:50%">
+                <span>{{i.accounT_TITLE}}</span>
+              </td>
+              <td style="width:20%">
+                <span>{{i.particulars}}</span>
+              </td>
+              <td style="width:20%">
+                <div *ngIf="voucheR_TYPE_CODE==1; then CPVDebit else CRVCredit"> </div>
+
+                <ng-template #CPVDebit>
+                  <span>{{i.debit}}</span>
+                </ng-template>
+                <ng-template #CRVCredit>
+                  <span>{{i.credit}}</span>
+                </ng-template>
+              </td>
+
+            </tr>
+
+          </tbody>
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:8%;margin-left:15px;"></th>
+              <th style="width:50%">Total:</th>
+              <th style="width:20%"></th>
+              <div *ngIf="voucheR_TYPE_CODE==1; then CPVTDebit else CRVTCredit"> </div>
+              <ng-template #CPVTDebit>
+                <th style="width:20%">{{TotalDebit()}}</th>
+              </ng-template>
+              <ng-template #CRVTCredit>
+                <th style="width:20%">{{TotalCredit()}}</th>
+              </ng-template>
+
+
+            </tr>
+          </thead>
+
+        </table>
+
+      </div>
+      <div class="row">
+        <div class="col-md-1">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-5">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+
+      </div>
+    </div>
+    <div class="modal-footer">
+      <div class="row" style="position: absolute;left: 30px;">
+        <!--Post Voucher-->
+        <button type="button" id="PostBtn" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="changeVoucherStatus(voucheR_ID,4);"><i class="fa fa-check" aria-hidden="true"></i> Post</button>
+      </div>
+      <button type="button" class="btn btn-small" (click)="c('Close click')"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Close</button>
+
+    </div>
+  </ng-template>
+
+  <!-- JV <===========> JV-->
+  <ng-template #contentJV let-c="close" let-d="dismiss">
+    <div class="modal-header">
+      <h5 class="modal-title" style="font-weight: bold;">
+        Journal Voucher Post Detail
+      </h5>
+      <button type="button" class="close" aria-label="Close" (click)="d('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div id="alertWarning" style="display:none">
+      <p *ngFor="let alert of alerts">
+        <ngb-alert [type]="alert.type">{{ alert.message }}</ngb-alert>
+      </p>
+    </div>
+
+    <div class="modal-body">
+
+      <div class="row">
+        <div class="col-md-2">
+          <span>Transaction Date	:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <div class="input-group">
+              <input class="form-control" name="dp" [(ngModel)]="voucheR_DATE.model" ngbDatepicker #dd="ngbDatepicker" (ngModelChange)="changeVDate($event)" disabled>
+              <div class="input-group-append">
+                <button class="btn btn-small " (click)="dd.toggle()">
+                  <i class="fa fa-calendar" aria-hidden="true"></i>
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-md-2">
+          <span>Office:</span>
+        </div>
+        <div class="col-md-2">
+          <div class="form-group">
+
+            <select class="form-control" [(ngModel)]="officE_CODE" id="officE_CODE" disabled>
+              <option *ngFor="let u of offices " [value]="u.officE_CODE">{{u.officE_NAME}}</option>
+            </select>
+
+          </div>
+        </div>
+      </div>
+
+      <div class="row" style="width:102%">
+
+        <table class="table table-hover table-striped" style="width:100%">
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;">Sr#.</th>
+              <th style="width:40%">Account Information</th>
+              <th style="width:15%">Memo</th>
+              <th style="width:10%">Debit</th>
+              <th style="width:10%">Credit</th>
+              <th style="width:15%"></th>
+            </tr>
+          </thead>
+          <tbody style="max-height: 300px;overflow: hidden scroll;display: block;width:100.5%;">
+            <tr class="row" *ngFor="let i of voucherDetails let idx = index">
+              <td style="width:5%;margin-left:15px;">{{idx+1}}</td>
+              <td style="width:40%">
+                <span ng-show="editMode">{{i.accounT_TITLE}}</span>
+              </td>
+              <td style="width:15%">
+                <div *ngIf="i.edit_Mode; then selectPrice else viewPrice"> </div>
+                <span ng-show="editMode">{{i.particulars}}</span>
+              </td>
+              <td style="width:10%">
+                <span ng-show="editMode">{{i.debit}}</span>
+              </td>
+              <td style="width:10%">
+                <span ng-show="editMode">{{i.credit}}</span>
+              </td>
+              <td style="width:15%"></td>
+            </tr>
+
+          </tbody>
+          <thead style="display: block;width:99%;">
+            <tr class="thclr row">
+              <th style="width:5%;margin-left:15px;"></th>
+              <th style="width:40%"></th>
+              <th style="width:15%">Total:</th>
+              <th style="width:10%">{{TotalDebit()}}</th>
+              <th style="width:10%">{{TotalCredit()}}</th>
+              <th style="width:15%">Difference: {{TotalDebit()-TotalCredit()}}</th>
+            </tr>
+
+          </thead>
+
+        </table>
+
+      </div>
+      <div class="row">
+        <div class="col-md-1">
+          <span>Description:</span>
+        </div>
+        <div class="col-md-5">
+          <fieldset class="form-group">
+            <textarea [(ngModel)]="remarks" name="textarea" placeholder="Please text here..." class="form-control" style="height:auto;"
+                      rows="4"></textarea>
+          </fieldset>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <div class="row" style="position: absolute;left: 30px;">
+
+        <!--Post Voucher-->
+        <button type="button" id="postBtn" style=" cursor:pointer; margin-right:5px;" class="btn btn-small btn-warning tip" (click)="changeVoucherStatus(voucheR_ID,4);"><i class="fa fa-check" aria-hidden="true"></i> Post</button>
+      </div>
+
+
+      <button type="button" class="btn btn-small" (click)="c('Close click')"><i class="fa fa-minus-square-o" aria-hidden="true"></i>Close</button>
+
+    </div>
+  </ng-template>
+  </div>

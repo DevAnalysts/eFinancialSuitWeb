@@ -1,0 +1,112 @@
+
+<div class='container-fluid'>
+  <div class='row'>
+    <div id="PageGrid" [class]="card1style">
+      <div class="row  card-header" style="height:40px;">
+        <div class="col-md-10" style="padding-top:5px;">
+          <div class="page-title-list">
+            <span style="font-size:large;font-weight:bold;">{{permissionUtility.FUNCTIONALITYNAME}}</span>
+          </div>
+        </div>
+        <div class="col-md-2">
+          <div class="input-group pull-right">
+            <input class="form-control" type="text" #input (keydown.enter)='$event.target.blur()' (blur)="getGrid(input.value)" name="search" placeholder="search..." [(ngModel)]="itemcode" style="float:left; width:100px;margin:3px;">
+            <button [style.display]="permissionUtility.PermissionAdd" class=" btn btn-small btn-warning tip"  style="margin:3px;" (click)="Add()" [style.display]="addbutton">
+              <i class="fa fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-body table-responsive table-shadow-padding">
+        <table class="table table-hover table-striped table-shadow">
+          <thead>
+            <tr class="thclr">
+              <th>ID</th>
+              <th>Name</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of grid | paginate: { itemsPerPage: 20, currentPage: p};">
+              <td>{{u.itemcode}}</td>
+              <td>{{u.itemname}}</td>
+              <td>
+                <div *ngIf="true == u.status; then on else off"></div>
+                <ng-template #on>
+                  Active
+                </ng-template>
+                <ng-template #off>
+                  Disabled
+                </ng-template>
+                <div class="btn-group" style="float:right; " [style.display]="addbutton">
+                  <button [style.display]="permissionUtility.PermissionEdit"  class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.itemcode);Edit();" id="edit">
+                    <span class="fa fa-pencil "></span>
+                  </button>
+                  <button [style.display]="permissionUtility.PermissionView" style="padding: 6px 7px;"  class="btn btn-small btn-warning tip" (click)="getDetailsByID(u.itemcode);View();" id="view">
+                    <span><img src="../../../../../../assets/images/icon/report.png" ></span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <pagination-controls (pageChange)="p = $event" style="float:right;"></pagination-controls>
+      </div>
+
+    </div>
+    <div id="frm" [class]="card2style" style="padding:0px;margin:0px;border:0px;" [style.display]="card2display">
+
+      <div class="card-header" style="height:40px;">
+        <div class="page-title-list">
+          <span style="font-size:large;font-weight:bold;">     {{permissionUtility.FUNCTIONALITYDETAILNAME}}</span>
+        </div>
+      </div>
+
+      <div class="card-body" style="margin-top:20px;">
+        <div class='container-fluid'>
+          <div class='row'>
+            <div class="col-md-4">
+              <span>Name</span>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <input type="text" class="form-control" required maxlength="100" (keypress)="valid.onlyAlphabet($event)" [(ngModel)]="itemname" id="itemname">
+              </div>
+            </div>
+          </div>
+          <div class='row'>
+            <div class="col-md-4">
+              <span>Asset Sub Category</span>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <select class="form-control" [(ngModel)]="subcategorycode" id="subcategorycode">
+                  <option *ngFor="let m of subcategory" [value]="m.subcategorycode">{{m.subcategoryname}}</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <span>Status</span>
+            </div>
+            <div class="col-md-6">
+              <div class="form-group">
+                <input type="checkbox" [(ngModel)]="status" id="status" (change)="checkValue(status?true:false)" />
+              </div>
+            </div>
+          </div>
+          <div class='row'>
+            <div class="col-md-4"></div>
+            <div class="col-md-6">
+
+              <button type="button" class="btn" style="float:right;margin:3px;" (click)="Cancel()"><i class="fa fa-window-close-o" aria-hidden="true"></i>Cancel</button>
+              <button type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp1" (click)=" saveData()"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save</button>
+              <button [style.display]="permissionUtility.PermissionEdit" type="button" class="btn btn-warning tip" style="float:right;margin:3px;" [style.display]="ShowEmp2" (click)=" updateData()"><i class="fa fa-floppy-o" aria-hidden="true"></i>Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
